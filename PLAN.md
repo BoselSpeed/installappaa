@@ -13,14 +13,18 @@ Working features:
 - Bilingual UI (Arabic default) with RTL/LTR document direction switching
 - Navigation: sticky navbar with language toggle, desktop sidebar, footer
 - Home, Sections, Lesson reader, Search, Favorites, Settings, Quiz pages
-- Lesson reader: localized content blocks, font-size setting, reading progress,
-  prev/next navigation, mark-complete and bookmark actions
+- Four books read as in-app PDFs (Kitab al-Tawhid, Thalathat al-Usul,
+  Al-Aqidah al-Wasitiyyah, Kashf al-Shubuhat) with page navigation, zoom,
+  jump-to-page, download, and per-page reading progress
 - Search across lesson/section titles and lesson content with highlighting
 - Quiz player: progress, scoring, results, review mode with explanations,
   retake; seeded quizzes for every lesson
 - Progress & settings persistence (localStorage in demo mode, Firestore when
   configured); demo account + sign-out
-- Service worker asset caching (public/sw.js)
+- **Installable PWA** (vite-plugin-pwa, Workbox): offline-first caching of the
+  app shell, all JS/CSS/worker assets, and all four book PDFs; Arabic manifest
+  (تطبيق الفقه) with standalone display, icons (192/512/maskable), RTL
+  - Build output goes to `تطبيق الفقه/`; verified fully functional offline
 - ESLint config and typecheck pass
 
 Remaining work: real Firebase auth flows, content management/admin, advanced

@@ -20,7 +20,7 @@ module.exports = {
   settings: {
     react: { version: '18.3' }
   },
-  ignorePatterns: ['dist', 'node_modules', '*.log'],
+  ignorePatterns: ['dist', 'تطبيق الفقه', 'node_modules', '*.log'],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',

@@ -1,7 +1,7 @@
 {
-  "app_name": "Islamic Fiqh Learning App",
-  "welcome_message": "Welcome to the Islamic Fiqh Learning App",
-  "welcome_hint": "Read and study the treatise Kashf al-Shubuhat by Imam Muhammad ibn Abd al-Wahhab inside the app, with progress tracking and offline reading.",
+  "app_name": "Fiqh App",
+  "welcome_message": "Welcome to the Fiqh App",
+  "welcome_hint": "Read and study the books of Tawheed and creed: Kitab al-Tawhid, Thalathat al-Usul, Al-Aqidah al-Wasitiyyah, and Kashf al-Shubuhat — inside the app, with progress tracking and offline reading.",
   "start_learning": "Start Learning",
   "browse_sections": "Browse Sections",
   "search_placeholder": "Search lessons...",
