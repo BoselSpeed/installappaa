@@ -1,6 +1,6 @@
 // Mock (demo) service layer used when Firebase is not configured.
-// All data is persisted to localStorage and seeded with the uploaded book
-// (Kashf al-Shubuhat, read as a PDF inside the application).
+// All data is persisted to localStorage and seeded with the uploaded books
+// (Kashf al-Shubuhat and Matn Thalathat al-Usul, read as PDFs inside the app).
 
 const KEYS = {
   seedVersion: 'fiqh_demo_seed_version',
@@ -17,7 +17,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'book-v1';
+const SEED_VERSION = 'book-v2';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -31,6 +31,14 @@ const seedSections = [
     description_ar: 'رسالة للإمام محمد بن عبد الوهاب تكشف الشبهات التي يثيرها المخالفون حول التوحيد وعبادة الله وحده، مع الرد عليها بالأدلة من الكتاب والسنة.',
     description_en: 'A treatise by Imam Muhammad ibn Abd al-Wahhab unveiling the ambiguities raised against Tawheed and the worship of Allah alone, responding to them with evidence from the Quran and Sunnah.',
     order: 1
+  },
+  {
+    id: 'thalatha-al-usul',
+    title_ar: 'متن ثلاثة الأصول وأدلتها',
+    title_en: 'Thalathat al-Usul',
+    description_ar: 'متن للإمام محمد بن عبد الوهاب في الأصول الثلاثة التي يجب على كل مسلم معرفتها والعمل بها: معرفة العبد ربه، ومعرفة دينه، ومعرفة نبيه ﷺ، مع أدلتها من الكتاب والسنة.',
+    description_en: 'A text by Imam Muhammad ibn Abd al-Wahhab on the three fundamentals every Muslim must know and act upon: knowing his Lord, his religion, and his Prophet, with their evidences from the Quran and Sunnah.',
+    order: 2
   }
 ];
 
@@ -44,10 +52,20 @@ const seedLessons = [
     pages: 60,
     title_ar: 'كشف الشبهات — النص الكامل (PDF)',
     title_en: 'Kashf al-Shubuhat — Full Text (PDF)'
+  },
+  {
+    id: 'thalatha-book',
+    sectionId: 'thalatha-al-usul',
+    order: 1,
+    level: 'beginner',
+    pdfUrl: '/books/thalathat-al-usul.pdf',
+    pages: 21,
+    title_ar: 'متن ثلاثة الأصول وأدلتها — النص الكامل (PDF)',
+    title_en: 'Thalathat al-Usul — Full Text (PDF)'
   }
 ];
 
-// The book is read as a PDF; no text blocks or quizzes are seeded.
+// The books are read as PDFs; no text blocks or quizzes are seeded.
 const seedContent = [];
 
 const seedQuizzes = [];
