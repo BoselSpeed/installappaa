@@ -1,6 +1,7 @@
 {
   "app_name": "Islamic Fiqh Learning App",
   "welcome_message": "Welcome to the Islamic Fiqh Learning App",
+  "welcome_hint": "Learn the rulings of Islamic jurisprudence through structured lessons, quizzes and progress tracking — available offline.",
   "start_learning": "Start Learning",
   "browse_sections": "Browse Sections",
   "search_placeholder": "Search lessons...",
@@ -60,5 +61,21 @@
   "lesson_level": "Lesson Level",
   "beginner": "Beginner",
   "intermediate": "Intermediate",
-  "advanced": "Advanced"
+  "advanced": "Advanced",
+  "all_rights_reserved": "All rights reserved.",
+  "account": "Account",
+  "guest": "Guest",
+  "demo_mode": "Demo mode (local data)",
+  "sign_out": "Sign Out",
+  "signed_out": "You have been signed out.",
+  "data": "Data",
+  "clear_cache": "Clear Cache",
+  "cache_cleared": "Cache cleared. Reloading...",
+  "font_preview": "This is how lesson text will look with the selected font size.",
+  "legal": "Legal",
+  "no_quiz": "No quiz is available for this lesson yet.",
+  "back_to_lesson": "Back to Lesson",
+  "review_answers": "Review Answers",
+  "explanation": "Explanation",
+  "reading_progress": "Reading Progress"
 }

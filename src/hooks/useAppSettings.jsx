@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { appSettingsService } from '../firebase/service';
 import { useTranslation } from 'react-i18next';
 
@@ -19,11 +19,10 @@ export const AppSettingsProvider = ({ children }) => {
 
   useEffect(() => {
     if (!userId) {
-      const defaultLanguage = navigator.language.startsWith('ar') ? 'ar' : 'en';
       setSettings({
         id: 'default',
         userId: 'default',
-        language: defaultLanguage,
+        language: 'ar',
         fontSize: 'medium',
         theme: 'light'
       });
@@ -41,11 +40,10 @@ export const AppSettingsProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error fetching app settings:', error);
-        const defaultLanguage = navigator.language.startsWith('ar') ? 'ar' : 'en';
         setSettings({
           id: 'default',
           userId: userId,
-          language: defaultLanguage,
+          language: 'ar',
           fontSize: 'medium',
           theme: 'light'
         });
@@ -55,7 +53,7 @@ export const AppSettingsProvider = ({ children }) => {
     };
 
     loadSettings();
-  }, [userId, i18n.language]);
+  }, [userId, i18n]);
 
   const updateUserId = useCallback((id) => {
     setUserId(id);

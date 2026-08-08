@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { lessonsService } from '../firebase/service';
 
 export const useLessonsService = () => {

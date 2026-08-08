@@ -526,11 +526,11 @@ try {
 // ---------------------------------------------------------------------------
 
 export const mockAuthService = {
-  signUp: async (email, password) => {
+  signUp: async (email, _password) => {
     await delay();
     return { ...DEMO_USER, email };
   },
-  signIn: async (email, password) => {
+  signIn: async (email, _password) => {
     await delay();
     return { ...DEMO_USER, email };
   },
@@ -732,7 +732,7 @@ export const mockAppSettingsService = {
     return {
       id: userId,
       userId,
-      language: navigator.language.startsWith('ar') ? 'ar' : 'en',
+      language: 'ar',
       fontSize: 'medium',
       theme: 'light',
       createdAt: now,

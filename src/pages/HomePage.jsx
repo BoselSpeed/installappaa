@@ -11,24 +11,22 @@ const HomePage = () => {
 
   return (
     <div className="space-y-8">
-      <WelcomeSection 
-        title={t('welcome_message')} 
-        description={t('app_name')} 
-        ctaText={t('start_learning')} 
+      <WelcomeSection
+        title={t('welcome_message')}
+        description={t('welcome_hint')}
+        ctaText={t('start_learning')}
         ctaUrl="/sections"
         secondaryText={t('browse_sections')}
         secondaryUrl="/sections"
       />
-      
-      <div className="grid gap-6">
-        <div className="lg:col-span-2">
-          <SearchBar placeholder={t('search_placeholder')} />
-        </div>
-        
+
+      <SearchBar placeholder={t('search_placeholder')} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
           <RecentActivity progress={progress} />
         </div>
-        
+
         <div className="lg:col-span-2">
           <SectionGrid title={t('sections')} />
         </div>

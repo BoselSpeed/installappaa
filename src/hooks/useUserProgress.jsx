@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { userProgressService } from '../firebase/service';
 
 const UserProgressContext = createContext(null);

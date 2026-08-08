@@ -254,7 +254,7 @@ const realAppSettingsService = {
     return {
       id: userId,
       userId,
-      language: navigator.language.startsWith('ar') ? 'ar' : 'en',
+      language: 'ar',
       fontSize: 'medium',
       theme: 'light',
       createdAt: now,
