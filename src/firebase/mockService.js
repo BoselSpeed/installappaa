@@ -1,6 +1,7 @@
 // Mock (demo) service layer used when Firebase is not configured.
 // All data is persisted to localStorage and seeded with the uploaded books
-// (Kashf al-Shubuhat and Matn Thalathat al-Usul, read as PDFs inside the app).
+// (Kitab al-Tawhid, Thalathat al-Usul, Al-Aqidah al-Wasitiyyah, and
+// Kashf al-Shubuhat, read as PDFs inside the application).
 
 const KEYS = {
   seedVersion: 'fiqh_demo_seed_version',
@@ -17,7 +18,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'book-v3';
+const SEED_VERSION = 'book-v4';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -25,11 +26,11 @@ const SEED_VERSION = 'book-v3';
 
 const seedSections = [
   {
-    id: 'kashf-al-shubuhat',
-    title_ar: 'كتاب كشف الشبهات',
-    title_en: 'Kashf al-Shubuhat',
-    description_ar: 'رسالة للإمام محمد بن عبد الوهاب تكشف الشبهات التي يثيرها المخالفون حول التوحيد وعبادة الله وحده، مع الرد عليها بالأدلة من الكتاب والسنة.',
-    description_en: 'A treatise by Imam Muhammad ibn Abd al-Wahhab unveiling the ambiguities raised against Tawheed and the worship of Allah alone, responding to them with evidence from the Quran and Sunnah.',
+    id: 'kitab-al-tawhid',
+    title_ar: 'كتاب التوحيد',
+    title_en: 'Kitab al-Tawhid',
+    description_ar: 'كتاب للإمام المجدد محمد بن عبد الوهاب في توحيد العبادة وما يناقضه من الشرك الأكبر والأصغر، مع أدلته من الكتاب والسنة وآثار السلف، وبيان ما يجب على العبد من توحيد الله وحده.',
+    description_en: 'A book by the Reviver Imam Muhammad ibn Abd al-Wahhab on the oneness of worship (Tawhid) and what negates it of major and minor shirk, with evidence from the Quran, Sunnah, and the Salaf, explaining what is incumbent upon the servant in singling out Allah alone.',
     order: 1
   },
   {
@@ -47,19 +48,27 @@ const seedSections = [
     description_ar: 'رسالة لشيخ الإسلام ابن تيمية في بيان عقيدة أهل السنة والجماعة في أسماء الله وصفاته والقدر والإيمان واليوم الآخر، بأسلوب يعتمد على نصوص الكتاب والسنة وإجماع السلف.',
     description_en: 'A treatise by Shaykh al-Islam Ibn Taymiyyah expounding the creed of Ahl al-Sunnah wal-Jama\'ah regarding Allah\'s names and attributes, Qadar, faith, and the Hereafter, grounded in the Quran, Sunnah, and the consensus of the Salaf.',
     order: 3
+  },
+  {
+    id: 'kashf-al-shubuhat',
+    title_ar: 'كتاب كشف الشبهات',
+    title_en: 'Kashf al-Shubuhat',
+    description_ar: 'رسالة للإمام محمد بن عبد الوهاب تكشف الشبهات التي يثيرها المخالفون حول التوحيد وعبادة الله وحده، مع الرد عليها بالأدلة من الكتاب والسنة.',
+    description_en: 'A treatise by Imam Muhammad ibn Abd al-Wahhab unveiling the ambiguities raised against Tawheed and the worship of Allah alone, responding to them with evidence from the Quran and Sunnah.',
+    order: 4
   }
 ];
 
 const seedLessons = [
   {
-    id: 'kashf-book',
-    sectionId: 'kashf-al-shubuhat',
+    id: 'tawhid-book',
+    sectionId: 'kitab-al-tawhid',
     order: 1,
-    level: 'intermediate',
-    pdfUrl: '/books/kashf-al-shubuhat.pdf',
-    pages: 60,
-    title_ar: 'كشف الشبهات — النص الكامل (PDF)',
-    title_en: 'Kashf al-Shubuhat — Full Text (PDF)'
+    level: 'beginner',
+    pdfUrl: '/books/kitab-al-tawhid.pdf',
+    pages: 168,
+    title_ar: 'كتاب التوحيد — النص الكامل (PDF)',
+    title_en: 'Kitab al-Tawhid — Full Text (PDF)'
   },
   {
     id: 'thalatha-book',
@@ -80,6 +89,16 @@ const seedLessons = [
     pages: 160,
     title_ar: 'العقيدة الواسطية — النص الكامل (PDF)',
     title_en: 'Al-Aqidah al-Wasitiyyah — Full Text (PDF)'
+  },
+  {
+    id: 'kashf-book',
+    sectionId: 'kashf-al-shubuhat',
+    order: 1,
+    level: 'intermediate',
+    pdfUrl: '/books/kashf-al-shubuhat.pdf',
+    pages: 60,
+    title_ar: 'كشف الشبهات — النص الكامل (PDF)',
+    title_en: 'Kashf al-Shubuhat — Full Text (PDF)'
   }
 ];
 
