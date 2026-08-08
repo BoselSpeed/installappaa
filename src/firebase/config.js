@@ -11,32 +11,13 @@ const firebaseConfig = {
   appId: "YOUR_APP_ID"
 };
 
-// Initialize Firebase only if we have valid configuration
-let initialized = false;
-
-export const initializeFirebase = () => {
-  if (!initialized && typeof window !== 'undefined') {
-    try {
-      // Check if config values are placeholders
-      const isConfigured = !Object.values(firebaseConfig).some(
-        value => value.startsWith('YOUR_')
-      );
-      
-      if (isConfigured) {
-        import('firebase/app').then(({ initializeApp }) => {
-          initializeApp(firebaseConfig);
-          console.log('Firebase initialized successfully');
-          initialized = true;
-        }).catch(error => {
-          console.error('Firebase initialization error:', error);
-        });
-      } else {
-        console.warn('Firebase not configured. Please update src/firebase/config.js with your Firebase project details.');
-      }
-    } catch (error) {
-      console.error('Firebase initialization error:', error);
-    }
-  }
+// Returns true only when real Firebase credentials are present.
+// When false, the app runs in demo mode backed by local (mock) data.
+export const isFirebaseConfigured = () => {
+  if (typeof window === 'undefined') return false;
+  return !Object.values(firebaseConfig).some(
+    (value) => typeof value === 'string' && value.startsWith('YOUR_')
+  );
 };
 
 export default firebaseConfig;

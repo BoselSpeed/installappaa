@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { 
-  getFirestore, 
+import {
+  getFirestore,
   enableIndexedDbPersistence,
   collection,
   doc,
@@ -12,12 +12,11 @@ import {
   query,
   where,
   orderBy,
-  limit,
   onSnapshot,
   setDoc
 } from 'firebase/firestore';
-import { 
-  getAuth, 
+import {
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -25,17 +24,30 @@ import {
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
-import firebaseConfig from './config';
+import firebaseConfig, { isFirebaseConfigured } from './config';
+import {
+  mockAuthService,
+  mockSectionsService,
+  mockLessonsService,
+  mockLessonContentService,
+  mockQuizzesService,
+  mockUserProgressService,
+  mockAppSettingsService
+} from './mockService';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Firebase is only initialized when real credentials are present.
+// Otherwise the application runs in demo mode against local mock data.
+export const isDemoMode = !isFirebaseConfigured();
 
-// Initialize Firestore with offline persistence
-const db = getFirestore(app);
+let db = null;
+let auth = null;
+let googleProvider = null;
 
-// Enable offline persistence
-enableIndexedDbPersistence(db)
-  .catch((err) => {
+if (!isDemoMode) {
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+
+  enableIndexedDbPersistence(db).catch((err) => {
     if (err.code === 'failed-precondition') {
       console.warn('Multiple tabs open, persistence can only be enabled in one tab');
     } else if (err.code === 'unimplemented') {
@@ -43,282 +55,164 @@ enableIndexedDbPersistence(db)
     }
   });
 
-// Initialize Auth
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+}
 
-// Auth Service
-export const authService = {
-  // Sign up with email/password
+if (isDemoMode) {
+  console.info(
+    'Firebase not configured — running in demo mode with locally seeded content. ' +
+    'Add your credentials in src/firebase/config.js to enable the real backend.'
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Real Firebase service implementations
+// ---------------------------------------------------------------------------
+
+const realAuthService = {
   signUp: async (email, password) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
-    } catch (error) {
-      throw error;
-    }
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
   },
-
-  // Sign in with email/password
   signIn: async (email, password) => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
-    } catch (error) {
-      throw error;
-    }
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
   },
-
-  // Sign in with Google
   signInWithGoogle: async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      return result.user;
-    } catch (error) {
-      throw error;
-    }
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
   },
-
-  // Sign out
   signOut: async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      throw error;
-    }
+    await signOut(auth);
   },
-
-  // Auth state listener
   onAuthStateChanged: (callback) => {
     return onAuthStateChanged(auth, callback);
   },
-
-  // Get current user
-  getCurrentUser: () => {
-    return auth.currentUser;
-  }
+  getCurrentUser: () => auth.currentUser
 };
 
-// Firestore Service for Sections
-export const sectionsService = {
-  // Get all sections
+const realSectionsService = {
   getAllSections: async () => {
-    const sectionsCol = collection(db, 'sections');
-    const sectionsSnapshot = await getDocs(sectionsCol);
-    return sectionsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+    return sectionsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   },
-
-  // Get section by ID
   getSectionById: async (sectionId) => {
-    const sectionDoc = doc(db, 'sections', sectionId);
-    const sectionSnap = await getDoc(sectionDoc);
-    if (sectionSnap.exists()) {
-      return { id: sectionSnap.id, ...sectionSnap.data() };
-    }
+    const sectionSnap = await getDoc(doc(db, 'sections', sectionId));
+    if (sectionSnap.exists()) return { id: sectionSnap.id, ...sectionSnap.data() };
     return null;
   },
-
-  // Add a new section
   addSection: async (sectionData) => {
-    const sectionsCol = collection(db, 'sections');
-    const docRef = await addDoc(sectionsCol, sectionData);
+    const docRef = await addDoc(collection(db, 'sections'), sectionData);
     return docRef.id;
   },
-
-  // Update section
   updateSection: async (sectionId, sectionData) => {
-    const sectionDoc = doc(db, 'sections', sectionId);
-    await updateDoc(sectionDoc, sectionData);
+    await updateDoc(doc(db, 'sections', sectionId), sectionData);
   },
-
-  // Delete section
   deleteSection: async (sectionId) => {
-    const sectionDoc = doc(db, 'sections', sectionId);
-    await deleteDoc(sectionDoc);
+    await deleteDoc(doc(db, 'sections', sectionId));
   },
-
-  // Listen to sections changes
   onSectionsChange: (callback) => {
-    const sectionsCol = collection(db, 'sections');
-    return onSnapshot(sectionsCol, (snapshot) => {
-      const sections = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      callback(sections);
+    return onSnapshot(collection(db, 'sections'), (snapshot) => {
+      callback(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
   }
 };
 
-// Firestore Service for Lessons
-export const lessonsService = {
-  // Get lessons by section ID
-  getLessonsBySection: async (sectionId) => {
-    const lessonsCol = collection(db, 'lessons');
-    const q = query(lessonsCol, where('sectionId', '==', sectionId), orderBy('order'));
-    const lessonsSnapshot = await getDocs(q);
-    return lessonsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+const realLessonsService = {
+  getAllLessons: async () => {
+    const lessonsSnapshot = await getDocs(collection(db, 'lessons'));
+    return lessonsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   },
-
-  // Get lesson by ID
+  getLessonsBySection: async (sectionId) => {
+    const q = query(collection(db, 'lessons'), where('sectionId', '==', sectionId), orderBy('order'));
+    const lessonsSnapshot = await getDocs(q);
+    return lessonsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  },
   getLessonById: async (lessonId) => {
-    const lessonDoc = doc(db, 'lessons', lessonId);
-    const lessonSnap = await getDoc(lessonDoc);
-    if (lessonSnap.exists()) {
-      return { id: lessonSnap.id, ...lessonSnap.data() };
-    }
+    const lessonSnap = await getDoc(doc(db, 'lessons', lessonId));
+    if (lessonSnap.exists()) return { id: lessonSnap.id, ...lessonSnap.data() };
     return null;
   },
-
-  // Add a new lesson
   addLesson: async (lessonData) => {
-    const lessonsCol = collection(db, 'lessons');
-    const docRef = await addDoc(lessonsCol, lessonData);
+    const docRef = await addDoc(collection(db, 'lessons'), lessonData);
     return docRef.id;
   },
-
-  // Update lesson
   updateLesson: async (lessonId, lessonData) => {
-    const lessonDoc = doc(db, 'lessons', lessonId);
-    await updateDoc(lessonDoc, lessonData);
+    await updateDoc(doc(db, 'lessons', lessonId), lessonData);
   },
-
-  // Delete lesson
   deleteLesson: async (lessonId) => {
-    const lessonDoc = doc(db, 'lessons', lessonId);
-    await deleteDoc(lessonDoc);
+    await deleteDoc(doc(db, 'lessons', lessonId));
   }
 };
 
-// Firestore Service for Lesson Content
-export const lessonContentService = {
-  // Get lesson content by lesson ID
+const realLessonContentService = {
   getLessonContent: async (lessonId) => {
-    // Assuming we have a lesson_content collection
-    const contentCol = collection(db, 'lesson_content');
-    const q = query(contentCol, where('lessonId', '==', lessonId));
+    const q = query(collection(db, 'lesson_content'), where('lessonId', '==', lessonId));
     const contentSnapshot = await getDocs(q);
-    
     if (!contentSnapshot.empty) {
-      // Return the first matching document's content blocks
       const contentDoc = contentSnapshot.docs[0];
       return { id: contentDoc.id, ...contentDoc.data() };
     }
-    
-    // Return empty content structure if not found
-    return {
-      id: '',
-      lessonId: lessonId,
-      blocks: []
-    };
+    return { id: '', lessonId, blocks: [] };
   },
-
-  // Save lesson content
   saveLessonContent: async (contentData) => {
-    const contentCol = collection(db, 'lesson_content');
-    // Check if content already exists for this lesson
-    const existingQuery = query(contentCol, where('lessonId', '==', contentData.lessonId));
+    const existingQuery = query(collection(db, 'lesson_content'), where('lessonId', '==', contentData.lessonId));
     const existingSnapshot = await getDocs(existingQuery);
-    
     if (!existingSnapshot.empty) {
-      // Update existing document
       const existingDoc = existingSnapshot.docs[0];
-      const contentDoc = doc(db, 'lesson_content', existingDoc.id);
-      await updateDoc(contentDoc, contentData);
+      await updateDoc(doc(db, 'lesson_content', existingDoc.id), contentData);
       return existingDoc.id;
-    } else {
-      // Create new document
-      const docRef = await addDoc(contentCol, contentData);
-      return docRef.id;
     }
+    const docRef = await addDoc(collection(db, 'lesson_content'), contentData);
+    return docRef.id;
   }
 };
 
-// Firestore Service for Quizzes
-export const quizzesService = {
-  // Get quizzes by lesson ID
+const realQuizzesService = {
   getQuizByLesson: async (lessonId) => {
-    const quizzesCol = collection(db, 'quizzes');
-    const q = query(quizzesCol, where('lessonId', '==', lessonId));
+    const q = query(collection(db, 'quizzes'), where('lessonId', '==', lessonId));
     const quizzesSnapshot = await getDocs(q);
-    return quizzesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    return quizzesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   },
-
-  // Get quiz by ID
   getQuizById: async (quizId) => {
-    const quizDoc = doc(db, 'quizzes', quizId);
-    const quizSnap = await getDoc(quizDoc);
-    if (quizSnap.exists()) {
-      return { id: quizSnap.id, ...quizSnap.data() };
-    }
+    const quizSnap = await getDoc(doc(db, 'quizzes', quizId));
+    if (quizSnap.exists()) return { id: quizSnap.id, ...quizSnap.data() };
     return null;
   },
-
-  // Add a new quiz
   addQuiz: async (quizData) => {
-    const quizzesCol = collection(db, 'quizzes');
-    const docRef = await addDoc(quizzesCol, quizData);
+    const docRef = await addDoc(collection(db, 'quizzes'), quizData);
     return docRef.id;
   },
-
-  // Update quiz
   updateQuiz: async (quizId, quizData) => {
-    const quizDoc = doc(db, 'quizzes', quizId);
-    await updateDoc(quizDoc, quizData);
+    await updateDoc(doc(db, 'quizzes', quizId), quizData);
   },
-
-  // Delete quiz
   deleteQuiz: async (quizId) => {
-    const quizDoc = doc(db, 'quizzes', quizId);
-    await deleteDoc(quizDoc);
+    await deleteDoc(doc(db, 'quizzes', quizId));
   }
 };
 
-// Firestore Service for User Progress
-export const userProgressService = {
-  // Get user progress
+const realUserProgressService = {
   getUserProgress: async (userId) => {
     if (!userId) return null;
-    
-    const progressDoc = doc(db, 'user_progress', userId);
-    const progressSnap = await getDoc(progressDoc);
-    if (progressSnap.exists()) {
-      return { id: progressSnap.id, ...progressSnap.data() };
-    }
-    
-    // Return default progress structure
+    const progressSnap = await getDoc(doc(db, 'user_progress', userId));
+    if (progressSnap.exists()) return { id: progressSnap.id, ...progressSnap.data() };
+    const now = new Date().toISOString();
     return {
       id: userId,
-      userId: userId,
+      userId,
       completedLessons: [],
       bookmarkedLessons: [],
       lastOpened: null,
       streaks: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: now,
+      updatedAt: now
     };
   },
-
-  // Save user progress
   saveUserProgress: async (progressData) => {
     if (!progressData.userId) return null;
-    
     const progressDoc = doc(db, 'user_progress', progressData.userId);
-    const dataToSave = {
-      ...progressData,
-      updatedAt: new Date().toISOString()
-    };
-    
-    // Check if document exists
+    const dataToSave = { ...progressData, updatedAt: new Date().toISOString() };
     const progressSnap = await getDoc(progressDoc);
     if (progressSnap.exists()) {
       await updateDoc(progressDoc, dataToSave);
@@ -326,83 +220,51 @@ export const userProgressService = {
       dataToSave.createdAt = new Date().toISOString();
       await setDoc(progressDoc, dataToSave);
     }
-    
     return progressData.userId;
   },
-
-  // Add completed lesson
   addCompletedLesson: async (userId, lessonId) => {
-    const progress = await userProgressService.getUserProgress(userId);
+    const progress = await realUserProgressService.getUserProgress(userId);
     if (progress) {
       const completedLessons = [...new Set([...progress.completedLessons, lessonId])];
-      await userProgressService.saveUserProgress({
-        ...progress,
-        completedLessons,
-        lastOpened: lessonId
-      });
+      await realUserProgressService.saveUserProgress({ ...progress, completedLessons, lastOpened: lessonId });
     }
   },
-
-  // Add bookmarked lesson
   addBookmarkedLesson: async (userId, lessonId) => {
-    const progress = await userProgressService.getUserProgress(userId);
+    const progress = await realUserProgressService.getUserProgress(userId);
     if (progress) {
       const bookmarkedLessons = [...new Set([...progress.bookmarkedLessons, lessonId])];
-      await userProgressService.saveUserProgress({
-        ...progress,
-        bookmarkedLessons
-      });
+      await realUserProgressService.saveUserProgress({ ...progress, bookmarkedLessons });
     }
   },
-
-  // Remove bookmarked lesson
   removeBookmarkedLesson: async (userId, lessonId) => {
-    const progress = await userProgressService.getUserProgress(userId);
+    const progress = await realUserProgressService.getUserProgress(userId);
     if (progress) {
-      const bookmarkedLessons = progress.bookmarkedLessons.filter(id => id !== lessonId);
-      await userProgressService.saveUserProgress({
-        ...progress,
-        bookmarkedLessons
-      });
+      const bookmarkedLessons = progress.bookmarkedLessons.filter((id) => id !== lessonId);
+      await realUserProgressService.saveUserProgress({ ...progress, bookmarkedLessons });
     }
   }
 };
 
-// Firestore Service for App Settings
-export const appSettingsService = {
-  // Get app settings for user
+const realAppSettingsService = {
   getAppSettings: async (userId) => {
     if (!userId) return null;
-    
-    const settingsDoc = doc(db, 'app_settings', userId);
-    const settingsSnap = await getDoc(settingsDoc);
-    if (settingsSnap.exists()) {
-      return { id: settingsSnap.id, ...settingsSnap.data() };
-    }
-    
-    // Return default settings
+    const settingsSnap = await getDoc(doc(db, 'app_settings', userId));
+    if (settingsSnap.exists()) return { id: settingsSnap.id, ...settingsSnap.data() };
+    const now = new Date().toISOString();
     return {
       id: userId,
-      userId: userId,
+      userId,
       language: navigator.language.startsWith('ar') ? 'ar' : 'en',
-      fontSize: 'medium', // small, medium, large
-      theme: 'light', // light, dark (though we only use light for now)
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      fontSize: 'medium',
+      theme: 'light',
+      createdAt: now,
+      updatedAt: now
     };
   },
-
-  // Save app settings
   saveAppSettings: async (settingsData) => {
     if (!settingsData.userId) return null;
-    
     const settingsDoc = doc(db, 'app_settings', settingsData.userId);
-    const dataToSave = {
-      ...settingsData,
-      updatedAt: new Date().toISOString()
-    };
-    
-    // Check if document exists
+    const dataToSave = { ...settingsData, updatedAt: new Date().toISOString() };
     const settingsSnap = await getDoc(settingsDoc);
     if (settingsSnap.exists()) {
       await updateDoc(settingsDoc, dataToSave);
@@ -410,10 +272,21 @@ export const appSettingsService = {
       dataToSave.createdAt = new Date().toISOString();
       await setDoc(settingsDoc, dataToSave);
     }
-    
     return settingsData.userId;
   }
 };
+
+// ---------------------------------------------------------------------------
+// Exports (real Firebase or mock depending on configuration)
+// ---------------------------------------------------------------------------
+
+export const authService = isDemoMode ? mockAuthService : realAuthService;
+export const sectionsService = isDemoMode ? mockSectionsService : realSectionsService;
+export const lessonsService = isDemoMode ? mockLessonsService : realLessonsService;
+export const lessonContentService = isDemoMode ? mockLessonContentService : realLessonContentService;
+export const quizzesService = isDemoMode ? mockQuizzesService : realQuizzesService;
+export const userProgressService = isDemoMode ? mockUserProgressService : realUserProgressService;
+export const appSettingsService = isDemoMode ? mockAppSettingsService : realAppSettingsService;
 
 export default {
   auth: authService,

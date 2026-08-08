@@ -2,9 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base styles for RTL support */
 html[dir="rtl"] {
-  /* Additional RTL-specific styles if needed */
+  font-family: 'Cairo', 'Amiri', system-ui, sans-serif;
+}
+
+html[dir="ltr"] {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background-color: #ffffff;
+  color: #212529;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom scrollbar */
