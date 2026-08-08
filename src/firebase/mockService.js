@@ -17,7 +17,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'book-v2';
+const SEED_VERSION = 'book-v3';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -39,6 +39,14 @@ const seedSections = [
     description_ar: 'متن للإمام محمد بن عبد الوهاب في الأصول الثلاثة التي يجب على كل مسلم معرفتها والعمل بها: معرفة العبد ربه، ومعرفة دينه، ومعرفة نبيه ﷺ، مع أدلتها من الكتاب والسنة.',
     description_en: 'A text by Imam Muhammad ibn Abd al-Wahhab on the three fundamentals every Muslim must know and act upon: knowing his Lord, his religion, and his Prophet, with their evidences from the Quran and Sunnah.',
     order: 2
+  },
+  {
+    id: 'al-aqidah-al-wasitiyyah',
+    title_ar: 'العقيدة الواسطية',
+    title_en: 'Al-Aqidah al-Wasitiyyah',
+    description_ar: 'رسالة لشيخ الإسلام ابن تيمية في بيان عقيدة أهل السنة والجماعة في أسماء الله وصفاته والقدر والإيمان واليوم الآخر، بأسلوب يعتمد على نصوص الكتاب والسنة وإجماع السلف.',
+    description_en: 'A treatise by Shaykh al-Islam Ibn Taymiyyah expounding the creed of Ahl al-Sunnah wal-Jama\'ah regarding Allah\'s names and attributes, Qadar, faith, and the Hereafter, grounded in the Quran, Sunnah, and the consensus of the Salaf.',
+    order: 3
   }
 ];
 
@@ -62,6 +70,16 @@ const seedLessons = [
     pages: 21,
     title_ar: 'متن ثلاثة الأصول وأدلتها — النص الكامل (PDF)',
     title_en: 'Thalathat al-Usul — Full Text (PDF)'
+  },
+  {
+    id: 'wasitiyyah-book',
+    sectionId: 'al-aqidah-al-wasitiyyah',
+    order: 1,
+    level: 'intermediate',
+    pdfUrl: '/books/al-aqidah-al-wasitiyyah.pdf',
+    pages: 160,
+    title_ar: 'العقيدة الواسطية — النص الكامل (PDF)',
+    title_en: 'Al-Aqidah al-Wasitiyyah — Full Text (PDF)'
   }
 ];
 
