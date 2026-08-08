@@ -1,5 +1,32 @@
 # Islamic Fiqh Learning Application - Implementation Plan
 
+## Implementation Status
+**Last updated:** 2026-08-08
+
+The application is functional end-to-end in **demo mode**: it runs entirely with
+locally seeded bilingual content when Firebase credentials are absent, and
+automatically uses the real Firebase backend once `src/firebase/config.js` is
+filled in.
+
+Working features:
+- Project scaffolding, TypeScript build, Tailwind design system (black/white)
+- Bilingual UI (Arabic default) with RTL/LTR document direction switching
+- Navigation: sticky navbar with language toggle, desktop sidebar, footer
+- Home, Sections, Lesson reader, Search, Favorites, Settings, Quiz pages
+- Lesson reader: localized content blocks, font-size setting, reading progress,
+  prev/next navigation, mark-complete and bookmark actions
+- Search across lesson/section titles and lesson content with highlighting
+- Quiz player: progress, scoring, results, review mode with explanations,
+  retake; seeded quizzes for every lesson
+- Progress & settings persistence (localStorage in demo mode, Firestore when
+  configured); demo account + sign-out
+- Service worker asset caching (public/sw.js)
+- ESLint config and typecheck pass
+
+Remaining work: real Firebase auth flows, content management/admin, advanced
+offline sync, performance optimization (code splitting), and the full testing
+suite described in Phases 5-8.
+
 ## Overview
 This plan outlines the implementation steps for building the Islamic Fiqh learning application based on the approved design specification. The application will be built using React 18, Vite, TypeScript, Tailwind CSS, and Firebase with offline capabilities.
 
@@ -29,18 +56,18 @@ This plan outlines the implementation steps for building the Islamic Fiqh learni
 - [ ] Create useAppSettings hook for UI preferences (language, font size)
 
 ### 1.3 Internationalization (i18n)
-- [ ] Set up react-i18next with i18next-browser-languagedetector
-- [ ] Create translation files: src/i18n/ar.json and src/i18n/en.json
-- [ ] Implement language detection with Arabic as default
-- [ ] Create useTranslation wrapper hook
-- [ ] Implement direction handling (RTL/LTR) based on language
+- [x] Set up react-i18next with i18next-browser-languagedetector
+- [x] Create translation files: src/i18n/ar.json and src/i18n/en.json
+- [x] Implement language detection with Arabic as default
+- [x] Create useTranslation wrapper hook
+- [x] Implement direction handling (RTL/LTR) based on language
 
 ### 1.4 Offline Capabilities
-- [ ] Enable Firestore offline persistence
-- [ ] Implement service worker with Workbox for asset caching
+- [x] Enable Firestore offline persistence
+- [x] Implement service worker with Workbox for asset caching
 - [ ] Create offline action queue for user interactions
 - [ ] Add online/offline status indicator component
-- [ ] Implement local storage fallback for critical user data
+- [x] Implement local storage fallback for critical user data
 
 ## Phase 2: UI Components and Design System
 ### 2.1 Design System Implementation
@@ -62,13 +89,13 @@ This plan outlines the implementation steps for building the Islamic Fiqh learni
 - [ ] Custom SVG Icon components (Heroicons or custom)
 
 ### 2.3 Navigation Components
-- [ ] NavBar with logo, app name, and language toggle
-- [ ] Sidebar with section navigation (collapsible on mobile)
-- [ ] Footer with app version and links
+- [x] NavBar with logo, app name, and language toggle
+- [x] Sidebar with section navigation (collapsible on mobile)
+- [x] Footer with app version and links
 - [ ] Breadcrumbs component for navigation hierarchy
 - [ ] Pagination component for lists
-- [ ] SectionGrid component for displaying fiqh sections
-- [ ] LessonList component for displaying lessons
+- [x] SectionGrid component for displaying fiqh sections
+- [x] LessonList component for displaying lessons
 
 ### 2.4 Content Components
 - [ ] LessonReader component for displaying lesson content
@@ -81,69 +108,69 @@ This plan outlines the implementation steps for building the Islamic Fiqh learni
 
 ## Phase 3: Page Implementation
 ### 3.1 Home Page
-- [ ] Header with logo, app name, and language toggle
-- [ ] Hero section with welcome message and CTAs
-- [ ] Progress statistics display
-- [ ] Sections grid with clickable section cards
-- [ ] Recent activity carousel (last opened, saved lessons)
-- [ ] Prominent search bar
+- [x] Header with logo, app name, and language toggle
+- [x] Hero section with welcome message and CTAs
+- [x] Progress statistics display
+- [x] Sections grid with clickable section cards
+- [x] Recent activity carousel (last opened, saved lessons)
+- [x] Prominent search bar
 
 ### 3.2 Sections/Browse Page
-- [ ] Two-column layout (section list | lesson preview) on desktop
-- [ ] Mobile accordion view for sections
-- [ ] Section cards with title, description, progress, icon
-- [ ] Lesson preview cards in selected section
-- [ ] Empty state when no sections exist
-- [ ] Loading and error states
+- [x] Two-column layout (section list | lesson preview) on desktop
+- [x] Mobile accordion view for sections
+- [x] Section cards with title, description, progress, icon
+- [x] Lesson preview cards in selected section
+- [x] Empty state when no sections exist
+- [x] Loading and error states
 
 ### 3.3 Lesson Detail Page
-- [ ] Fixed header with back button, section title, lesson title
-- [ ] Reading area with max-width for comfortable line length
-- [ ] Content rendering with hierarchical blocks (heading, paragraph, note, list)
-- [ ] Font size controls in header (A- A A+)
-- [ ] Footer controls: Previous/Next lesson, Bookmark, Mark complete
-- [ ] Reading progress indicator at bottom
-- [ ] Loading and error states
+- [x] Fixed header with back button, section title, lesson title
+- [x] Reading area with max-width for comfortable line length
+- [x] Content rendering with hierarchical blocks (heading, paragraph, note, list)
+- [x] Font size controls in header (A- A A+)
+- [x] Footer controls: Previous/Next lesson, Bookmark, Mark complete
+- [x] Reading progress indicator at bottom
+- [x] Loading and error states
 - [ ] Offline access indicator
 
 ### 3.4 Search Page
-- [ ] Search bar with retained query
-- [ ] Results grouped by lessons and sections
-- [ ] Result cards with highlighted snippets
-- [ ] Section badges on lesson results
+- [x] Search bar with retained query
+- [x] Results grouped by lessons and sections
+- [x] Result cards with highlighted snippets
+- [x] Section badges on lesson results
 - [ ] Pagination or infinite scroll
-- [ ] Empty state with search suggestions
-- [ ] Loading and error states
+- [x] Empty state with search suggestions
+- [x] Loading and error states
 
 ### 3.5 Favorites Page
-- [ ] Tabs: Lessons | Topics | Questions
-- [ ] Grid/list view toggle for each tab
-- [ ] Favorite items with title, section, date saved, remove button
+- [x] Tabs: Lessons | Topics | Questions
+- [x] Grid/list view toggle for each tab
+- [x] Favorite items with title, section, date saved, remove button
 - [ ] Bulk remove option
-- [ ] Empty state guidance for each tab
-- [ ] Loading and error states
+- [x] Empty state guidance for each tab
+- [x] Loading and error states
 
 ### 3.6 Settings Page
-- [ ] Language section: Arabic/English toggle with immediate effect
-- [ ] Display section: Font size slider with preview
-- [ ] About section: App version, description
-- [ ] Legal section: Links to Privacy Policy, Terms of Use
-- [ ] Data section: Clear cache, export/import options (future)
-- [ ] Loading and error states
+- [x] Language section: Arabic/English toggle with immediate effect
+- [x] Display section: Font size slider with preview
+- [x] About section: App version, description
+- [x] Legal section: Links to Privacy Policy, Terms of Use
+- [x] Data section: Clear cache, export/import options (future)
+- [x] Loading and error states
 
 ### 3.7 Quiz/Test Page
-- [ ] Progress indicator: Question X of Y
-- [ ] Question card with question text and options (A/B/C/D)
-- [ ] Navigation: Previous, Next, Submit (on last question)
-- [ ] Results screen: Score percentage, breakdown, retake option
-- [ ] Review mode showing correct answers with explanations
-- [ ] Loading and error states
+- [x] Progress indicator: Question X of Y
+- [x] Question card with question text and options (A/B/C/D)
+- [x] Navigation: Previous, Next, Submit (on last question)
+- [x] Results screen: Score percentage, breakdown, retake option
+- [x] Review mode showing correct answers with explanations
+- [x] Loading and error states
 
 ### 3.8 Error and Empty States
-- [ ] NotFoundPage for 404 routes
+- [x] NotFoundPage for 404 routes
 - [ ] Generic error page with retry option
-- [ ] Empty state components with guidance illustrations
-- [ ] Loading skeletons for content placeholders
+- [x] Empty state components with guidance illustrations
+- [x] Loading skeletons for content placeholders
 
 ## Phase 4: Features and Functionality
 ### 4.1 Authentication System
@@ -152,38 +179,38 @@ This plan outlines the implementation steps for building the Islamic Fiqh learni
 - [ ] Google sign-in (optional)
 - [ ] Auth protected routes
 - [ ] User profile management
-- [ ] Sign out functionality
+- [x] Sign out functionality
 
 ### 4.2 Learning Progress Tracking
-- [ ] Mark lessons as completed
-- [ ] Track completed lessons per user
-- [ ] Calculate overall progress percentage
+- [x] Mark lessons as completed
+- [x] Track completed lessons per user
+- [x] Calculate overall progress percentage
 - [ ] Track streaks (consecutive days of learning)
-- [ ] Last opened lesson tracking
-- [ ] Visual progress indicators in UI
+- [x] Last opened lesson tracking
+- [x] Visual progress indicators in UI
 
 ### 4.3 Bookmarking/Favorites System
-- [ ] Save lessons to favorites
+- [x] Save lessons to favorites
 - [ ] Save specific topics or questions
-- [ ] Remove from favorites
-- [ ] View all favorites in dedicated page
-- [ ] Sync favorites when online/offline
+- [x] Remove from favorites
+- [x] View all favorites in dedicated page
+- [x] Sync favorites when online/offline
 
 ### 4.4 Search Functionality
-- [ ] Search across lesson titles, section titles, and content
-- [ ] Real-time search as user types (debounced)
-- [ ] Highlight search matches in results
-- [ ] Filter results by section or type
+- [x] Search across lesson titles, section titles, and content
+- [x] Real-time search as user types (debounced)
+- [x] Highlight search matches in results
+- [x] Filter results by section or type
 - [ ] Search history (optional)
 - [ ] Voice search capability (future enhancement)
 
 ### 4.5 Quiz and Assessment System
-- [ ] Create quizzes associated with lessons
-- [ ] Multiple choice questions with single correct answer
-- [ ] Immediate feedback after each question (optional)
-- [ ] Final score calculation
-- [ ] Review mode with explanations
-- [ ] Retake quiz functionality
+- [x] Create quizzes associated with lessons
+- [x] Multiple choice questions with single correct answer
+- [x] Immediate feedback after each question (optional)
+- [x] Final score calculation
+- [x] Review mode with explanations
+- [x] Retake quiz functionality
 - [ ] Quiz completion tracking
 
 ### 4.6 Content Management Structure
