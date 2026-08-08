@@ -9,8 +9,14 @@ export default defineConfig({
     port: 3000,
     open: false,
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2022',
+    },
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
+    target: 'es2022',
   },
 })

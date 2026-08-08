@@ -1,7 +1,7 @@
 {
   "app_name": "Islamic Fiqh Learning App",
   "welcome_message": "Welcome to the Islamic Fiqh Learning App",
-  "welcome_hint": "Learn the rulings of Islamic jurisprudence through structured lessons, quizzes and progress tracking — available offline.",
+  "welcome_hint": "Read and study the treatise Kashf al-Shubuhat by Imam Muhammad ibn Abd al-Wahhab inside the app, with progress tracking and offline reading.",
   "start_learning": "Start Learning",
   "browse_sections": "Browse Sections",
   "search_placeholder": "Search lessons...",
@@ -77,5 +77,17 @@
   "back_to_lesson": "Back to Lesson",
   "review_answers": "Review Answers",
   "explanation": "Explanation",
-  "reading_progress": "Reading Progress"
+  "book": "Book",
+  "read_book": "Read the Book",
+  "pdf_loading": "Loading the book...",
+  "pdf_error": "Failed to load the book. You can download it and read it outside the app.",
+  "of_pages": "of {{count}} pages",
+  "go_to_page": "Go to page",
+  "previous_page": "Previous page",
+  "next_page": "Next page",
+  "zoom_in": "Zoom in",
+  "zoom_out": "Zoom out",
+  "fit_width": "Fit width",
+  "fit_page": "Fit page",
+  "download_pdf": "Download PDF"
 }

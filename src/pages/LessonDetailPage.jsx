@@ -1,10 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { lessonsService, lessonContentService } from '../firebase/service';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { useAppSettings } from '../hooks/useAppSettings';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
+
+const PDFReader = lazy(() =>
+  import('../components/Content/PDFReader').then((m) => ({ default: m.PDFReader }))
+);
 
 const fontSizeClass = {
   small: 'text-sm',
@@ -91,6 +95,11 @@ const LessonDetailPage = () => {
     }
   };
 
+  const handlePdfPageChange = useCallback((page, totalPages) => {
+    const value = totalPages > 0 ? Math.round((page / totalPages) * 100) : 0;
+    setReadingProgress(value);
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
@@ -176,17 +185,41 @@ const LessonDetailPage = () => {
         </div>
 
         {/* Content */}
-        <div
-          ref={contentRef}
-          onScroll={handleScroll}
-          className={`max-h-[60vh] overflow-y-auto ${fontSizeClass[settings?.fontSize] || 'text-base'}`}
-        >
-          {(content?.blocks?.length ? content.blocks : []).map(renderBlock) ||
-            <p className="text-gray-500">{t('no_results')}</p>}
-          {content && content.blocks && content.blocks.length === 0 && (
-            <p className="text-gray-500">{t('no_results')}</p>
-          )}
-        </div>
+        {lesson.pdfUrl ? (
+          <div className={`${fontSizeClass[settings?.fontSize] || 'text-base'}`}>
+            <Suspense
+              fallback={
+                <div className="flex flex-col items-center justify-center py-24 gap-3 bg-gray-50 border border-gray-200 rounded-lg">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+                  <p className="text-gray-500">{t('pdf_loading')}</p>
+                </div>
+              }
+            >
+              <PDFReader
+                pdfUrl={lesson.pdfUrl}
+                fileName={`${lesson.id}.pdf`}
+                onPageChange={handlePdfPageChange}
+              />
+            </Suspense>
+            {lesson.pages > 0 && (
+              <p className="text-sm text-gray-500 mt-3 text-center">
+                {t('of_pages', { count: lesson.pages })}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div
+            ref={contentRef}
+            onScroll={handleScroll}
+            className={`max-h-[60vh] overflow-y-auto ${fontSizeClass[settings?.fontSize] || 'text-base'}`}
+          >
+            {(content?.blocks?.length ? content.blocks : []).map(renderBlock) ||
+              <p className="text-gray-500">{t('no_results')}</p>}
+            {content && content.blocks && content.blocks.length === 0 && (
+              <p className="text-gray-500">{t('no_results')}</p>
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex flex-wrap gap-4 pt-8 border-t border-gray-200">
