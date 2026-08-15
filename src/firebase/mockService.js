@@ -3,12 +3,15 @@
 // (Kitab al-Tawhid, Thalathat al-Usul, Al-Aqidah al-Wasitiyyah, and
 // Kashf al-Shubuhat, read as PDFs inside the application).
 
+import { SEED_BOOKS } from '../data/books';
+
 const KEYS = {
   seedVersion: 'fiqh_demo_seed_version',
   sections: 'fiqh_demo_sections',
   lessons: 'fiqh_demo_lessons',
   content: 'fiqh_demo_lesson_content',
   quizzes: 'fiqh_demo_quizzes',
+  books: 'fiqh_demo_books',
   progress: (uid) => `fiqh_demo_progress_${uid}`,
   settings: (uid) => `fiqh_demo_settings_${uid}`,
   userId: 'userId'
@@ -245,6 +248,76 @@ export const mockLessonsService = {
   }
 };
 
+// The library is seeded from src/data/books.js (the single place where books
+// are maintained). Books added or edited through the service API are stored
+// separately in localStorage and merged over the seed, so existing books are
+// never replaced and new books can be added at any time.
+const mergeBooks = (seed, custom) => {
+  const map = new Map();
+  seed.forEach((book) => map.set(book.id, book));
+  custom.forEach((book) => map.set(book.id, book));
+  return Array.from(map.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
+};
+
+const getAllBooks = async () => {
+  await delay();
+  return mergeBooks(SEED_BOOKS, read(KEYS.books, []));
+};
+
+export const mockBooksService = {
+  getAllBooks,
+  getBookById: async (bookId) => {
+    const books = await getAllBooks();
+    return books.find((b) => b.id === bookId) || null;
+  },
+  addBook: async (bookData) => {
+    await delay();
+    const custom = read(KEYS.books, []);
+    const newBook = { ...bookData, id: bookData.id || `book-${Date.now()}` };
+    write(KEYS.books, [...custom, newBook]);
+    return newBook.id;
+  },
+  updateBook: async (bookId, bookData) => {
+    await delay();
+    const custom = read(KEYS.books, []);
+    const existing = custom.find((b) => b.id === bookId);
+    // Merge with the full (seed + custom) book so updating a field never
+    // drops the book's other data such as volumes, titles, or covers.
+    const current = existing || (await mockBooksService.getBookById(bookId)) || {};
+    const updated = { ...current, ...bookData, id: bookId };
+    write(KEYS.books, [...custom.filter((b) => b.id !== bookId), updated]);
+  },
+  deleteBook: async (bookId) => {
+    await delay();
+    write(KEYS.books, read(KEYS.books, []).filter((b) => b.id !== bookId));
+  },
+  addVolume: async (bookId, volumeData) => {
+    await delay();
+    const book = await mockBooksService.getBookById(bookId);
+    if (!book) throw new Error('Book not found');
+    const volumes = book.volumes || [];
+    const newVolume = { ...volumeData, id: volumeData.id || `v-${Date.now()}` };
+    await mockBooksService.updateBook(bookId, { volumes: [...volumes, newVolume] });
+    return newVolume.id;
+  },
+  updateVolume: async (bookId, volumeId, volumeData) => {
+    await delay();
+    const book = await mockBooksService.getBookById(bookId);
+    if (!book) throw new Error('Book not found');
+    const volumes = (book.volumes || []).map((v) =>
+      v.id === volumeId ? { ...v, ...volumeData } : v
+    );
+    await mockBooksService.updateBook(bookId, { volumes });
+  },
+  deleteVolume: async (bookId, volumeId) => {
+    await delay();
+    const book = await mockBooksService.getBookById(bookId);
+    if (!book) throw new Error('Book not found');
+    const volumes = (book.volumes || []).filter((v) => v.id !== volumeId);
+    await mockBooksService.updateBook(bookId, { volumes });
+  }
+};
+
 export const mockLessonContentService = {
   getLessonContent: async (lessonId) => {
     await delay();
@@ -391,6 +464,7 @@ export default {
   lessons: mockLessonsService,
   lessonContent: mockLessonContentService,
   quizzes: mockQuizzesService,
+  books: mockBooksService,
   userProgress: mockUserProgressService,
   appSettings: mockAppSettingsService
 };

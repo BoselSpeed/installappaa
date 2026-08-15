@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { sectionsService, lessonsService } from '../../firebase/service';
+import { sectionsService, lessonsService, booksService } from '../../firebase/service';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
 
 const SectionGrid = ({ title }) => {
   const [sections, setSections] = useState([]);
+  const [books, setBooks] = useState([]);
   const [lessonCounts, setLessonCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
@@ -14,9 +15,10 @@ const SectionGrid = ({ title }) => {
   useEffect(() => {
     const loadSections = async () => {
       try {
-        const [data, allLessons] = await Promise.all([
+        const [data, allLessons, allBooks] = await Promise.all([
           sectionsService.getAllSections(),
-          lessonsService.getAllLessons()
+          lessonsService.getAllLessons(),
+          booksService.getAllBooks()
         ]);
         const counts = {};
         allLessons.forEach((l) => {
@@ -24,6 +26,7 @@ const SectionGrid = ({ title }) => {
         });
         setSections(data.slice().sort((a, b) => (a.order || 0) - (b.order || 0)));
         setLessonCounts(counts);
+        setBooks(allBooks);
       } catch (error) {
         console.error('Error loading sections:', error);
       } finally {
@@ -33,6 +36,14 @@ const SectionGrid = ({ title }) => {
 
     loadSections();
   }, []);
+
+  const bookById = {};
+  books.forEach((book) => {
+    bookById[book.id] = book;
+  });
+
+  const sectionLink = (section) =>
+    bookById[section.id] ? `/books/${section.id}` : `/sections/${section.id}`;
 
   if (loading) {
     return (
@@ -63,7 +74,7 @@ const SectionGrid = ({ title }) => {
         {sections.map((section) => (
           <Link
             key={section.id}
-            to={`/sections/${section.id}`}
+            to={sectionLink(section)}
             className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-black"
           >
             <h3 className="text-xl font-semibold mb-2 text-black">
