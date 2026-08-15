@@ -122,6 +122,7 @@
   "not_downloaded": "غير محمل",
   "downloading": "جاري التنزيل...",
   "download_error": "تعذر تنزيل الملف. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.",
+  "open_in_browser": "فتح في المتصفح",
   "delete_from_device": "حذف من الجهاز",
   "confirm_delete": "تأكيد الحذف",
   "cancel": "إلغاء"

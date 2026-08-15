@@ -128,9 +128,19 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       </div>
 
       {state.error && (
-        <p className="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-2">
-          {state.error === 'download_error' ? t('download_error') : state.error}
-        </p>
+        <div className="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-2 space-y-2">
+          <p>{state.error === 'download_error' ? t('download_error') : state.error}</p>
+          {volume.downloadUrl && (
+            <a
+              href={volume.downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-3 py-1.5 bg-white text-black border border-black rounded text-xs font-medium hover:bg-gray-50 transition-colors"
+            >
+              {t('open_in_browser')}
+            </a>
+          )}
+        </div>
       )}
 
       <div className="flex flex-wrap gap-2 items-center mt-auto pt-1">{renderActions()}</div>
