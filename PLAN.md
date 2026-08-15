@@ -16,6 +16,15 @@ Working features:
 - Four books read as in-app PDFs (Kitab al-Tawhid, Thalathat al-Usul,
   Al-Aqidah al-Wasitiyyah, Kashf al-Shubuhat) with page navigation, zoom,
   jump-to-page, download, and per-page reading progress
+- Books & volumes system: library page, book detail page with rich metadata
+  (author, muhaqqiq, translator, publisher, edition, year, language,
+  category, madhab, description, cover), and per-book volume cards
+  - Volume 1 is bundled with the app (offline, PWA-precached); later volumes
+    download on demand and are stored locally (IndexedDB) for offline
+    reading; downloaded volumes can be deleted from the device
+  - Books maintained in `src/data/books.js` (add/edit any number of volumes
+    without touching app code); books service supports full CRUD
+    (mock + Firebase `books` collection)
 - Search across lesson/section titles and lesson content with highlighting
 - Quiz player: progress, scoring, results, review mode with explanations,
   retake; seeded quizzes for every lesson
