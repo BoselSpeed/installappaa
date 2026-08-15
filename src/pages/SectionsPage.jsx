@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { sectionsService, lessonsService } from '../firebase/service';
+import { sectionsService, lessonsService, booksService } from '../firebase/service';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
 
 const SectionsPage = () => {
   const { sectionId } = useParams();
   const [sections, setSections] = useState([]);
+  const [books, setBooks] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [lessonCounts, setLessonCounts] = useState({});
   const [selectedSection, setSelectedSection] = useState(null);
@@ -20,9 +21,10 @@ const SectionsPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const [data, allLessons] = await Promise.all([
+        const [data, allLessons, allBooks] = await Promise.all([
           sectionsService.getAllSections(),
-          lessonsService.getAllLessons()
+          lessonsService.getAllLessons(),
+          booksService.getAllBooks()
         ]);
 
         const counts = {};
@@ -30,6 +32,7 @@ const SectionsPage = () => {
           counts[l.sectionId] = (counts[l.sectionId] || 0) + 1;
         });
         setLessonCounts(counts);
+        setBooks(allBooks);
 
         const sorted = data.slice().sort((a, b) => (a.order || 0) - (b.order || 0));
         setSections(sorted);
@@ -52,6 +55,14 @@ const SectionsPage = () => {
 
     loadSections();
   }, [sectionId]);
+
+  const bookById = {};
+  books.forEach((book) => {
+    bookById[book.id] = book;
+  });
+
+  const sectionLink = (section) =>
+    bookById[section.id] ? `/books/${section.id}` : `/sections/${section.id}`;
 
   if (loading) {
     return (
@@ -85,7 +96,7 @@ const SectionsPage = () => {
                 {sections.map((section) => (
                   <Link
                     key={section.id}
-                    to={`/sections/${section.id}`}
+                    to={sectionLink(section)}
                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-black"
                   >
                     <h3 className="text-xl font-semibold mb-2 text-black">

@@ -31,6 +31,7 @@ import {
   mockLessonsService,
   mockLessonContentService,
   mockQuizzesService,
+  mockBooksService,
   mockUserProgressService,
   mockAppSettingsService
 } from './mockService';
@@ -192,6 +193,52 @@ const realQuizzesService = {
   }
 };
 
+const realBooksService = {
+  getAllBooks: async () => {
+    const booksSnapshot = await getDocs(collection(db, 'books'));
+    return booksSnapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  },
+  getBookById: async (bookId) => {
+    const bookSnap = await getDoc(doc(db, 'books', bookId));
+    if (bookSnap.exists()) return { id: bookSnap.id, ...bookSnap.data() };
+    return null;
+  },
+  addBook: async (bookData) => {
+    const docRef = await addDoc(collection(db, 'books'), bookData);
+    return docRef.id;
+  },
+  updateBook: async (bookId, bookData) => {
+    await updateDoc(doc(db, 'books', bookId), bookData);
+  },
+  deleteBook: async (bookId) => {
+    await deleteDoc(doc(db, 'books', bookId));
+  },
+  addVolume: async (bookId, volumeData) => {
+    const book = await realBooksService.getBookById(bookId);
+    if (!book) throw new Error('Book not found');
+    const volumes = book.volumes || [];
+    const newVolume = { ...volumeData, id: volumeData.id || `v-${Date.now()}` };
+    await updateDoc(doc(db, 'books', bookId), { volumes: [...volumes, newVolume] });
+    return newVolume.id;
+  },
+  updateVolume: async (bookId, volumeId, volumeData) => {
+    const book = await realBooksService.getBookById(bookId);
+    if (!book) throw new Error('Book not found');
+    const volumes = (book.volumes || []).map((v) =>
+      v.id === volumeId ? { ...v, ...volumeData } : v
+    );
+    await updateDoc(doc(db, 'books', bookId), { volumes });
+  },
+  deleteVolume: async (bookId, volumeId) => {
+    const book = await realBooksService.getBookById(bookId);
+    if (!book) throw new Error('Book not found');
+    const volumes = (book.volumes || []).filter((v) => v.id !== volumeId);
+    await updateDoc(doc(db, 'books', bookId), { volumes });
+  }
+};
+
 const realUserProgressService = {
   getUserProgress: async (userId) => {
     if (!userId) return null;
@@ -285,6 +332,7 @@ export const sectionsService = isDemoMode ? mockSectionsService : realSectionsSe
 export const lessonsService = isDemoMode ? mockLessonsService : realLessonsService;
 export const lessonContentService = isDemoMode ? mockLessonContentService : realLessonContentService;
 export const quizzesService = isDemoMode ? mockQuizzesService : realQuizzesService;
+export const booksService = isDemoMode ? mockBooksService : realBooksService;
 export const userProgressService = isDemoMode ? mockUserProgressService : realUserProgressService;
 export const appSettingsService = isDemoMode ? mockAppSettingsService : realAppSettingsService;
 
@@ -294,6 +342,7 @@ export default {
   lessons: lessonsService,
   lessonContent: lessonContentService,
   quizzes: quizzesService,
+  books: booksService,
   userProgress: userProgressService,
   appSettings: appSettingsService
 };

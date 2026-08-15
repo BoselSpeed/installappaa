@@ -3,6 +3,9 @@ import { MainLayout } from './layouts/MainLayout'
 import { HomePage } from './pages/HomePage'
 import { SectionsPage } from './pages/SectionsPage'
 import { LessonDetailPage } from './pages/LessonDetailPage'
+import { BooksPage } from './pages/BooksPage'
+import { BookDetailPage } from './pages/BookDetailPage'
+import { VolumeReaderPage } from './pages/VolumeReaderPage'
 import { SearchPage } from './pages/SearchPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { SettingsPage } from './pages/SettingsPage'
@@ -19,6 +22,9 @@ function App() {
           <Route path="/sections" element={<SectionsPage />} />
           <Route path="/sections/:sectionId" element={<SectionsPage />} />
           <Route path="/section/:sectionId/lesson/:lessonId" element={<LessonDetailPage />} />
+          <Route path="/books" element={<BooksPage />} />
+          <Route path="/books/:bookId" element={<BookDetailPage />} />
+          <Route path="/books/:bookId/volume/:volumeId" element={<VolumeReaderPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/settings" element={<SettingsPage />} />

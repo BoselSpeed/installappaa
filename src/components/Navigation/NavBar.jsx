@@ -19,6 +19,12 @@ const NavBar = () => {
 
           <nav className="hidden sm:flex items-center space-x-4 rtl:space-x-reverse">
             <Link
+              to="/books"
+              className="px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded hover:bg-gray-800 transition-colors"
+            >
+              {t('books')}
+            </Link>
+            <Link
               to="/sections"
               className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
             >
@@ -45,6 +51,9 @@ const NavBar = () => {
       </div>
 
       <nav className="sm:hidden flex items-center justify-around border-t border-gray-200 px-2 py-2">
+        <Link to="/books" className="px-3 py-2 text-sm font-medium text-white bg-black rounded transition-colors">
+          {t('books')}
+        </Link>
         <Link to="/sections" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
           {t('browse_sections')}
         </Link>
