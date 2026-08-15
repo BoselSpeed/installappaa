@@ -3,6 +3,8 @@
 // offline without re-downloading. Deleting a volume only removes the local
 // PDF blob — the book and its information are never touched.
 
+import { resolveVolumeUrl } from './supabaseStorage';
+
 const DB_NAME = 'fiqh-app';
 const DB_VERSION = 1;
 const STORE = 'volumes';
@@ -78,9 +80,10 @@ export const removeStoredVolume = async (bookId, volumeId) => {
 };
 
 // Downloads a volume PDF and persists it locally. Reports progress (0-100)
-// through onProgress. Uses the volume's downloadUrl for non-bundled volumes.
+// through onProgress. Resolves the source URL (downloadUrl, Supabase
+// storagePath, or bundled pdfUrl) for non-bundled volumes.
 export const downloadVolume = async (book, volume, onProgress) => {
-  const url = volume.downloadUrl || volume.pdfUrl;
+  const url = resolveVolumeUrl(volume);
   if (!url) {
     throw new Error('No download URL available for this volume');
   }

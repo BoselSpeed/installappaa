@@ -75,14 +75,42 @@ src/data/books.js
 
 1. **المجلد الأول** دائماً `bundled: true` مع `pdfUrl` يشير إلى ملف داخل
    `public/books/` حتى يكون متوفرًا مع التطبيق دون إنترنت.
-2. **المجلدات الأخرى** تكون `bundled: false` مع `downloadUrl` (رابط مباشر
-   لملف PDF). عند الضغط على «تنزيل» يُحفظ الملف محليًا على الجهاز، ويمكن
-   فتحه لاحقًا دون إنترنت.
+2. **المجلدات الأخرى** تكون `bundled: false` مع `downloadUrl` أو `storagePath`
+   (انظر «الاستضافة على Supabase Storage» أدناه). عند الضغط على «تنزيل»
+   يُحفظ الملف محليًا على الجهاز، ويمكن فتحه لاحقًا دون إنترنت.
 3. أي حقل تتركه فارغًا لن يظهر للمستخدم — لا شيء يُحذف ولا شيء ينكسر.
 4. لا تغيّر `id` كتاب موجود إلا إذا أردت إنشاء كتاب جديد.
 5. لا تحذف ملفات PDF الموجودة في `public/books/` ولا الملفات في `public/covers/`.
 6. التطبيق لا يضيف الكتب أو يعدّلها تلقائيًا — أنت من يتحكم بالمحتوى بالكامل
    من خلال هذا الملف.
+
+### الاستضافة على Supabase Storage (مقترح لاستضافة المجلدات الكبيرة)
+
+بدلاً من `downloadUrl` كامل يمكنك تخزين ملفات PDF على **Supabase Storage**
+وتستخدم التطبيق `storagePath`:
+
+```js
+{
+  bundled: false,
+  pdfUrl: null,
+  storagePath: 'books/كتاب-الاسم/vol2.pdf', // المسار داخل الجراب العام (bucket)
+  sizeMb: 150
+}
+```
+
+خطوات الإعداد مرة واحدة:
+
+1. أنشئ مشروعًا مجانيًا على https://supabase.com
+2. من **Storage** أنشئ جرابًا عامًا (public bucket) باسم `books`
+   (Project Settings → Storage → سياسة القراءة العامة).
+3. ارفع ملفات PDF إلى الجراب بنفس بنية `storagePath`.
+4. ضع رابط مشروعك في `src/supabase/config.js`:
+   `projectUrl: 'https://xxxxxxxx.supabase.co'` و `publicBucket: 'books'`.
+
+مزايا هذه الطريقة: روابط التحميل تعمل مع CORS مباشرة، فشريط التقدم يعمل
+داخل التطبيق، ولا يوجد حد 100MB كما في GitHub، والمجلدات الكبيرة مدعومة.
+
+---
 
 ### إضافة كتاب متعدد المجلدات (أي عدد من المجلدات)
 
@@ -123,8 +151,36 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
   - **Volume 1** must be `bundled: true` with a `pdfUrl` pointing to a PDF
     inside `public/books/`. It ships with the app and works offline.
   - **Later volumes** must be `bundled: false` with a `downloadUrl` (a direct
-    link to the PDF). They are downloaded on demand and stored locally on the
-    device, so they can be opened offline afterwards.
+    link to the PDF) or a `storagePath` (a path inside your Supabase public
+    bucket — see below). They are downloaded on demand and stored locally on
+    the device, so they can be opened offline afterwards.
+
+### Hosting on Supabase Storage (recommended for large volumes)
+
+Instead of a full `downloadUrl`, you can store your PDFs on **Supabase
+Storage** and point volumes at them with `storagePath`:
+
+```js
+{
+  bundled: false,
+  pdfUrl: null,
+  storagePath: 'books/book-name/vol2.pdf', // path inside the public bucket
+  sizeMb: 150
+}
+```
+
+One-time setup:
+
+1. Create a free project at https://supabase.com
+2. In **Storage**, create a public bucket named `books` (Project Settings →
+   Storage → public read policy).
+3. Upload your PDFs into the bucket following the same `storagePath` structure.
+4. Put your project URL in `src/supabase/config.js`:
+   `projectUrl: 'https://xxxxxxxx.supabase.co'` and `publicBucket: 'books'`.
+
+Why: public storage URLs work with CORS out of the box, so the in-app
+download progress bar works, there is no 100MB GitHub limit, and large
+volumes are fully supported.
 
 ### Rules
 
