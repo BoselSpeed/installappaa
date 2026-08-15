@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html[dir="rtl"] {
+  font-family: 'Cairo', 'Amiri', system-ui, sans-serif;
+}
+
+html[dir="ltr"] {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background-color: #ffffff;
+  color: #212529;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* PDF reader scroll container */
+.pdf-reader-scroll {
+  height: 70vh;
+  background-color: #f5f5f5;
+}
+
+@media (min-width: 768px) {
+  .pdf-reader-scroll {
+    height: 75vh;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
