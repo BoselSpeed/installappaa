@@ -114,6 +114,7 @@
   "volume_count_none": "بدون مجلدات",
   "description": "نبذة عن الكتاب",
   "volumes": "مجلدات الكتاب",
+  "volumes_short": "مجلدات",
   "volume": "المجلد",
   "download": "تنزيل",
   "open_pdf": "فتح PDF",
