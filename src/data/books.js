@@ -222,16 +222,16 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1FcgySndQ_tGecVHcl1Axu5bcjBdzajuF/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'الجزء ١', title_en: 'Part 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '0001-0343.pdf', sizeMb: 9.3 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ٢', title_en: 'Part 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0344-0686.pdf', sizeMb: 8.5 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٣', title_en: 'Part 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0687-1029.pdf', sizeMb: 8.5 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٤', title_en: 'Part 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1030-1372.pdf', sizeMb: 8.7 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٥', title_en: 'Part 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '1373-1715.pdf', sizeMb: 8.0 },
-      { id: 'v6', number: 6, title_ar: 'الجزء ٦', title_en: 'Part 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '1716-2058.pdf', sizeMb: 8.4 },
-      { id: 'v7', number: 7, title_ar: 'الجزء ٧', title_en: 'Part 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '2059-2401.pdf', sizeMb: 8.2 },
-      { id: 'v8', number: 8, title_ar: 'الجزء ٨', title_en: 'Part 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '2402-2744.pdf', sizeMb: 8.2 },
-      { id: 'v9', number: 9, title_ar: 'الجزء ٩', title_en: 'Part 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '2745-3087.pdf', sizeMb: 7.6 },
-      { id: 'v10', number: 10, title_ar: 'الجزء ١٠', title_en: 'Part 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '3088-3430.pdf', sizeMb: 5.7 }
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/tafsir-al-baghawi-v1.pdf', downloadUrl: null, path: '0001-0343.pdf', sizeMb: 9.3 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0344-0686.pdf', sizeMb: 8.5 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0687-1029.pdf', sizeMb: 8.5 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1030-1372.pdf', sizeMb: 8.7 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '1373-1715.pdf', sizeMb: 8.0 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٦', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '1716-2058.pdf', sizeMb: 8.4 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٧', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '2059-2401.pdf', sizeMb: 8.2 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٨', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '2402-2744.pdf', sizeMb: 8.2 },
+      { id: 'v9', number: 9, title_ar: 'المجلد ٩', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '2745-3087.pdf', sizeMb: 7.6 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ١٠', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '3088-3430.pdf', sizeMb: 5.7 }
     ]
   },
   {
@@ -268,11 +268,11 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1FJ9TVi7Ssb9z4v5PFZR9-LDhwAcFIZl0/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt1p.pdf', sizeMb: 1.3 },
-      { id: 'v2', number: 2, title_ar: 'الجزء الأول: الأحاديث 1 - 640', title_en: 'Volume 1: Hadiths 1 - 640', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt1.pdf', sizeMb: 8.6 },
-      { id: 'v3', number: 3, title_ar: 'الجزء الثاني: الأحاديث 641 - 1469', title_en: 'Volume 2: Hadiths 641 - 1469', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt2.pdf', sizeMb: 11.1 },
-      { id: 'v4', number: 4, title_ar: 'الجزء الثالث: الأحاديث 1470 - 2358', title_en: 'Volume 3: Hadiths 1470 - 2358', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt3.pdf', sizeMb: 10.5 },
-      { id: 'v5', number: 5, title_ar: 'الجزء الرابع: الأحاديث 2359 - 2890', title_en: 'Volume 4: Hadiths 2359 - 2890', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt4.pdf', sizeMb: 10.4 }
+      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: true, pdfUrl: '/books/musnad-abi-dawud-v1.pdf', downloadUrl: null, path: 'madt1p.pdf', sizeMb: 1.3 },
+      { id: 'v2', number: 2, title_ar: 'المجلد الأول: الأحاديث 1 - 640', title_en: 'Volume 1: Hadiths 1 - 640', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt1.pdf', sizeMb: 8.6 },
+      { id: 'v3', number: 3, title_ar: 'المجلد الثاني: الأحاديث 641 - 1469', title_en: 'Volume 2: Hadiths 641 - 1469', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt2.pdf', sizeMb: 11.1 },
+      { id: 'v4', number: 4, title_ar: 'المجلد الثالث: الأحاديث 1470 - 2358', title_en: 'Volume 3: Hadiths 1470 - 2358', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt3.pdf', sizeMb: 10.5 },
+      { id: 'v5', number: 5, title_ar: 'المجلد الرابع: الأحاديث 2359 - 2890', title_en: 'Volume 4: Hadiths 2359 - 2890', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt4.pdf', sizeMb: 10.4 }
     ]
   },
   {
@@ -309,16 +309,16 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1Mzd6incsUn42wwhp3jq0a3nYB1n38Ej5/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'الجزء ١', title_en: 'Part 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '0001-0200.pdf', sizeMb: 4.8 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ٢', title_en: 'Part 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0201-0400.pdf', sizeMb: 4.2 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٣', title_en: 'Part 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0401-0600.pdf', sizeMb: 4.1 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٤', title_en: 'Part 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '0601-0800.pdf', sizeMb: 4.5 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٥', title_en: 'Part 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '0801-1000.pdf', sizeMb: 4.6 },
-      { id: 'v6', number: 6, title_ar: 'الجزء ٦', title_en: 'Part 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '1001-1200.pdf', sizeMb: 4.8 },
-      { id: 'v7', number: 7, title_ar: 'الجزء ٧', title_en: 'Part 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '1201-1400.pdf', sizeMb: 4.4 },
-      { id: 'v8', number: 8, title_ar: 'الجزء ٨', title_en: 'Part 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '1401-1600.pdf', sizeMb: 4.2 },
-      { id: 'v9', number: 9, title_ar: 'الجزء ٩', title_en: 'Part 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '1601-1800.pdf', sizeMb: 4.5 },
-      { id: 'v10', number: 10, title_ar: 'الجزء ١٠', title_en: 'Part 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '1801-1944.pdf', sizeMb: 3.3 }
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/sahih-al-bukhari-v1.pdf', downloadUrl: null, path: '0001-0200.pdf', sizeMb: 4.8 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0201-0400.pdf', sizeMb: 4.2 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0401-0600.pdf', sizeMb: 4.1 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '0601-0800.pdf', sizeMb: 4.5 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '0801-1000.pdf', sizeMb: 4.6 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٦', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '1001-1200.pdf', sizeMb: 4.8 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٧', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '1201-1400.pdf', sizeMb: 4.4 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٨', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '1401-1600.pdf', sizeMb: 4.2 },
+      { id: 'v9', number: 9, title_ar: 'المجلد ٩', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '1601-1800.pdf', sizeMb: 4.5 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ١٠', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '1801-1944.pdf', sizeMb: 3.3 }
     ]
   },
   {
@@ -355,16 +355,16 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1oqAej4IjBw6o8Acl7O7ZETlNi2i_hmeZ/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'الجزء ١', title_en: 'Part 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '0001-0300.pdf', sizeMb: 6.5 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ٢', title_en: 'Part 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0301-0600.pdf', sizeMb: 6.5 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٣', title_en: 'Part 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0601-0900.pdf', sizeMb: 6.6 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٤', title_en: 'Part 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '0901-1200.pdf', sizeMb: 6.4 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٥', title_en: 'Part 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '1201-1500.pdf', sizeMb: 6.5 },
-      { id: 'v6', number: 6, title_ar: 'الجزء ٦', title_en: 'Part 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '1501-1800.pdf', sizeMb: 6.2 },
-      { id: 'v7', number: 7, title_ar: 'الجزء ٧', title_en: 'Part 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '1801-2100.pdf', sizeMb: 6.2 },
-      { id: 'v8', number: 8, title_ar: 'الجزء ٨', title_en: 'Part 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '2101-2400.pdf', sizeMb: 5.6 },
-      { id: 'v9', number: 9, title_ar: 'الجزء ٩', title_en: 'Part 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '2401-2700.pdf', sizeMb: 2.7 },
-      { id: 'v10', number: 10, title_ar: 'الجزء ١٠', title_en: 'Part 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '2701-2933.pdf', sizeMb: 3.5 }
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/sahih-muslim-v1.pdf', downloadUrl: null, path: '0001-0300.pdf', sizeMb: 6.5 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0301-0600.pdf', sizeMb: 6.5 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0601-0900.pdf', sizeMb: 6.6 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '0901-1200.pdf', sizeMb: 6.4 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '1201-1500.pdf', sizeMb: 6.5 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٦', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '1501-1800.pdf', sizeMb: 6.2 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٧', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '1801-2100.pdf', sizeMb: 6.2 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٨', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '2101-2400.pdf', sizeMb: 5.6 },
+      { id: 'v9', number: 9, title_ar: 'المجلد ٩', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '2401-2700.pdf', sizeMb: 2.7 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ١٠', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '2701-2933.pdf', sizeMb: 3.5 }
     ]
   },
   {
@@ -401,16 +401,16 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1WaN7z9KBvvmGQrS_qB8derlWYJJGUoXe/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'الجزء ١', title_en: 'Part 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '0001-0590.pdf', sizeMb: 9.2 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ٢', title_en: 'Part 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0591-1180.pdf', sizeMb: 13.5 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٣', title_en: 'Part 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '1181-1770.pdf', sizeMb: 13.5 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٤', title_en: 'Part 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1771-2360.pdf', sizeMb: 13.3 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٥', title_en: 'Part 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '2361-2950.pdf', sizeMb: 13.5 },
-      { id: 'v6', number: 6, title_ar: 'الجزء ٦', title_en: 'Part 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '2951-3540.pdf', sizeMb: 13.2 },
-      { id: 'v7', number: 7, title_ar: 'الجزء ٧', title_en: 'Part 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '3541-4130.pdf', sizeMb: 13.0 },
-      { id: 'v8', number: 8, title_ar: 'الجزء ٨', title_en: 'Part 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '4131-4720.pdf', sizeMb: 13.5 },
-      { id: 'v9', number: 9, title_ar: 'الجزء ٩', title_en: 'Part 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '4721-5310.pdf', sizeMb: 13.5 },
-      { id: 'v10', number: 10, title_ar: 'الجزء ١٠', title_en: 'Part 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '5311-5886.pdf', sizeMb: 10.8 }
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/sunan-al-nasai-v1.pdf', downloadUrl: null, path: '0001-0590.pdf', sizeMb: 9.2 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0591-1180.pdf', sizeMb: 13.5 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '1181-1770.pdf', sizeMb: 13.5 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1771-2360.pdf', sizeMb: 13.3 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '2361-2950.pdf', sizeMb: 13.5 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٦', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '2951-3540.pdf', sizeMb: 13.2 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٧', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '3541-4130.pdf', sizeMb: 13.0 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٨', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '4131-4720.pdf', sizeMb: 13.5 },
+      { id: 'v9', number: 9, title_ar: 'المجلد ٩', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '4721-5310.pdf', sizeMb: 13.5 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ١٠', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '5311-5886.pdf', sizeMb: 10.8 }
     ]
   },
   {
@@ -447,11 +447,11 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1k-BRprDbtC7VpB5saVTBagceu0PAgXKs/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'الجزء ١', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi01.pdf', sizeMb: 8.6 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi02.pdf', sizeMb: 7.2 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi03.pdf', sizeMb: 9.7 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi04.pdf', sizeMb: 10.8 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi05.pdf', sizeMb: 12.7 }
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/sunan-al-tirmidhi-v1.pdf', downloadUrl: null, path: 'Sunan_Tirmithi01.pdf', sizeMb: 8.6 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi02.pdf', sizeMb: 7.2 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi03.pdf', sizeMb: 9.7 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi04.pdf', sizeMb: 10.8 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi05.pdf', sizeMb: 12.7 }
     ]
   },
   {
@@ -488,31 +488,31 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1afH4OzfUWtundYWzuSS7vC__NK0regaa/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'مقدمة', title_en: 'Introduction', bundled: false, pdfUrl: null, downloadUrl: null, path: '01_73651p.pdf', sizeMb: 0.6 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ١: الفاتحة - البقرة ٣٩', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '01_73651.pdf', sizeMb: 12.4 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٢: البقرة ٤٠ - ١٦٤', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '02_73652.pdf', sizeMb: 12.1 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٣: البقرة ١٦٥ - ٢٢٢', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '03_73653.pdf', sizeMb: 11.6 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٤: البقرة ٢٢٣ - آخرها', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '04_73654.pdf', sizeMb: 11.9 },
-      { id: 'v6', number: 6, title_ar: 'الجزء ٥: آل عمران', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '05_73655.pdf', sizeMb: 11.9 },
-      { id: 'v7', number: 7, title_ar: 'الجزء ٦: النساء ١ - ٩١', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '06_73656.pdf', sizeMb: 10.0 },
-      { id: 'v8', number: 8, title_ar: 'الجزء ٧: النساء ٩٢ - المائدة ٤٤', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '07_73657.pdf', sizeMb: 9.7 },
-      { id: 'v9', number: 9, title_ar: 'الجزء ٨: المائدة ٤٥ - الأنعام', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '08_73658.pdf', sizeMb: 11.1 },
-      { id: 'v10', number: 10, title_ar: 'الجزء ٩: الأنعام ١١٤ - الأنفال ٤٠', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '09_73659.pdf', sizeMb: 11.4 },
-      { id: 'v11', number: 11, title_ar: 'الجزء ١٠: الأنفال ٤١ - يونس ٤٦', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '10_73660.pdf', sizeMb: 11.7 },
-      { id: 'v12', number: 12, title_ar: 'الجزء ١١: يونس ٤٧ - يوسف', title_en: 'Volume 11', bundled: false, pdfUrl: null, downloadUrl: null, path: '11_73661.pdf', sizeMb: 10.6 },
-      { id: 'v13', number: 13, title_ar: 'الجزء ١٢: الرعد - النحل', title_en: 'Volume 12', bundled: false, pdfUrl: null, downloadUrl: null, path: '12_73662.pdf', sizeMb: 10.3 },
-      { id: 'v14', number: 14, title_ar: 'الجزء ١٣: الإسراء - مريم', title_en: 'Volume 13', bundled: false, pdfUrl: null, downloadUrl: null, path: '13_73663.pdf', sizeMb: 12.0 },
-      { id: 'v15', number: 15, title_ar: 'الجزء ١٤: طه - الحج', title_en: 'Volume 14', bundled: false, pdfUrl: null, downloadUrl: null, path: '14_73664.pdf', sizeMb: 9.9 },
-      { id: 'v16', number: 16, title_ar: 'الجزء ١٥: المؤمنون - الفرقان', title_en: 'Volume 15', bundled: false, pdfUrl: null, downloadUrl: null, path: '15_73665.pdf', sizeMb: 11.0 },
-      { id: 'v17', number: 17, title_ar: 'الجزء ١٦: الشعراء - لقمان', title_en: 'Volume 16', bundled: false, pdfUrl: null, downloadUrl: null, path: '16_73666.pdf', sizeMb: 11.5 },
-      { id: 'v18', number: 18, title_ar: 'الجزء ١٧: السجدة - يس', title_en: 'Volume 17', bundled: false, pdfUrl: null, downloadUrl: null, path: '17_73667.pdf', sizeMb: 11.2 },
-      { id: 'v19', number: 19, title_ar: 'الجزء ١٨: الصافات - الشورى', title_en: 'Volume 18', bundled: false, pdfUrl: null, downloadUrl: null, path: '18_73668.pdf', sizeMb: 11.8 },
-      { id: 'v20', number: 20, title_ar: 'الجزء ١٩: الزخرف - الطور', title_en: 'Volume 19', bundled: false, pdfUrl: null, downloadUrl: null, path: '19_73669.pdf', sizeMb: 10.8 },
-      { id: 'v21', number: 21, title_ar: 'الجزء ٢٠', title_en: 'Volume 20', bundled: false, pdfUrl: null, downloadUrl: null, path: '20_73670.pdf', sizeMb: 11.5 },
-      { id: 'v22', number: 22, title_ar: 'الجزء ٢١: التغابن - المرسلات', title_en: 'Volume 21', bundled: false, pdfUrl: null, downloadUrl: null, path: '21_73671.pdf', sizeMb: 10.9 },
-      { id: 'v23', number: 23, title_ar: 'الجزء ٢٢: النبأ - الناس', title_en: 'Volume 22', bundled: false, pdfUrl: null, downloadUrl: null, path: '22_73672.pdf', sizeMb: 11.2 },
-      { id: 'v24', number: 24, title_ar: 'الجزء ٢٣: الفهارس - الأحاديث والآثار والأشعار', title_en: 'Volume 23', bundled: false, pdfUrl: null, downloadUrl: null, path: '23_73673.pdf', sizeMb: 10.1 },
-      { id: 'v25', number: 25, title_ar: 'الجزء ٢٤: الفهارس العامة - الأعلام والموضوعات واللغة', title_en: 'Volume 24', bundled: false, pdfUrl: null, downloadUrl: null, path: '24_73674.pdf', sizeMb: 4.5 }
+      { id: 'v1', number: 1, title_ar: 'مقدمة', title_en: 'Introduction', bundled: true, pdfUrl: '/books/tafsir-al-qurtubi-v1.pdf', downloadUrl: null, path: '01_73651p.pdf', sizeMb: 0.6 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ١: الفاتحة - البقرة ٣٩', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '01_73651.pdf', sizeMb: 12.4 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٢: البقرة ٤٠ - ١٦٤', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '02_73652.pdf', sizeMb: 12.1 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٣: البقرة ١٦٥ - ٢٢٢', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '03_73653.pdf', sizeMb: 11.6 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٤: البقرة ٢٢٣ - آخرها', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '04_73654.pdf', sizeMb: 11.9 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٥: آل عمران', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '05_73655.pdf', sizeMb: 11.9 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٦: النساء ١ - ٩١', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '06_73656.pdf', sizeMb: 10.0 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٧: النساء ٩٢ - المائدة ٤٤', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '07_73657.pdf', sizeMb: 9.7 },
+      { id: 'v9', number: 9, title_ar: 'المجلد ٨: المائدة ٤٥ - الأنعام', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '08_73658.pdf', sizeMb: 11.1 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ٩: الأنعام ١١٤ - الأنفال ٤٠', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '09_73659.pdf', sizeMb: 11.4 },
+      { id: 'v11', number: 11, title_ar: 'المجلد ١٠: الأنفال ٤١ - يونس ٤٦', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '10_73660.pdf', sizeMb: 11.7 },
+      { id: 'v12', number: 12, title_ar: 'المجلد ١١: يونس ٤٧ - يوسف', title_en: 'Volume 11', bundled: false, pdfUrl: null, downloadUrl: null, path: '11_73661.pdf', sizeMb: 10.6 },
+      { id: 'v13', number: 13, title_ar: 'المجلد ١٢: الرعد - النحل', title_en: 'Volume 12', bundled: false, pdfUrl: null, downloadUrl: null, path: '12_73662.pdf', sizeMb: 10.3 },
+      { id: 'v14', number: 14, title_ar: 'المجلد ١٣: الإسراء - مريم', title_en: 'Volume 13', bundled: false, pdfUrl: null, downloadUrl: null, path: '13_73663.pdf', sizeMb: 12.0 },
+      { id: 'v15', number: 15, title_ar: 'المجلد ١٤: طه - الحج', title_en: 'Volume 14', bundled: false, pdfUrl: null, downloadUrl: null, path: '14_73664.pdf', sizeMb: 9.9 },
+      { id: 'v16', number: 16, title_ar: 'المجلد ١٥: المؤمنون - الفرقان', title_en: 'Volume 15', bundled: false, pdfUrl: null, downloadUrl: null, path: '15_73665.pdf', sizeMb: 11.0 },
+      { id: 'v17', number: 17, title_ar: 'المجلد ١٦: الشعراء - لقمان', title_en: 'Volume 16', bundled: false, pdfUrl: null, downloadUrl: null, path: '16_73666.pdf', sizeMb: 11.5 },
+      { id: 'v18', number: 18, title_ar: 'المجلد ١٧: السجدة - يس', title_en: 'Volume 17', bundled: false, pdfUrl: null, downloadUrl: null, path: '17_73667.pdf', sizeMb: 11.2 },
+      { id: 'v19', number: 19, title_ar: 'المجلد ١٨: الصافات - الشورى', title_en: 'Volume 18', bundled: false, pdfUrl: null, downloadUrl: null, path: '18_73668.pdf', sizeMb: 11.8 },
+      { id: 'v20', number: 20, title_ar: 'المجلد ١٩: الزخرف - الطور', title_en: 'Volume 19', bundled: false, pdfUrl: null, downloadUrl: null, path: '19_73669.pdf', sizeMb: 10.8 },
+      { id: 'v21', number: 21, title_ar: 'المجلد ٢٠', title_en: 'Volume 20', bundled: false, pdfUrl: null, downloadUrl: null, path: '20_73670.pdf', sizeMb: 11.5 },
+      { id: 'v22', number: 22, title_ar: 'المجلد ٢١: التغابن - المرسلات', title_en: 'Volume 21', bundled: false, pdfUrl: null, downloadUrl: null, path: '21_73671.pdf', sizeMb: 10.9 },
+      { id: 'v23', number: 23, title_ar: 'المجلد ٢٢: النبأ - الناس', title_en: 'Volume 22', bundled: false, pdfUrl: null, downloadUrl: null, path: '22_73672.pdf', sizeMb: 11.2 },
+      { id: 'v24', number: 24, title_ar: 'المجلد ٢٣: الفهارس - الأحاديث والآثار والأشعار', title_en: 'Volume 23', bundled: false, pdfUrl: null, downloadUrl: null, path: '23_73673.pdf', sizeMb: 10.1 },
+      { id: 'v25', number: 25, title_ar: 'المجلد ٢٤: الفهارس العامة - الأعلام والموضوعات واللغة', title_en: 'Volume 24', bundled: false, pdfUrl: null, downloadUrl: null, path: '24_73674.pdf', sizeMb: 4.5 }
     ]
   },
   {
@@ -549,32 +549,32 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/10qPAffk3lx1NgTNj3b73GsSsxOjA1IKQ/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry01p.pdf', sizeMb: 4.6 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ١: الفاتحة - البقرة ٥٩', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry01.pdf', sizeMb: 12.7 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٢: البقرة ٦٠ - ١٦٣', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry02.pdf', sizeMb: 13.1 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٣: البقرة ١٦٤ - ٢٢٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry03.pdf', sizeMb: 13.0 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٤: البقرة ٢٢٤ - ٢٦٧', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry04.pdf', sizeMb: 12.4 },
-      { id: 'v6', number: 6, title_ar: 'الجزء ٥: البقرة ٢٦٨ - آل عمران ١٢٠', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry05.pdf', sizeMb: 12.9 },
-      { id: 'v7', number: 7, title_ar: 'الجزء ٦: آل عمران ١٢١ - النساء ٣٥', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry06.pdf', sizeMb: 13.3 },
-      { id: 'v8', number: 8, title_ar: 'الجزء ٧: النساء ٣٦ - آخرها', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry07.pdf', sizeMb: 14.7 },
-      { id: 'v9', number: 9, title_ar: 'الجزء ٨: المائدة ١ - ٩٦', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry08.pdf', sizeMb: 13.0 },
-      { id: 'v10', number: 10, title_ar: 'الجزء ٩: المائدة ٩٧ - الأنعام ١٥٤', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry09.pdf', sizeMb: 13.2 },
-      { id: 'v11', number: 11, title_ar: 'الجزء ١٠: الأنعام ١٥٥ - الأعراف ٢٠٦', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry10.pdf', sizeMb: 12.5 },
-      { id: 'v12', number: 12, title_ar: 'الجزء ١١', title_en: 'Volume 11', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry11.pdf', sizeMb: 13.5 },
-      { id: 'v13', number: 13, title_ar: 'الجزء ١٢', title_en: 'Volume 12', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry12.pdf', sizeMb: 12.0 },
-      { id: 'v14', number: 14, title_ar: 'الجزء ١٣', title_en: 'Volume 13', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry13.pdf', sizeMb: 12.4 },
-      { id: 'v15', number: 15, title_ar: 'الجزء ١٤', title_en: 'Volume 14', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry14.pdf', sizeMb: 12.7 },
-      { id: 'v16', number: 16, title_ar: 'الجزء ١٥', title_en: 'Volume 15', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry15.pdf', sizeMb: 10.8 },
-      { id: 'v17', number: 17, title_ar: 'الجزء ١٦', title_en: 'Volume 16', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry16.pdf', sizeMb: 13.0 },
-      { id: 'v18', number: 18, title_ar: 'الجزء ١٧', title_en: 'Volume 17', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry17.pdf', sizeMb: 11.5 },
-      { id: 'v19', number: 19, title_ar: 'الجزء ١٨', title_en: 'Volume 18', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry18.pdf', sizeMb: 11.0 },
-      { id: 'v20', number: 20, title_ar: 'الجزء ١٩', title_en: 'Volume 19', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry19.pdf', sizeMb: 11.5 },
-      { id: 'v21', number: 21, title_ar: 'الجزء ٢٠: ص - الزخرف', title_en: 'Volume 20', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry20.pdf', sizeMb: 11.5 },
-      { id: 'v22', number: 22, title_ar: 'الجزء ٢١: الدخان - الطور', title_en: 'Volume 21', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry21.pdf', sizeMb: 10.3 },
-      { id: 'v23', number: 23, title_ar: 'الجزء ٢٢: النجم - المنافقون', title_en: 'Volume 22', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry22.pdf', sizeMb: 12.2 },
-      { id: 'v24', number: 24, title_ar: 'الجزء ٢٣: التغابن - المرسلات', title_en: 'Volume 23', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry23.pdf', sizeMb: 10.9 },
-      { id: 'v25', number: 25, title_ar: 'الجزء ٢٤: تفسير جزء عم', title_en: 'Volume 24', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry24.pdf', sizeMb: 11.8 },
-      { id: 'v26', number: 26, title_ar: 'الفهارس: الجزءان ٢٥ و ٢٦', title_en: 'Indexes', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry25_26.pdf', sizeMb: 18.7 }
+      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: true, pdfUrl: '/books/tafsir-al-tabari-v1.pdf', downloadUrl: null, path: 'taftabry01p.pdf', sizeMb: 4.6 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ١: الفاتحة - البقرة ٥٩', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry01.pdf', sizeMb: 12.7 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٢: البقرة ٦٠ - ١٦٣', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry02.pdf', sizeMb: 13.1 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٣: البقرة ١٦٤ - ٢٢٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry03.pdf', sizeMb: 13.0 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٤: البقرة ٢٢٤ - ٢٦٧', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry04.pdf', sizeMb: 12.4 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٥: البقرة ٢٦٨ - آل عمران ١٢٠', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry05.pdf', sizeMb: 12.9 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٦: آل عمران ١٢١ - النساء ٣٥', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry06.pdf', sizeMb: 13.3 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٧: النساء ٣٦ - آخرها', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry07.pdf', sizeMb: 14.7 },
+      { id: 'v9', number: 9, title_ar: 'المجلد ٨: المائدة ١ - ٩٦', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry08.pdf', sizeMb: 13.0 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ٩: المائدة ٩٧ - الأنعام ١٥٤', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry09.pdf', sizeMb: 13.2 },
+      { id: 'v11', number: 11, title_ar: 'المجلد ١٠: الأنعام ١٥٥ - الأعراف ٢٠٦', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry10.pdf', sizeMb: 12.5 },
+      { id: 'v12', number: 12, title_ar: 'المجلد ١١', title_en: 'Volume 11', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry11.pdf', sizeMb: 13.5 },
+      { id: 'v13', number: 13, title_ar: 'المجلد ١٢', title_en: 'Volume 12', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry12.pdf', sizeMb: 12.0 },
+      { id: 'v14', number: 14, title_ar: 'المجلد ١٣', title_en: 'Volume 13', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry13.pdf', sizeMb: 12.4 },
+      { id: 'v15', number: 15, title_ar: 'المجلد ١٤', title_en: 'Volume 14', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry14.pdf', sizeMb: 12.7 },
+      { id: 'v16', number: 16, title_ar: 'المجلد ١٥', title_en: 'Volume 15', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry15.pdf', sizeMb: 10.8 },
+      { id: 'v17', number: 17, title_ar: 'المجلد ١٦', title_en: 'Volume 16', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry16.pdf', sizeMb: 13.0 },
+      { id: 'v18', number: 18, title_ar: 'المجلد ١٧', title_en: 'Volume 17', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry17.pdf', sizeMb: 11.5 },
+      { id: 'v19', number: 19, title_ar: 'المجلد ١٨', title_en: 'Volume 18', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry18.pdf', sizeMb: 11.0 },
+      { id: 'v20', number: 20, title_ar: 'المجلد ١٩', title_en: 'Volume 19', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry19.pdf', sizeMb: 11.5 },
+      { id: 'v21', number: 21, title_ar: 'المجلد ٢٠: ص - الزخرف', title_en: 'Volume 20', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry20.pdf', sizeMb: 11.5 },
+      { id: 'v22', number: 22, title_ar: 'المجلد ٢١: الدخان - الطور', title_en: 'Volume 21', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry21.pdf', sizeMb: 10.3 },
+      { id: 'v23', number: 23, title_ar: 'المجلد ٢٢: النجم - المنافقون', title_en: 'Volume 22', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry22.pdf', sizeMb: 12.2 },
+      { id: 'v24', number: 24, title_ar: 'المجلد ٢٣: التغابن - المرسلات', title_en: 'Volume 23', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry23.pdf', sizeMb: 10.9 },
+      { id: 'v25', number: 25, title_ar: 'المجلد ٢٤: تفسير جزء عم', title_en: 'Volume 24', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry24.pdf', sizeMb: 11.8 },
+      { id: 'v26', number: 26, title_ar: 'الفهارس: المجلدان ٢٥ و ٢٦', title_en: 'Indexes', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry25_26.pdf', sizeMb: 18.7 }
     ]
   },
   {
@@ -611,11 +611,11 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1qEWMYuHmlpH4WyhsqkvBqJgvyDWh0ugh/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'الجزء ١: الفاتحة - النساء', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني - الجزء الأول.pdf', sizeMb: 19.3 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ٢: المائدة - هود', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني - الجزء الثاني.pdf', sizeMb: 17.0 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٣: يوسف - المؤمنون', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الثالث.pdf', sizeMb: 15.2 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٤: النور - الدخان', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الرابع.pdf', sizeMb: 17.0 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٥: الجاثية - الناس', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الخامس.pdf', sizeMb: 15.4 }
+      { id: 'v1', number: 1, title_ar: 'المجلد ١: الفاتحة - النساء', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/tafsir-al-shawkani-v1.pdf', downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني - الجزء الأول.pdf', sizeMb: 19.3 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢: المائدة - هود', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني - الجزء الثاني.pdf', sizeMb: 17.0 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣: يوسف - المؤمنون', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الثالث.pdf', sizeMb: 15.2 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤: النور - الدخان', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الرابع.pdf', sizeMb: 17.0 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥: الجاثية - الناس', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الخامس.pdf', sizeMb: 15.4 }
     ]
   },
   {
@@ -652,17 +652,17 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/15TV24fFlE-mSRp4yDRNCXU4fc4ghNbfg/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'الجزء ١', title_en: 'Part 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '0001-0450.pdf', sizeMb: 12.0 },
-      { id: 'v2', number: 2, title_ar: 'الجزء ٢', title_en: 'Part 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0451-0900.pdf', sizeMb: 12.0 },
-      { id: 'v3', number: 3, title_ar: 'الجزء ٣', title_en: 'Part 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0901-1350.pdf', sizeMb: 11.6 },
-      { id: 'v4', number: 4, title_ar: 'الجزء ٤', title_en: 'Part 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1351-1800.pdf', sizeMb: 11.6 },
-      { id: 'v5', number: 5, title_ar: 'الجزء ٥', title_en: 'Part 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '1801-2250.pdf', sizeMb: 11.4 },
-      { id: 'v6', number: 6, title_ar: 'الجزء ٦', title_en: 'Part 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '2251-2700.pdf', sizeMb: 11.4 },
-      { id: 'v7', number: 7, title_ar: 'الجزء ٧', title_en: 'Part 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '2701-3150.pdf', sizeMb: 11.2 },
-      { id: 'v8', number: 8, title_ar: 'الجزء ٨', title_en: 'Part 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '3151-3600.pdf', sizeMb: 11.1 },
-      { id: 'v9', number: 9, title_ar: 'الجزء ٩', title_en: 'Part 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '3601-4050.pdf', sizeMb: 12.1 },
-      { id: 'v10', number: 10, title_ar: 'الجزء ١٠', title_en: 'Part 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '4051-4500.pdf', sizeMb: 10.6 },
-      { id: 'v11', number: 11, title_ar: 'الجزء ١١', title_en: 'Part 11', bundled: false, pdfUrl: null, downloadUrl: null, path: '4501-4664.pdf', sizeMb: 3.5 }
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/tafsir-ibn-kathir-v1.pdf', downloadUrl: null, path: '0001-0450.pdf', sizeMb: 12.0 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0451-0900.pdf', sizeMb: 12.0 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0901-1350.pdf', sizeMb: 11.6 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1351-1800.pdf', sizeMb: 11.6 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: null, path: '1801-2250.pdf', sizeMb: 11.4 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٦', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: null, path: '2251-2700.pdf', sizeMb: 11.4 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٧', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: null, path: '2701-3150.pdf', sizeMb: 11.2 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٨', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: null, path: '3151-3600.pdf', sizeMb: 11.1 },
+      { id: 'v9', number: 9, title_ar: 'المجلد ٩', title_en: 'Volume 9', bundled: false, pdfUrl: null, downloadUrl: null, path: '3601-4050.pdf', sizeMb: 12.1 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ١٠', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: null, path: '4051-4500.pdf', sizeMb: 10.6 },
+      { id: 'v11', number: 11, title_ar: 'المجلد ١١', title_en: 'Volume 11', bundled: false, pdfUrl: null, downloadUrl: null, path: '4501-4664.pdf', sizeMb: 3.5 }
     ]
   },
   {
@@ -699,9 +699,9 @@ const SEED_BOOKS = [
         number: 1,
         title_ar: 'الكتاب كاملًا',
         title_en: 'Full Book',
-        bundled: false,
-        pdfUrl: null,
-        downloadUrl: 'https://drive.usercontent.google.com/download?id=1t6Yg1wtcRkh2nJtXVUNw4H4PKo_suw6b&export=download&confirm=t',
+        bundled: true,
+        pdfUrl: '/books/qisas-min-sahih-al-bukhari.pdf',
+        downloadUrl: null,
         sizeMb: 2.4
       }
     ]
