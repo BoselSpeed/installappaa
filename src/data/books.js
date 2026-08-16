@@ -50,7 +50,7 @@ const SEED_BOOKS = [
       'كتاب للإمام المجدد محمد بن عبد الوهاب في توحيد العبادة وما يناقضه من الشرك الأكبر والأصغر، مع أدلته من الكتاب والسنة وآثار السلف، وبيان ما يجب على العبد من توحيد الله وحده.',
     description_en:
       'A book by the Reviver Imam Muhammad ibn Abd al-Wahhab on the oneness of worship (Tawhid) and what negates it of major and minor shirk, with evidence from the Quran, Sunnah, and the Salaf, explaining what is incumbent upon the servant in singling out Allah alone.',
-    coverImage: '/covers/kitab-al-tawhid.svg',
+    coverImage: '/covers/kitab-al-tawhid.jpg',
     order: 1,
     volumes: [
       {
@@ -91,7 +91,7 @@ const SEED_BOOKS = [
       'متن للإمام محمد بن عبد الوهاب في الأصول الثلاثة التي يجب على كل مسلم معرفتها والعمل بها: معرفة العبد ربه، ومعرفة دينه، ومعرفة نبيه ﷺ، مع أدلتها من الكتاب والسنة.',
     description_en:
       'A text by Imam Muhammad ibn Abd al-Wahhab on the three fundamentals every Muslim must know and act upon: knowing his Lord, his religion, and his Prophet, with their evidences from the Quran and Sunnah.',
-    coverImage: '/covers/thalathat-al-usul.svg',
+    coverImage: '/covers/thalathat-al-usul.jpg',
     order: 2,
     volumes: [
       {
@@ -132,7 +132,7 @@ const SEED_BOOKS = [
       'رسالة لشيخ الإسلام ابن تيمية في بيان عقيدة أهل السنة والجماعة في أسماء الله وصفاته والقدر والإيمان واليوم الآخر، بأسلوب يعتمد على نصوص الكتاب والسنة وإجماع السلف.',
     description_en:
       "A treatise by Shaykh al-Islam Ibn Taymiyyah expounding the creed of Ahl al-Sunnah wal-Jama'ah regarding Allah's names and attributes, Qadar, faith, and the Hereafter, grounded in the Quran, Sunnah, and the consensus of the Salaf.",
-    coverImage: '/covers/al-aqidah-al-wasitiyyah.svg',
+    coverImage: '/covers/al-aqidah-al-wasitiyyah.jpg',
     order: 3,
     volumes: [
       {
@@ -173,7 +173,7 @@ const SEED_BOOKS = [
       'رسالة للإمام محمد بن عبد الوهاب تكشف الشبهات التي يثيرها المخالفون حول التوحيد وعبادة الله وحده، مع الرد عليها بالأدلة من الكتاب والسنة.',
     description_en:
       "A treatise by Imam Muhammad ibn Abd al-Wahhab unveiling the ambiguities raised against Tawheed and the worship of Allah alone, responding to them with evidence from the Quran and Sunnah.",
-    coverImage: '/covers/kashf-al-shubuhat.svg',
+    coverImage: '/covers/kashf-al-shubuhat.jpg',
     order: 4,
     volumes: [
       {
@@ -214,7 +214,7 @@ const SEED_BOOKS = [
       'تفسير جامع للإمام البغوي يجمع بين التفسير بالمأثور وعرض أقوال المفسرين بأسلوب متوسط، مع عناية بالقراءات وذكر أسباب النزول والأحكام المستنبطة.',
     description_en:
       "A comprehensive tafsir by Imam al-Baghawi combining transmitted interpretation with the views of early commentators in a moderate style, paying attention to the qira'at, occasions of revelation, and derived rulings.",
-    coverImage: '/covers/tafsir-al-baghawi.svg',
+    coverImage: '/covers/tafsir-al-baghawi.jpg',
     order: 5,
     source: {
       type: 'zip',
@@ -260,7 +260,7 @@ const SEED_BOOKS = [
       'مسند الإمام الطيالسي أحد مسانيد الحديث المبكرة، جمع فيه أحاديث الصحابة مرفوعةً إلى النبي ﷺ، ويعد من أصول كتب السنة.',
     description_en:
       "One of the early hadith musnads compiled by Imam al-Tayalisi, gathering the marfu' ahadith of the Companions, and considered among the foundational books of the Sunnah.",
-    coverImage: '/covers/musnad-abi-dawud.svg',
+    coverImage: '/covers/musnad-abi-dawud.jpg',
     order: 6,
     source: {
       type: 'zip',
@@ -301,7 +301,7 @@ const SEED_BOOKS = [
       'أصح كتاب بعد كتاب الله تعالى، جمع فيه الإمام البخاري أصح ما روي من أحاديث النبي ﷺ في العقائد والأحكام والآداب وغيرها، بعد تمحيص شديد واستيفاء لشروط الصحة.',
     description_en:
       "The most authentic book after the Book of Allah. Imam al-Bukhari compiled therein the soundest narrations of the Prophet in creed, rulings, and manners, after rigorous scrutiny and the strictest conditions of authenticity.",
-    coverImage: '/covers/sahih-al-bukhari.svg',
+    coverImage: '/covers/sahih-al-bukhari.jpg',
     order: 7,
     source: {
       type: 'zip',
@@ -347,7 +347,7 @@ const SEED_BOOKS = [
       'أحد أصح كتب الحديث بعد صحيح البخاري، جمع الإمام مسلم فيه الحديث الصحيح مرتبًا على الأبواب، مع اهتمامه البالغ بالترتيب والجمع بين الطرق.',
     description_en:
       "One of the most authentic hadith collections after Sahih al-Bukhari. Imam Muslim compiled authentic hadiths arranged by chapters, with great attention to ordering and combining the chains and wordings.",
-    coverImage: '/covers/sahih-muslim.svg',
+    coverImage: '/covers/sahih-muslim.jpg',
     order: 8,
     source: {
       type: 'zip',
@@ -393,7 +393,7 @@ const SEED_BOOKS = [
       'من دواوين السنة الستة، صنفه الإمام النسائي في السنن والأحكام، ويتميز بمنهجه النقدي في علل الحديث، حتى قيل إنه أصح الكتب المصنفة في الأحكام.',
     description_en:
       "One of the six canonical hadith collections. Imam al-Nasa'i arranged it by rulings and is known for his critical method regarding hadith defects, such that it was described as the most authentic of the books compiled on rulings.",
-    coverImage: '/covers/sunan-al-nasai.svg',
+    coverImage: '/covers/sunan-al-nasai.jpg',
     order: 9,
     source: {
       type: 'zip',
@@ -439,7 +439,7 @@ const SEED_BOOKS = [
       'جامع الترمذي من دواوين السنة، يتميز ببيانه لدرجة كل حديث من الصحة والحسن والضعف، وبعنايته بعلل الأحاديث ومعرفة الرجال.',
     description_en:
       "Jami' al-Tirmidhi is one of the six canonical collections, distinguished by grading each hadith (authentic, good, or weak) and by its attention to hadith defects and narrators.",
-    coverImage: '/covers/sunan-al-tirmidhi.svg',
+    coverImage: '/covers/sunan-al-tirmidhi.jpg',
     order: 10,
     source: {
       type: 'zip',
@@ -480,7 +480,7 @@ const SEED_BOOKS = [
       'تفسير جامع لأحكام القرآن للعلامة القرطبي، يعنى بآيات الأحكام والاستنباطات الفقهية مع العناية باللغة والقراءات والناسخ والمنسوخ.',
     description_en:
       "A comprehensive commentary on the rulings of the Quran by al-Qurtubi, focusing on verses of rulings and juristic deductions, with attention to language, the qira'at, and abrogation.",
-    coverImage: '/covers/tafsir-al-qurtubi.svg',
+    coverImage: '/covers/tafsir-al-qurtubi.jpg',
     order: 11,
     source: {
       type: 'zip',
@@ -541,7 +541,7 @@ const SEED_BOOKS = [
       'أمّ التفاسير بالمأثور، روى فيه الإمام الطبري أقوال السلف بأسانيدها وعلّق عليها، فكان مرجعًا لكل من جاء بعده من المفسرين.',
     description_en:
       "The mother of transmitted tafsir. Imam al-Tabari narrated the sayings of the Salaf with their chains and commented upon them, making it the reference for every commentator after him.",
-    coverImage: '/covers/tafsir-al-tabari.svg',
+    coverImage: '/covers/tafsir-al-tabari.jpg',
     order: 12,
     source: {
       type: 'zip',
@@ -603,7 +603,7 @@ const SEED_BOOKS = [
       'تفسير للإمام الشوكاني يجمع بين التفسير بالمأثور وبين الدراية والاستنباط، مع عناية بعلوم القرآن والبلاغة والترجيح بين الأقوال.',
     description_en:
       "A tafsir by Imam al-Shawkani combining transmitted interpretation with independent deduction, with attention to the Quranic sciences, eloquence, and weighing between views.",
-    coverImage: '/covers/tafsir-al-shawkani.svg',
+    coverImage: '/covers/tafsir-al-shawkani.jpg',
     order: 13,
     source: {
       type: 'zip',
@@ -644,7 +644,7 @@ const SEED_BOOKS = [
       'من أشهر كتب التفسير بالمأثور، فسّر فيه الحافظ ابن كثير القرآن بالقرآن ثم بالحديث وأقوال الصحابة والتابعين، بأسلوب متميز في الترجيح والنقد.',
     description_en:
       "One of the most famous transmitted tafsirs. Ibn Kathir interpreted the Quran by the Quran, then by hadith and the sayings of the Companions and Successors, with a distinguished style of weighing and critique.",
-    coverImage: '/covers/tafsir-ibn-kathir.svg',
+    coverImage: '/covers/tafsir-ibn-kathir.jpg',
     order: 14,
     source: {
       type: 'zip',
@@ -691,7 +691,7 @@ const SEED_BOOKS = [
       'مجموعة من خمسين قصة منتقاة من صحيح البخاري بأسلوب مبسط مناسب للأطفال والناشئة، لترسيخ القيم والمعاني من السنة النبوية.',
     description_en:
       "A collection of fifty stories selected from Sahih al-Bukhari in a simple style suited for children and young readers, instilling values and lessons from the Prophetic Sunnah.",
-    coverImage: '/covers/qisas-min-sahih-al-bukhari.svg',
+    coverImage: '/covers/qisas-min-sahih-al-bukhari.jpg',
     order: 15,
     volumes: [
       {
