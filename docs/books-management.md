@@ -110,6 +110,53 @@ src/data/books.js
 مزايا هذه الطريقة: روابط التحميل تعمل مع CORS مباشرة، فشريط التقدم يعمل
 داخل التطبيق، ولا يوجد حد 100MB كما في GitHub، والمجلدات الكبيرة مدعومة.
 
+### كتاب كامل داخل أرشيف ZIP واحد على Google Drive (لمجلدات كثيرة)
+
+إذا كان الكتاب الكبير مرقّمًا إلى عشرات المجلدات، أسهل طريقة هي رفع **ملف ZIP
+واحد** يحتوي كل المجلدات إلى Google Drive، ثم الإشارة إليه في الكتاب:
+
+```js
+{
+  id: 'اسم-الكتاب',
+  // ...
+  source: {
+    type: 'zip',
+    // رابط التحميل المباشر (مهم جدًا: انسخه بهذا الشكل من معرّف الملف)
+    url: 'https://drive.usercontent.google.com/download?id=FILE_ID&export=download&confirm=t',
+    // رابط صفحة Drive للفتح في المتصفح عند فشل التحميل (اختياري)
+    pageUrl: 'https://drive.google.com/file/d/FILE_ID/view'
+  },
+  volumes: [
+    {
+      id: 'v1',
+      number: 1,
+      bundled: false,
+      pdfUrl: null,
+      downloadUrl: null,
+      path: '0001-0343.pdf', // اسم الملف داخل الـ ZIP بالضبط
+      sizeMb: 9.3
+    }
+    // ... بقية المجلدات بنفس `path` لكل ملف داخل الـ ZIP
+  ]
+}
+```
+
+كيف يعمل: عند الضغط على «تنزيل» لأي مجلد، يقرأ التطبيق ذلك المجلد فقط من
+الـ ZIP عبر طلبات HTTP Range (دون تحميل الـ ZIP كاملًا)، يفك ضغطه ويحفظه
+محليًا — المستخدم لا يغادر التطبيق إطلاقًا ولا يذهب إلى Google Drive.
+
+الشروط المطلوبة حتى تعمل هذه الطريقة:
+
+1. **شارك ملف الـ ZIP بـ «أي شخص لديه الرابط»** (Viewer) — وإلا لن يستطيع
+   المستخدمون تحميله.
+2. **اضبط الرابط المباشر** بالشكل:
+   `https://drive.usercontent.google.com/download?id=FILE_ID&export=download&confirm=t`
+   حيث `FILE_ID` هو المعرّف الموجود في رابط المشاركة.
+3. انسخ اسم كل ملف داخل الـ ZIP **حرفًا بحرف** في حقل `path` (الحروف والمسافات
+   والرموز مهمة).
+4. `bundled: false` لكل المجلدات ما دامت داخل الـ ZIP — لا يُدمج شيء مع التطبيق
+   حتى لا يضخم حجمه.
+
 ---
 
 ### إضافة كتاب متعدد المجلدات (أي عدد من المجلدات)
@@ -154,6 +201,11 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
     link to the PDF) or a `storagePath` (a path inside your Supabase public
     bucket — see below). They are downloaded on demand and stored locally on
     the device, so they can be opened offline afterwards.
+  - **Whole book inside one ZIP on Google Drive** — set `source: { type:
+    'zip', url, pageUrl }` on the book and give each volume a `path` (the
+    exact member filename inside the ZIP). The app fetches that single volume
+    from the ZIP via HTTP Range requests, so the user never leaves the app.
+    See the Arabic section above for the full recipe.
 
 ### Hosting on Supabase Storage (recommended for large volumes)
 

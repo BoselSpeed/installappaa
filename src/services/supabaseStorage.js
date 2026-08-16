@@ -14,7 +14,9 @@ export const getSupabasePublicUrl = (path) => {
 // 1. explicit downloadUrl (any host, e.g. a direct CDN link)
 // 2. storagePath → Supabase public storage URL (when configured)
 // 3. bundled pdfUrl (Volume 1 ships with the app)
-export const resolveVolumeUrl = (volume) => {
+// 4. book.source.pageUrl — the browser fallback for volumes stored inside a
+//    remote ZIP archive (the download itself uses per-volume Range requests).
+export const resolveVolumeUrl = (volume, book) => {
   if (!volume) return null;
   if (volume.downloadUrl) return volume.downloadUrl;
   if (volume.storagePath) {
@@ -22,6 +24,7 @@ export const resolveVolumeUrl = (volume) => {
     if (url) return url;
   }
   if (volume.pdfUrl) return volume.pdfUrl;
+  if (book?.source?.pageUrl) return book.source.pageUrl;
   return null;
 };
 

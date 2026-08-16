@@ -4,6 +4,7 @@
 // PDF blob — the book and its information are never touched.
 
 import { resolveVolumeUrl } from './supabaseStorage';
+import { extractZipMember } from './zipRangeReader';
 
 const DB_NAME = 'fiqh-app';
 const DB_VERSION = 1;
@@ -80,9 +81,22 @@ export const removeStoredVolume = async (bookId, volumeId) => {
 };
 
 // Downloads a volume PDF and persists it locally. Reports progress (0-100)
-// through onProgress. Resolves the source URL (downloadUrl, Supabase
-// storagePath, or bundled pdfUrl) for non-bundled volumes.
+// through onProgress. Supports three sources, in order:
+//   1. book.source = { type: 'zip', ... } — the volume is a member of a remote
+//      ZIP archive, fetched per-volume via HTTP Range requests.
+//   2. resolveVolumeUrl(volume) — a direct downloadUrl, a Supabase storagePath,
+//      or a bundled pdfUrl.
 export const downloadVolume = async (book, volume, onProgress) => {
+  if (book?.source?.type === 'zip') {
+    const blob = await extractZipMember(
+      book.source.url,
+      volume.path,
+      onProgress
+    );
+    await storeVolume(book.id, volume.id, blob);
+    return blob;
+  }
+
   const url = resolveVolumeUrl(volume);
   if (!url) {
     throw new Error('No download URL available for this volume');

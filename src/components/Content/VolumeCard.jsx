@@ -131,9 +131,9 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       {state.error && (
         <div className="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-2 space-y-2">
           <p>{state.error === 'download_error' ? t('download_error') : state.error}</p>
-          {resolveVolumeUrl(volume) && (
+          {resolveVolumeUrl(volume, book) && (
             <a
-              href={resolveVolumeUrl(volume)}
+              href={resolveVolumeUrl(volume, book)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-3 py-1.5 bg-white text-black border border-black rounded text-xs font-medium hover:bg-gray-50 transition-colors"
