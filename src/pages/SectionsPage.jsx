@@ -64,6 +64,14 @@ const SectionsPage = () => {
   const sectionLink = (section) =>
     bookById[section.id] ? `/books/${section.id}` : `/sections/${section.id}`;
 
+  const countBadge = (section) =>
+    bookById[section.id]
+      ? {
+          label: t('volumes_short'),
+          count: (bookById[section.id].volumes || []).length
+        }
+      : { label: t('lessons'), count: lessonCounts[section.id] || 0 };
+
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
@@ -107,9 +115,9 @@ const SectionsPage = () => {
                     </p>
                     <div className="flex items-center text-sm text-gray-500">
                       <span className="bg-black text-white px-2 py-1 rounded text-xs">
-                        {t('lessons')}
+                        {countBadge(section).label}
                       </span>
-                      <span className="rtl:mr-2 ltr:ml-2">{lessonCounts[section.id] || 0}</span>
+                      <span className="rtl:mr-2 ltr:ml-2">{countBadge(section).count}</span>
                     </div>
                   </Link>
                 ))}

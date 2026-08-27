@@ -110,6 +110,7 @@
   "volume_count_none": "No volumes",
   "description": "About the Book",
   "volumes": "Book Volumes",
+  "volumes_short": "Volumes",
   "volume": "Volume",
   "download": "Download",
   "open_pdf": "Open PDF",

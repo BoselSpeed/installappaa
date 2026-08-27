@@ -21,7 +21,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'book-v4';
+const SEED_VERSION = 'book-v5';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -59,6 +59,94 @@ const seedSections = [
     description_ar: 'رسالة للإمام محمد بن عبد الوهاب تكشف الشبهات التي يثيرها المخالفون حول التوحيد وعبادة الله وحده، مع الرد عليها بالأدلة من الكتاب والسنة.',
     description_en: 'A treatise by Imam Muhammad ibn Abd al-Wahhab unveiling the ambiguities raised against Tawheed and the worship of Allah alone, responding to them with evidence from the Quran and Sunnah.',
     order: 4
+  },
+  {
+    id: 'tafsir-al-baghawi',
+    title_ar: 'تفسير البغوي',
+    title_en: 'Tafsir al-Baghawi',
+    description_ar: 'تفسير جامع للإمام البغوي يجمع بين التفسير بالمأثور وعرض أقوال المفسرين بأسلوب متوسط، مع عناية بالقراءات وذكر أسباب النزول والأحكام المستنبطة.',
+    description_en: 'A comprehensive tafsir by Imam al-Baghawi combining transmitted interpretation with the views of early commentators in a moderate style.',
+    order: 5
+  },
+  {
+    id: 'musnad-abi-dawud',
+    title_ar: 'مسند أبي داود الطيالسي',
+    title_en: 'Musnad Abi Dawud al-Tayalisi',
+    description_ar: 'مسند الإمام الطيالسي أحد مسانيد الحديث المبكرة، جمع فيه أحاديث الصحابة مرفوعةً إلى النبي ﷺ، ويعد من أصول كتب السنة.',
+    description_en: "One of the early hadith musnads compiled by Imam al-Tayalisi, gathering the marfu' ahadith of the Companions.",
+    order: 6
+  },
+  {
+    id: 'sahih-al-bukhari',
+    title_ar: 'صحيح البخاري',
+    title_en: 'Sahih al-Bukhari',
+    description_ar: 'أصح كتاب بعد كتاب الله تعالى، جمع فيه الإمام البخاري أصح ما روي من أحاديث النبي ﷺ في العقائد والأحكام والآداب وغيرها، بعد تمحيص شديد واستيفاء لشروط الصحة.',
+    description_en: 'The most authentic book after the Book of Allah, compiling the soundest narrations of the Prophet in creed, rulings, and manners.',
+    order: 7
+  },
+  {
+    id: 'sahih-muslim',
+    title_ar: 'صحيح مسلم',
+    title_en: 'Sahih Muslim',
+    description_ar: 'أحد أصح كتب الحديث بعد صحيح البخاري، جمع الإمام مسلم فيه الحديث الصحيح مرتبًا على الأبواب، مع اهتمامه البالغ بالترتيب والجمع بين الطرق.',
+    description_en: 'One of the most authentic hadith collections, compiled by Imam Muslim arranged by chapters.',
+    order: 8
+  },
+  {
+    id: 'sunan-al-nasai',
+    title_ar: 'سنن النسائي',
+    title_en: "Sunan al-Nasa'i",
+    description_ar: 'من دواوين السنة الستة، صنفه الإمام النسائي في السنن والأحكام، ويتميز بمنهجه النقدي في علل الحديث.',
+    description_en: "One of the six canonical hadith collections, known for its critical method regarding hadith defects.",
+    order: 9
+  },
+  {
+    id: 'sunan-al-tirmidhi',
+    title_ar: 'سنن الترمذي',
+    title_en: 'Sunan al-Tirmidhi',
+    description_ar: 'جامع الترمذي من دواوين السنة، يتميز ببيانه لدرجة كل حديث من الصحة والحسن والضعف، وبعنايته بعلل الأحاديث ومعرفة الرجال.',
+    description_en: 'Jami\' al-Tirmidhi, one of the six canonical collections, distinguished by grading each hadith.',
+    order: 10
+  },
+  {
+    id: 'tafsir-al-qurtubi',
+    title_ar: 'تفسير القرطبي',
+    title_en: 'Tafsir al-Qurtubi',
+    description_ar: 'تفسير جامع لأحكام القرآن للعلامة القرطبي، يعنى بآيات الأحكام والاستنباطات الفقهية مع العناية باللغة والقراءات والناسخ والمنسوخ.',
+    description_en: "A comprehensive commentary on the rulings of the Quran by al-Qurtubi.",
+    order: 11
+  },
+  {
+    id: 'tafsir-al-tabari',
+    title_ar: 'تفسير الطبري',
+    title_en: 'Tafsir al-Tabari',
+    description_ar: 'أمّ التفاسير بالمأثور، روى فيه الإمام الطبري أقوال السلف بأسانيدها وعلّق عليها، فكان مرجعًا لكل من جاء بعده من المفسرين.',
+    description_en: 'The mother of transmitted tafsir, narrating the sayings of the Salaf with their chains.',
+    order: 12
+  },
+  {
+    id: 'tafsir-al-shawkani',
+    title_ar: 'تفسير الشوكاني',
+    title_en: 'Tafsir al-Shawkani',
+    description_ar: 'تفسير للإمام الشوكاني يجمع بين التفسير بالمأثور وبين الدراية والاستنباط، مع عناية بعلوم القرآن والبلاغة والترجيح بين الأقوال.',
+    description_en: 'A tafsir by Imam al-Shawkani combining transmitted interpretation with independent deduction.',
+    order: 13
+  },
+  {
+    id: 'tafsir-ibn-kathir',
+    title_ar: 'تفسير ابن كثير',
+    title_en: 'Tafsir Ibn Kathir',
+    description_ar: 'من أشهر كتب التفسير بالمأثور، فسّر فيه الحافظ ابن كثير القرآن بالقرآن ثم بالحديث وأقوال الصحابة والتابعين، بأسلوب متميز في الترجيح والنقد.',
+    description_en: 'One of the most famous transmitted tafsirs, interpreting the Quran by the Quran then by hadith.',
+    order: 14
+  },
+  {
+    id: 'qisas-min-sahih-al-bukhari',
+    title_ar: '50 من قصص صحيح البخاري',
+    title_en: '50 Stories from Sahih al-Bukhari',
+    description_ar: 'مجموعة من خمسين قصة منتقاة من صحيح البخاري بأسلوب مبسط مناسب للأطفال والناشئة، لترسيخ القيم والمعاني من السنة النبوية.',
+    description_en: 'A collection of fifty stories selected from Sahih al-Bukhari in a simple style suited for children and young readers.',
+    order: 15
   }
 ];
 

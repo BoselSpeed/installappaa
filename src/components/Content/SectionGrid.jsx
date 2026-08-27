@@ -45,6 +45,14 @@ const SectionGrid = ({ title }) => {
   const sectionLink = (section) =>
     bookById[section.id] ? `/books/${section.id}` : `/sections/${section.id}`;
 
+  const countBadge = (section) =>
+    bookById[section.id]
+      ? {
+          label: t('volumes_short'),
+          count: (bookById[section.id].volumes || []).length
+        }
+      : { label: t('lessons'), count: lessonCounts[section.id] || 0 };
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -85,9 +93,9 @@ const SectionGrid = ({ title }) => {
             </p>
             <div className="flex items-center text-sm text-gray-500">
               <span className="bg-black text-white px-2 py-1 rounded text-xs">
-                {t('lessons')}
+                {countBadge(section).label}
               </span>
-              <span className="rtl:mr-2 ltr:ml-2">{lessonCounts[section.id] || 0}</span>
+              <span className="rtl:mr-2 ltr:ml-2">{countBadge(section).count}</span>
             </div>
           </Link>
         ))}
