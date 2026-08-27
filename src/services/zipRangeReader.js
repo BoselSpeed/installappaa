@@ -31,12 +31,35 @@ const decodeName = (bytes, isUtf8) => {
   return decoders.cp437.decode(bytes);
 };
 
+// Same-origin reverse proxy exposed by the dev server (see vite.config.ts) and
+// by production backends. Used as a fallback when the archive host blocks
+// cross-origin browser fetches (Google Drive sends no CORS headers).
+const PROXY_PATH = '/__drive-proxy';
+const proxiedUrl = (url) => `${PROXY_PATH}?url=${encodeURIComponent(url)}`;
+
+const fetchOnce = async (url, init) => {
+  let res;
+  try {
+    res = await fetch(url, init);
+  } catch (err) {
+    // CORS/net failure: retry through the same-origin proxy. It forwards the
+    // exact same request server-side, so Range headers and bodies pass through.
+    return await fetch(proxiedUrl(url), init);
+  }
+  if (res.status >= 400) {
+    // Some hosts (Google Drive) reject browser requests with a 4xx. Retry
+    // through the proxy before giving up.
+    return await fetch(proxiedUrl(url), init);
+  }
+  return res;
+};
+
 // Fetches bytes [start..end] from url. Uses a byte-suffix range when start is
 // negative. Returns a Uint8Array with exactly the requested bytes.
 const fetchRange = async (url, start, end) => {
   const range =
     start < 0 ? `bytes=${start}` : `bytes=${start}-${end}`;
-  const res = await fetch(url, { headers: { Range: range } });
+  const res = await fetchOnce(url, { headers: { Range: range } });
   if (res.status === 206) {
     return new Uint8Array(await res.arrayBuffer());
   }
@@ -151,7 +174,7 @@ export const extractZipMemberWhole = async (url, path, onProgress) => {
     throw new Error('Missing ZIP archive URL or member path');
   }
 
-  const response = await fetch(url);
+  const response = await fetchOnce(url);
   if (!response.ok) {
     throw new Error(`Download failed (${response.status})`);
   }
