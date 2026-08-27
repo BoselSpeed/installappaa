@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
-import { resolveVolumeUrl } from '../../services/supabaseStorage';
 
 const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
   const { t } = useTranslation();
@@ -131,16 +130,7 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       {state.error && (
         <div className="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-2 space-y-2">
           <p>{state.error === 'download_error' ? t('download_error') : state.error}</p>
-          {resolveVolumeUrl(volume, book) && (
-            <a
-              href={resolveVolumeUrl(volume, book)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-3 py-1.5 bg-white text-black border border-black rounded text-xs font-medium hover:bg-gray-50 transition-colors"
-            >
-              {t('open_in_browser')}
-            </a>
-          )}
+          <p className="text-xs text-gray-500">{t('download_retry_hint')}</p>
         </div>
       )}
 

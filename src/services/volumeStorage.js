@@ -4,7 +4,7 @@
 // PDF blob — the book and its information are never touched.
 
 import { resolveVolumeUrl } from './supabaseStorage';
-import { extractZipMember } from './zipRangeReader';
+import { extractZipMember, extractZipMemberWhole } from './zipRangeReader';
 
 const DB_NAME = 'fiqh-app';
 const DB_VERSION = 1;
@@ -88,13 +88,28 @@ export const removeStoredVolume = async (bookId, volumeId) => {
 //      or a bundled pdfUrl.
 export const downloadVolume = async (book, volume, onProgress) => {
   if (book?.source?.type === 'zip') {
-    const blob = await extractZipMember(
-      book.source.url,
-      volume.path,
-      onProgress
-    );
-    await storeVolume(book.id, volume.id, blob);
-    return blob;
+    const url = book.source.url;
+    const attempts = [
+      // Preferred: fetch just this volume from the archive via HTTP Range
+      // requests (does not download the whole ZIP).
+      () => extractZipMember(url, volume.path, onProgress),
+      // Fallback for servers that block Range requests / their CORS preflight:
+      // download the whole archive once and extract the volume locally. Either
+      // way the download happens inside the app.
+      () => extractZipMemberWhole(url, volume.path, onProgress)
+    ];
+    let lastError = null;
+    for (const attempt of attempts) {
+      try {
+        const blob = await attempt();
+        await storeVolume(book.id, volume.id, blob);
+        return blob;
+      } catch (error) {
+        console.warn('Volume download method failed, trying next:', error);
+        lastError = error;
+      }
+    }
+    throw lastError || new Error('download_error');
   }
 
   const url = resolveVolumeUrl(volume);

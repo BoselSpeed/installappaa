@@ -123,7 +123,7 @@ src/data/books.js
     type: 'zip',
     // رابط التحميل المباشر (مهم جدًا: انسخه بهذا الشكل من معرّف الملف)
     url: 'https://drive.usercontent.google.com/download?id=FILE_ID&export=download&confirm=t',
-    // رابط صفحة Drive للفتح في المتصفح عند فشل التحميل (اختياري)
+    // رابط صفحة Drive (اختياري — يُستخدم كملاذ أخير احتياطي فقط)
     pageUrl: 'https://drive.google.com/file/d/FILE_ID/view'
   },
   volumes: [
@@ -151,9 +151,12 @@ src/data/books.js
 ```
 
 كيف يعمل: المجلد الأول يُقرأ مباشرة من داخل التطبيق (مدمج). عند الضغط على
-«تنزيل» لأي مجلد آخر، يقرأ التطبيق ذلك المجلد فقط من الـ ZIP عبر طلبات
-HTTP Range (دون تحميل الـ ZIP كاملًا)، يفك ضغطه ويحفظه محليًا — المستخدم لا
-يغادر التطبيق إطلاقًا ولا يذهب إلى Google Drive.
+«تنزيل» لأي مجلد آخر، يحاول التطبيق أولًا قراءة ذلك المجلد فقط من الـ ZIP عبر
+طلبات HTTP Range (دون تحميل الـ ZIP كاملًا). إذا منع الخادم (Google Drive أحيانًا)
+طلبات Range أو فشلت مصافحة CORS الخاصة بها، يلجأ التطبيق تلقائيًا إلى التنزيل
+الاحتياطي: ينزّل ملف الـ ZIP كاملًا داخل التطبيق ويفك ضغط المجلد المطلوب محليًا.
+في الحالتين يتم التنزيل **داخل التطبيق بالكامل** — لا يغادر المستخدم التطبيق ولا
+يُوجَّه إلى Google Drive.
 
 الشروط المطلوبة حتى تعمل هذه الطريقة:
 
@@ -162,6 +165,9 @@ HTTP Range (دون تحميل الـ ZIP كاملًا)، يفك ضغطه ويح�
 2. **اضبط الرابط المباشر** بالشكل:
    `https://drive.usercontent.google.com/download?id=FILE_ID&export=download&confirm=t`
    حيث `FILE_ID` هو المعرّف الموجود في رابط المشاركة.
+   (`drive.google.com/download` العادي قد يعرض صفحة تحذير الفيروسات التي تعطّل
+   التنزيل داخل التطبيق — تأكد من استخدام `drive.usercontent.google.com` مع
+   `confirm=t` كما في المثال).
 3. انسخ اسم كل ملف داخل الـ ZIP **حرفًا بحرفًا** في حقل `path` (الحروف والمسافات
    والرموز مهمة). الحرف «الجزء» في اسم الملف الفعلي داخل الـ ZIP لا تغيّره حتى
    لو غيّرت عنوان العرض إلى «المجلد».
@@ -214,9 +220,12 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
     the device, so they can be opened offline afterwards.
   - **Whole book inside one ZIP on Google Drive** — set `source: { type:
     'zip', url, pageUrl }` on the book and give each volume a `path` (the
-    exact member filename inside the ZIP). The app fetches that single volume
-    from the ZIP via HTTP Range requests, so the user never leaves the app.
-    See the Arabic section above for the full recipe.
+    exact member filename inside the ZIP). The app first fetches that single
+    volume from the ZIP via HTTP Range requests; if the server blocks Range
+    requests or their CORS preflight, it automatically falls back to
+    downloading the whole archive inside the app and extracting the volume
+    locally. Either way the download happens entirely in-app — the user is
+    never sent to Google Drive. See the Arabic section above for the recipe.
 
 ### Hosting on Supabase Storage (recommended for large volumes)
 

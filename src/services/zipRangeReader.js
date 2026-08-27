@@ -141,4 +141,84 @@ export const extractZipMember = async (url, path, onProgress) => {
   return new Blob([pdfBytes], { type: 'application/pdf' });
 };
 
-export default { extractZipMember };
+// Fallback extraction used when HTTP Range requests (or their CORS preflight)
+// are blocked by the hosting server. It downloads the whole archive once with
+// a plain GET — no custom headers, so no preflight is needed — and extracts
+// the requested member locally. Heavier than the Range path, but it keeps the
+// download inside the app anywhere the archive itself can be fetched.
+export const extractZipMemberWhole = async (url, path, onProgress) => {
+  if (!url || !path) {
+    throw new Error('Missing ZIP archive URL or member path');
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Download failed (${response.status})`);
+  }
+
+  let data;
+  if (!response.body) {
+    data = new Uint8Array(await response.arrayBuffer());
+  } else {
+    const reader = response.body.getReader();
+    const chunks = [];
+    let lastReported = -1;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      const percent = Math.min(99, Math.round((chunks.length / 40) * 100));
+      if (percent !== lastReported) {
+        lastReported = percent;
+        onProgress?.(percent);
+      }
+    }
+    data = new Uint8Array(
+      chunks.reduce((a, c) => a + c.length, 0)
+    );
+    let off = 0;
+    for (const c of chunks) {
+      data.set(c, off);
+      off += c.length;
+    }
+  }
+
+  const eocdOffset = findEocd(data);
+  if (eocdOffset < 0) {
+    throw new Error('Invalid ZIP archive (end record not found)');
+  }
+
+  const cdStart = u32(data, eocdOffset + 16);
+  const cdSize = u32(data, eocdOffset + 12);
+  if (cdStart + cdSize > data.length) {
+    throw new Error('Invalid ZIP archive (central directory out of range)');
+  }
+  const entries = parseCentralDirectory(data.slice(cdStart, cdStart + cdSize));
+  const entry = entries.get(path);
+
+  if (!entry) {
+    throw new Error('Volume not found in archive');
+  }
+  if (entry.method !== 0 && entry.method !== 8) {
+    throw new Error('Unsupported compression method');
+  }
+
+  if (entry.lho + 30 > data.length || u32(data, entry.lho) !== LH_SIG) {
+    throw new Error('Invalid ZIP local header');
+  }
+  const nameLen = u16(data, entry.lho + 26);
+  const extraLen = u16(data, entry.lho + 28);
+  const dataStart = entry.lho + 30 + nameLen + extraLen;
+  const dataEnd = dataStart + entry.csize;
+  if (dataEnd > data.length) {
+    throw new Error('Invalid ZIP member data');
+  }
+
+  const compressed = data.slice(dataStart, dataEnd);
+  const pdfBytes = entry.method === 8 ? inflateSync(compressed) : compressed;
+  onProgress?.(100);
+  return new Blob([pdfBytes], { type: 'application/pdf' });
+};
+
+export default { extractZipMember, extractZipMemberWhole };
