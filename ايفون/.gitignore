@@ -1,0 +1,16 @@
+App/build
+App/Pods
+App/output
+# The bundled web assets under App/App/public are committed so the Xcode
+# project is fully self-contained and builds without the Capacitor CLI.
+# App/App/public
+DerivedData
+xcuserdata
+
+# Cordova plugins for Capacitor
+capacitor-cordova-ios-plugins
+
+# Generated Config files are committed so native settings (CapacitorHttp, etc.)
+# survive a copy. Regenerate with `npx cap sync ios` if needed.
+# App/App/capacitor.config.json
+# App/App/config.xml

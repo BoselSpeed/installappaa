@@ -1,0 +1,17 @@
+{
+	"appId": "com.fiqh.app",
+	"appName": "تطبيق الفقه",
+	"webDir": "تطبيق الفقه",
+	"android": {
+		"allowMixedContent": true
+	},
+	"server": {
+		"androidScheme": "https"
+	},
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		}
+	},
+	"packageClassList": []
+}
