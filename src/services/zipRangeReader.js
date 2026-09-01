@@ -5,9 +5,19 @@
 // per-volume downloads directly inside the app.
 //
 // Requires the server to support:
-//   - HTTP Range requests (206 Partial Content) with CORS
+//   - HTTP Range requests (206 Partial Content)
 //   - byte-suffix ranges ("bytes=-N") to read the end-of-central-directory
+//
+// Cross-origin considerations:
+//   - Native app (Android/iOS): every request goes through CapacitorHttp, the
+//     OS HTTP client, so there is no browser CORS and Google Drive accepts the
+//     Range requests (they look like any normal download client).
+//   - Web: the app is on a different origin than Google Drive, which sends no
+//     Access-Control-Allow-Origin header, so direct fetches are CORS-blocked.
+//     Those are retried through the same-origin proxy exposed by the dev server
+//     (vite.config.ts) / any production backend.
 
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { inflateSync } from 'fflate';
 
 const EOCD_SIG = 0x06054b50;
@@ -37,21 +47,52 @@ const decodeName = (bytes, isUtf8) => {
 const PROXY_PATH = '/__drive-proxy';
 const proxiedUrl = (url) => `${PROXY_PATH}?url=${encodeURIComponent(url)}`;
 
-const fetchOnce = async (url, init) => {
+const isNativeApp = () =>
+  typeof Capacitor !== 'undefined' &&
+  typeof Capacitor.getPlatform === 'function' &&
+  Capacitor.getPlatform() !== 'web';
+
+const decodeBase64 = (b64) => {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+};
+
+// Executes one GET and returns { status, bytes }.
+// - Native app: routed through CapacitorHttp (OS HTTP client), so no CORS.
+// - Web: plain fetch; CORS blocks and 4xx responses are retried through the
+//   same-origin proxy, which forwards the identical request server-side.
+const rawGet = async (url, { headers = {} } = {}) => {
+  if (isNativeApp()) {
+    const res = await CapacitorHttp.request({
+      url,
+      method: 'GET',
+      headers,
+      responseType: 'arraybuffer',
+    });
+    const data =
+      typeof res.data === 'string'
+        ? decodeBase64(res.data)
+        : new Uint8Array(res.data || []);
+    return { status: res.status, bytes: data };
+  }
+
   let res;
   try {
-    res = await fetch(url, init);
+    res = await fetch(url, { headers });
   } catch (err) {
     // CORS/net failure: retry through the same-origin proxy. It forwards the
     // exact same request server-side, so Range headers and bodies pass through.
-    return await fetch(proxiedUrl(url), init);
+    res = await fetch(proxiedUrl(url), { headers });
   }
   if (res.status >= 400) {
     // Some hosts (Google Drive) reject browser requests with a 4xx. Retry
     // through the proxy before giving up.
-    return await fetch(proxiedUrl(url), init);
+    res = await fetch(proxiedUrl(url), { headers });
   }
-  return res;
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  return { status: res.status, bytes };
 };
 
 // Fetches bytes [start..end] from url. Uses a byte-suffix range when start is
@@ -59,15 +100,28 @@ const fetchOnce = async (url, init) => {
 const fetchRange = async (url, start, end) => {
   const range =
     start < 0 ? `bytes=${start}` : `bytes=${start}-${end}`;
-  const res = await fetchOnce(url, { headers: { Range: range } });
-  if (res.status === 206) {
-    return new Uint8Array(await res.arrayBuffer());
+  const { status, bytes } = await rawGet(url, { headers: { Range: range } });
+  if (status === 206) {
+    return bytes;
   }
-  if (res.status === 200) {
-    const buf = new Uint8Array(await res.arrayBuffer());
-    return start < 0 ? buf : buf.slice(start, Math.min(end + 1, buf.length));
+  if (status === 200) {
+    return start < 0 ? bytes : bytes.slice(start, Math.min(end + 1, bytes.length));
   }
-  throw new Error(`Range request failed (${res.status})`);
+  throw new Error(`Range request failed (${status})`);
+};
+
+// Web only: streams a whole resource, retrying through the proxy on CORS/4xx.
+const fetchStream = async (url, { headers = {} } = {}) => {
+  let res;
+  try {
+    res = await fetch(url, { headers });
+  } catch (err) {
+    res = await fetch(proxiedUrl(url), { headers });
+  }
+  if (res.status >= 400) {
+    res = await fetch(proxiedUrl(url), { headers });
+  }
+  return res;
 };
 
 const findEocd = (tail) => {
@@ -174,36 +228,42 @@ export const extractZipMemberWhole = async (url, path, onProgress) => {
     throw new Error('Missing ZIP archive URL or member path');
   }
 
-  const response = await fetchOnce(url);
-  if (!response.ok) {
-    throw new Error(`Download failed (${response.status})`);
-  }
-
   let data;
-  if (!response.body) {
-    data = new Uint8Array(await response.arrayBuffer());
+  if (isNativeApp()) {
+    // CapacitorHttp buffers the whole response; no incremental progress.
+    const { bytes } = await rawGet(url);
+    data = bytes;
+    onProgress?.(100);
   } else {
-    const reader = response.body.getReader();
-    const chunks = [];
-    let lastReported = -1;
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      const percent = Math.min(99, Math.round((chunks.length / 40) * 100));
-      if (percent !== lastReported) {
-        lastReported = percent;
-        onProgress?.(percent);
-      }
+    const response = await fetchStream(url);
+    if (!response.ok) {
+      throw new Error(`Download failed (${response.status})`);
     }
-    data = new Uint8Array(
-      chunks.reduce((a, c) => a + c.length, 0)
-    );
-    let off = 0;
-    for (const c of chunks) {
-      data.set(c, off);
-      off += c.length;
+    if (!response.body) {
+      data = new Uint8Array(await response.arrayBuffer());
+    } else {
+      const reader = response.body.getReader();
+      const chunks = [];
+      let lastReported = -1;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        const percent = Math.min(99, Math.round((chunks.length / 40) * 100));
+        if (percent !== lastReported) {
+          lastReported = percent;
+          onProgress?.(percent);
+        }
+      }
+      data = new Uint8Array(
+        chunks.reduce((a, c) => a + c.length, 0)
+      );
+      let off = 0;
+      for (const c of chunks) {
+        data.set(c, off);
+        off += c.length;
+      }
     }
   }
 
