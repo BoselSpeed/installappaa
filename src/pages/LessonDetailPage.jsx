@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { lessonsService, lessonContentService } from '../firebase/service';
+import { lessonsService, lessonContentService, notesService } from '../firebase/service';
 import { useUserProgress } from '../hooks/useUserProgress';
+import { useNotes } from '../hooks/useNotes';
 import { useAppSettings } from '../hooks/useAppSettings';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
@@ -22,14 +23,20 @@ const LessonDetailPage = () => {
   const [content, setContent] = useState(null);
   const [siblings, setSiblings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { markLessonCompleted, addBookmark, removeBookmark, progress } = useUserProgress();
+  const { markLessonCompleted, addBookmark, removeBookmark, progress, updateReadingStats, checkDailyGoal } = useUserProgress();
+  const { loadNotesForLesson, addNote, updateNote, deleteNote, getNotesForLesson } = useNotes();
   const { settings } = useAppSettings();
   const { t } = useTranslation();
   const { pick } = useLocalized();
   const [isCompleted, setIsCompleted] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [notes, setNotes] = useState([]);
+  const [noteText, setNoteText] = useState('');
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [noteType, setNoteType] = useState('note');
   const contentRef = useRef(null);
+  const readingStartRef = useRef(null);
 
   useEffect(() => {
     const loadLesson = async () => {
@@ -59,6 +66,43 @@ const LessonDetailPage = () => {
     loadLesson();
     setReadingProgress(0);
   }, [lessonId, sectionId, progress]);
+
+  useEffect(() => {
+    if (lessonId) {
+      loadNotesForLesson(lessonId);
+    }
+  }, [lessonId, loadNotesForLesson]);
+
+  useEffect(() => {
+    const handler = setInterval(() => {
+      if (readingStartRef.current) {
+        const elapsed = Math.floor((Date.now() - readingStartRef.current) / 60000);
+        if (elapsed > 0) {
+          updateReadingStats(elapsed);
+          readingStartRef.current = Date.now();
+        }
+      }
+    }, 60000);
+    return () => clearInterval(handler);
+  }, [updateReadingStats]);
+
+  useEffect(() => {
+    readingStartRef.current = Date.now();
+    return () => {
+      if (readingStartRef.current) {
+        const elapsed = Math.floor((Date.now() - readingStartRef.current) / 60000);
+        if (elapsed > 0) {
+          updateReadingStats(elapsed);
+        }
+      }
+    };
+  }, [lessonId, updateReadingStats]);
+
+  useEffect(() => {
+    if (isCompleted) {
+      checkDailyGoal();
+    }
+  }, [isCompleted, checkDailyGoal]);
 
   const handleScroll = useCallback(() => {
     const el = contentRef.current;
@@ -99,6 +143,39 @@ const LessonDetailPage = () => {
     const value = totalPages > 0 ? Math.round((page / totalPages) * 100) : 0;
     setReadingProgress(value);
   }, []);
+
+  const handleAddNote = async () => {
+    if (!noteText.trim()) return;
+    try {
+      await addNote(lessonId, noteText.trim(), noteType);
+      setNoteText('');
+      setNoteType('note');
+      const updated = await notesService.getNotesByLesson(lessonId);
+      setNotes(updated);
+    } catch (error) {
+      console.error('Error adding note:', error);
+    }
+  };
+
+  const handleUpdateNote = async (noteId, text) => {
+    try {
+      await updateNote(lessonId, noteId, text);
+      setEditingNoteId(null);
+      const updated = await notesService.getNotesByLesson(lessonId);
+      setNotes(updated);
+    } catch (error) {
+      console.error('Error updating note:', error);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      await deleteNote(lessonId, noteId);
+      setNotes(prev => prev.filter(n => n.id !== noteId));
+    } catch (error) {
+      console.error('Error deleting note:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -251,6 +328,110 @@ const LessonDetailPage = () => {
           >
             {t('quiz')}
           </Link>
+        </div>
+
+        {/* Notes Section */}
+        <div className="mt-12 border-t border-gray-200 pt-8">
+          <h2 className="text-2xl font-bold mb-6 text-black">{t('notes')}</h2>
+          
+          <div className="mb-6 space-y-3">
+            <textarea
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder={t('note_text_placeholder')}
+              className="w-full px-4 py-3 border border-black rounded-lg bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black min-h-[100px]"
+            />
+            <div className="flex items-center gap-3">
+              <select
+                value={noteType}
+                onChange={(e) => setNoteType(e.target.value)}
+                className="px-3 py-2 border border-black rounded bg-white text-black"
+              >
+                <option value="note">{t('add_note')}</option>
+                <option value="question">{t('add_question')}</option>
+              </select>
+              <button
+                onClick={handleAddNote}
+                disabled={!noteText.trim()}
+                className="px-6 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t('save_note')}
+              </button>
+            </div>
+          </div>
+
+          {notes.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">{t('no_notes')}</p>
+          ) : (
+            <div className="space-y-4">
+              {notes.map((note) => (
+                <div key={note.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  {editingNoteId === note.id ? (
+                    <div className="space-y-3">
+                      <textarea
+                        defaultValue={note.text}
+                        onBlur={(e) => {
+                          if (e.target.value.trim() && e.target.value !== note.text) {
+                            handleUpdateNote(note.id, e.target.value.trim());
+                          } else {
+                            setEditingNoteId(null);
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-black rounded bg-white text-black min-h-[80px]"
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            const el = document.querySelector(`[data-note-id="${note.id}"] textarea`);
+                            if (el && el.value.trim()) {
+                              handleUpdateNote(note.id, el.value.trim());
+                            } else {
+                              setEditingNoteId(null);
+                            }
+                          }}
+                          className="px-4 py-1.5 bg-black text-white rounded text-sm"
+                        >
+                          {t('save_note')}
+                        </button>
+                        <button
+                          onClick={() => setEditingNoteId(null)}
+                          className="px-4 py-1.5 border border-black rounded text-sm text-black"
+                        >
+                          {t('cancel')}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-gray-500">
+                          {note.type === 'question' ? '❓ ' : '📝 '}
+                          {new Date(note.createdAt).toLocaleDateString()}
+                          {note.updatedAt !== note.createdAt && ' (معدلة)'}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setEditingNoteId(note.id)}
+                            className="text-sm text-black hover:text-gray-600"
+                          >
+                            {t('edit_note')}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="text-sm text-red-600 hover:text-red-800"
+                          >
+                            {t('delete_note')}
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-gray-800 whitespace-pre-wrap">{note.text}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Prev / Next */}

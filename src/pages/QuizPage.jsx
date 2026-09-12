@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { quizzesService, lessonsService } from '../firebase/service';
+import { useUserProgress } from '../hooks/useUserProgress';
 import { useTranslation } from 'react-i18next';
 import { useLocalized, lessonUrl } from '../utils/helpers';
 
@@ -13,8 +14,10 @@ const QuizPage = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [quizRecorded, setQuizRecorded] = useState(false);
   const { t } = useTranslation();
   const { pick } = useLocalized();
+  const { recordQuizResult } = useUserProgress();
 
   useEffect(() => {
     const loadQuiz = async () => {
@@ -37,6 +40,7 @@ const QuizPage = () => {
     setScore(0);
     setShowResult(false);
     setCurrentQuestionIndex(0);
+    setQuizRecorded(false);
   }, [lessonId]);
 
   const currentQuestion = quiz?.questions?.[currentQuestionIndex];
@@ -49,7 +53,7 @@ const QuizPage = () => {
     }));
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
@@ -59,6 +63,10 @@ const QuizPage = () => {
       );
       setScore(totalScore);
       setShowResult(true);
+      if (!quizRecorded) {
+        setQuizRecorded(true);
+        await recordQuizResult(totalScore, quiz.questions.length);
+      }
     }
   };
 
@@ -67,6 +75,7 @@ const QuizPage = () => {
     setScore(0);
     setShowResult(false);
     setCurrentQuestionIndex(0);
+    setQuizRecorded(false);
   }, []);
 
   if (loading) {

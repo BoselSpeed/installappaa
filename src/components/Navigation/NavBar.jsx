@@ -37,6 +37,18 @@ const NavBar = () => {
               {t('favorites')}
             </Link>
             <Link
+              to="/statistics"
+              className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
+            >
+              {t('stats')}
+            </Link>
+            <Link
+              to="/achievements"
+              className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
+            >
+              {t('achievements')}
+            </Link>
+            <Link
               to="/settings"
               className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
             >
@@ -59,6 +71,9 @@ const NavBar = () => {
         </Link>
         <Link to="/favorites" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
           {t('favorites')}
+        </Link>
+        <Link to="/statistics" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
+          {t('stats')}
         </Link>
         <Link to="/settings" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
           {t('settings')}

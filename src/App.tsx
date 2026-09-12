@@ -10,6 +10,8 @@ import { SearchPage } from './pages/SearchPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { QuizPage } from './pages/QuizPage'
+import { AchievementsPage } from './pages/AchievementsPage'
+import { StatisticsPage } from './pages/StatisticsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { AppProviders } from './components/AppProviders'
 
@@ -29,6 +31,8 @@ function App() {
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/quiz/:lessonId" element={<QuizPage />} />
+          <Route path="/achievements" element={<AchievementsPage />} />
+          <Route path="/statistics" element={<StatisticsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

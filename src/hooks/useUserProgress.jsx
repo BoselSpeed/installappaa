@@ -129,6 +129,66 @@ export const UserProgressProvider = ({ children }) => {
     }
   }, [userId, progress]);
 
+  const updateReadingStats = useCallback(async (minutesSpent) => {
+    if (!userId) return;
+    try {
+      await userProgressService.updateReadingStats?.(userId, minutesSpent);
+      setProgress(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          readingTimeMinutes: (prev.readingTimeMinutes || 0) + minutesSpent
+        };
+      });
+    } catch (error) {
+      console.error('Error updating reading stats:', error);
+    }
+  }, [userId]);
+
+  const recordQuizResult = useCallback(async (score, total) => {
+    if (!userId) return;
+    try {
+      await userProgressService.recordQuizResult?.(userId, score, total);
+      setProgress(prev => {
+        if (!prev) return prev;
+        const totalQuizzesTaken = (prev.totalQuizzesTaken || 0) + 1;
+        const totalQuizScore = (prev.totalQuizScore || 0) + score;
+        const averageQuizScore = totalQuizzesTaken > 0 ? Math.round((totalQuizScore / totalQuizzesTaken) * 100) / 100 : 0;
+        return {
+          ...prev,
+          totalQuizzesTaken,
+          totalQuizScore,
+          averageQuizScore
+        };
+      });
+    } catch (error) {
+      console.error('Error recording quiz result:', error);
+    }
+  }, [userId]);
+
+  const checkDailyGoal = useCallback(async () => {
+    if (!userId) return;
+    try {
+      await userProgressService.checkDailyGoal?.(userId);
+      setProgress(prev => {
+        if (!prev) return prev;
+        const today = new Date().toISOString().split('T')[0];
+        const lastDate = prev.lastDailyGoalDate;
+        if (lastDate !== today) {
+          const dailyGoalCompleted = (prev.readingTimeMinutes || 0) >= (prev.dailyGoal || 30);
+          return {
+            ...prev,
+            dailyGoalCompleted,
+            lastDailyGoalDate: today
+          };
+        }
+        return prev;
+      });
+    } catch (error) {
+      console.error('Error checking daily goal:', error);
+    }
+  }, [userId]);
+
   return (
     <UserProgressContext.Provider value={{ 
       progress, 
@@ -139,7 +199,10 @@ export const UserProgressProvider = ({ children }) => {
       markLessonCompleted, 
       addBookmark, 
       removeBookmark, 
-      updateLastOpened 
+      updateLastOpened,
+      updateReadingStats,
+      recordQuizResult,
+      checkDailyGoal
     }}>
       {children}
     </UserProgressContext.Provider>

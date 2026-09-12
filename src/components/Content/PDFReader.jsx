@@ -9,8 +9,6 @@ const MAX_DPR = 2;
 const FIT_WIDTH = 'width';
 const FIT_PAGE = 'page';
 
-// Cache loaded documents per URL so React StrictMode's double-invoked effects
-// reuse the same loading task instead of destroying the shared worker.
 const docPromises = {};
 
 const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
@@ -22,6 +20,7 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
   const [fitMode, setFitMode] = useState(FIT_WIDTH);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const containerRef = useRef(null);
   const pagesRef = useRef({});
@@ -32,6 +31,7 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
   const fitModeRef = useRef(FIT_WIDTH);
   const zoomRef = useRef(100);
   const onPageChangeRef = useRef(onPageChange);
+  const pinchStateRef = useRef(null);
 
   useEffect(() => {
     onPageChangeRef.current = onPageChange;
@@ -263,11 +263,71 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
     }
   };
 
+  const toggleFullscreen = async () => {
+    if (!containerRef.current) return;
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (err) {
+      console.error('Fullscreen error:', err);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStateRef.current = {
+        initialDistance: Math.hypot(dx, dy),
+        initialZoom: zoomRef.current
+      };
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 2 && pinchStateRef.current) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const currentDistance = Math.hypot(dx, dy);
+      const scale = currentDistance / pinchStateRef.current.initialDistance;
+      const newZoom = Math.min(Math.max(Math.round(pinchStateRef.current.initialZoom * scale), 50), 300);
+      zoomRef.current = newZoom;
+      setZoom(newZoom);
+      setFitMode(FIT_WIDTH);
+      fitModeRef.current = FIT_WIDTH;
+      applyZoom(FIT_WIDTH, newZoom);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    pinchStateRef.current = null;
+  };
+
   const toolbarButton = 'px-3 py-1.5 border border-black rounded text-sm text-black hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors';
   const activeButton = 'bg-black text-white';
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <div
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''}`}
+    >
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-gray-200 bg-gray-50">
         <button
@@ -344,10 +404,27 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
           {t('next')}
         </button>
 
+        <button
+          onClick={toggleFullscreen}
+          className={`${toolbarButton} rtl:mr-auto ltr:ml-auto`}
+          aria-label={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
+          title={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
+        >
+          {isFullscreen ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          )}
+        </button>
+
         <a
           href={pdfUrl}
           download={fileName}
-          className={`${toolbarButton} rtl:mr-auto ltr:ml-auto`}
+          className={`${toolbarButton}`}
         >
           {t('download_pdf')}
         </a>
@@ -355,9 +432,7 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
 
       {/* Pages */}
       <div
-        ref={containerRef}
-        onScroll={handleScroll}
-        className="pdf-reader-scroll overflow-y-auto"
+        className={`pdf-reader-scroll overflow-y-auto ${isFullscreen ? 'h-screen' : ''}`}
       >
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-3">

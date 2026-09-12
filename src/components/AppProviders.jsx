@@ -5,6 +5,7 @@ import i18n from '../i18n/i18n';
 import { AuthProvider } from './../hooks/useAuth';
 import { AppSettingsProvider } from './../hooks/useAppSettings';
 import { UserProgressProvider } from './../hooks/useUserProgress';
+import { NotesProvider } from './../hooks/useNotes';
 
 const AppProviders = ({ children }) => {
   useEffect(() => {
@@ -25,7 +26,9 @@ const AppProviders = ({ children }) => {
         <AuthProvider>
           <AppSettingsProvider>
             <UserProgressProvider>
-              {children}
+              <NotesProvider>
+                {children}
+              </NotesProvider>
             </UserProgressProvider>
           </AppSettingsProvider>
         </AuthProvider>

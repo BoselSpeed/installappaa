@@ -67,6 +67,23 @@ const Sidebar = () => {
           </Link>
         </nav>
 
+        <nav className="space-y-1 mb-5" aria-label={t('stats')}>
+          <Link
+            to="/statistics"
+            className="flex items-center justify-between px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
+          >
+            {t('stats')}
+            <span aria-hidden="true">📊</span>
+          </Link>
+          <Link
+            to="/achievements"
+            className="flex items-center justify-between px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
+          >
+            {t('achievements')}
+            <span aria-hidden="true">🏆</span>
+          </Link>
+        </nav>
+
         <h2 className="text-lg font-semibold mb-4 text-black">{t('sections')}</h2>
         <nav className="space-y-1" aria-label={t('sections')}>
           {sections

@@ -5,17 +5,19 @@
 
 import { SEED_BOOKS } from '../data/books';
 
-const KEYS = {
-  seedVersion: 'fiqh_demo_seed_version',
-  sections: 'fiqh_demo_sections',
-  lessons: 'fiqh_demo_lessons',
-  content: 'fiqh_demo_lesson_content',
-  quizzes: 'fiqh_demo_quizzes',
-  books: 'fiqh_demo_books',
-  progress: (uid) => `fiqh_demo_progress_${uid}`,
-  settings: (uid) => `fiqh_demo_settings_${uid}`,
-  userId: 'userId'
-};
+  const KEYS = {
+    seedVersion: 'fiqh_demo_seed_version',
+    sections: 'fiqh_demo_sections',
+    lessons: 'fiqh_demo_lessons',
+    content: 'fiqh_demo_lesson_content',
+    quizzes: 'fiqh_demo_quizzes',
+    books: 'fiqh_demo_books',
+    notes: 'fiqh_demo_notes',
+    searchHistory: 'fiqh_demo_search_history',
+    progress: (uid) => `fiqh_demo_progress_${uid}`,
+    settings: (uid) => `fiqh_demo_settings_${uid}`,
+    userId: 'userId'
+  };
 
 const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
@@ -456,6 +458,55 @@ export const mockQuizzesService = {
   }
 };
 
+export const mockNotesService = {
+  getNotesByLesson: async (lessonId) => {
+    await delay();
+    const notes = read(KEYS.notes, []);
+    return notes.filter((n) => n.lessonId === lessonId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  },
+  addNote: async (noteData) => {
+    await delay();
+    const notes = read(KEYS.notes, []);
+    const newNote = {
+      ...noteData,
+      id: noteData.id || `note-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    write(KEYS.notes, [...notes, newNote]);
+    return newNote.id;
+  },
+  updateNote: async (noteId, noteData) => {
+    await delay();
+    const notes = read(KEYS.notes, []);
+    write(KEYS.notes, notes.map((n) => (n.id === noteId ? { ...n, ...noteData, updatedAt: new Date().toISOString() } : n)));
+  },
+  deleteNote: async (noteId) => {
+    await delay();
+    write(KEYS.notes, read(KEYS.notes, []).filter((n) => n.id !== noteId));
+  }
+};
+
+export const mockSearchHistoryService = {
+  getSearchHistory: async () => {
+    await delay();
+    return read(KEYS.searchHistory, []);
+  },
+  addSearch: async (query) => {
+    await delay();
+    const history = read(KEYS.searchHistory, []);
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    const filtered = history.filter((item) => item.query !== trimmed);
+    const updated = [{ query: trimmed, timestamp: new Date().toISOString() }, ...filtered].slice(0, 20);
+    write(KEYS.searchHistory, updated);
+  },
+  clearSearchHistory: async () => {
+    await delay();
+    write(KEYS.searchHistory, []);
+  }
+};
+
 export const mockUserProgressService = {
   getUserProgress: async (userId) => {
     await delay();
@@ -470,6 +521,14 @@ export const mockUserProgressService = {
       bookmarkedLessons: [],
       lastOpened: null,
       streaks: 0,
+      readingTimeMinutes: 0,
+      totalQuizzesTaken: 0,
+      totalQuizScore: 0,
+      averageQuizScore: 0,
+      achievements: [],
+      dailyGoal: 30,
+      dailyGoalCompleted: false,
+      lastDailyGoalDate: null,
       createdAt: now,
       updatedAt: now
     };
@@ -510,6 +569,92 @@ export const mockUserProgressService = {
     if (progress) {
       const bookmarkedLessons = progress.bookmarkedLessons.filter((id) => id !== lessonId);
       await mockUserProgressService.saveUserProgress({ ...progress, bookmarkedLessons });
+    }
+  },
+  updateReadingStats: async (userId, minutesSpent) => {
+    const progress = await mockUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const readingTimeMinutes = (progress.readingTimeMinutes || 0) + minutesSpent;
+      const totalQuizzesTaken = progress.totalQuizzesTaken || 0;
+      const totalQuizScore = progress.totalQuizScore || 0;
+      const averageQuizScore = totalQuizzesTaken > 0 ? Math.round((totalQuizScore / totalQuizzesTaken) * 100) / 100 : 0;
+      const newAchievements = [...(progress.achievements || [])];
+      if (readingTimeMinutes >= 60 && !newAchievements.includes('first_hour')) {
+        newAchievements.push('first_hour');
+      }
+      if (readingTimeMinutes >= 300 && !newAchievements.includes('five_hours')) {
+        newAchievements.push('five_hours');
+      }
+      if (progress.completedLessons.length >= 1 && !newAchievements.includes('first_lesson')) {
+        newAchievements.push('first_lesson');
+      }
+      if (progress.completedLessons.length >= 5 && !newAchievements.includes('five_lessons')) {
+        newAchievements.push('five_lessons');
+      }
+      if (progress.completedLessons.length >= 10 && !newAchievements.includes('ten_lessons')) {
+        newAchievements.push('ten_lessons');
+      }
+      if (progress.streaks >= 3 && !newAchievements.includes('streak_3')) {
+        newAchievements.push('streak_3');
+      }
+      if (progress.streaks >= 7 && !newAchievements.includes('streak_7')) {
+        newAchievements.push('streak_7');
+      }
+      if (progress.streaks >= 30 && !newAchievements.includes('streak_30')) {
+        newAchievements.push('streak_30');
+      }
+      const today = new Date().toISOString().split('T')[0];
+      const lastDate = progress.lastDailyGoalDate;
+      const dailyGoalCompleted = lastDate === today && progress.dailyGoalCompleted;
+      await mockUserProgressService.saveUserProgress({
+        ...progress,
+        readingTimeMinutes,
+        totalQuizzesTaken,
+        totalQuizScore,
+        averageQuizScore,
+        achievements: newAchievements,
+        dailyGoalCompleted,
+        lastDailyGoalDate: lastDate
+      });
+    }
+  },
+  recordQuizResult: async (userId, score, total) => {
+    const progress = await mockUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const totalQuizzesTaken = (progress.totalQuizzesTaken || 0) + 1;
+      const totalQuizScore = (progress.totalQuizScore || 0) + score;
+      const averageQuizScore = totalQuizzesTaken > 0 ? Math.round((totalQuizScore / totalQuizzesTaken) * 100) / 100 : 0;
+      const newAchievements = [...(progress.achievements || [])];
+      if (score === total && !newAchievements.includes('perfect_quiz')) {
+        newAchievements.push('perfect_quiz');
+      }
+      if (totalQuizzesTaken >= 3 && !newAchievements.includes('three_quizzes')) {
+        newAchievements.push('three_quizzes');
+      }
+      if (averageQuizScore >= 0.8 && !newAchievements.includes('high_average')) {
+        newAchievements.push('high_average');
+      }
+      await mockUserProgressService.saveUserProgress({
+        ...progress,
+        totalQuizzesTaken,
+        totalQuizScore,
+        averageQuizScore,
+        achievements: newAchievements
+      });
+    }
+  },
+  checkDailyGoal: async (userId) => {
+    const progress = await mockUserProgressService.getUserProgress(userId);
+    if (!progress) return;
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = progress.lastDailyGoalDate;
+    if (lastDate !== today) {
+      const dailyGoalCompleted = (progress.readingTimeMinutes || 0) >= (progress.dailyGoal || 30);
+      await mockUserProgressService.saveUserProgress({
+        ...progress,
+        dailyGoalCompleted,
+        lastDailyGoalDate: today
+      });
     }
   }
 };
@@ -554,5 +699,7 @@ export default {
   quizzes: mockQuizzesService,
   books: mockBooksService,
   userProgress: mockUserProgressService,
-  appSettings: mockAppSettingsService
+  appSettings: mockAppSettingsService,
+  notes: mockNotesService,
+  searchHistory: mockSearchHistoryService
 };

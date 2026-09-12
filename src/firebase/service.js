@@ -13,7 +13,8 @@ import {
   where,
   orderBy,
   onSnapshot,
-  setDoc
+  setDoc,
+  writeBatch
 } from 'firebase/firestore';
 import {
   getAuth,
@@ -33,7 +34,9 @@ import {
   mockQuizzesService,
   mockBooksService,
   mockUserProgressService,
-  mockAppSettingsService
+  mockAppSettingsService,
+  mockNotesService,
+  mockSearchHistoryService
 } from './mockService';
 
 // Firebase is only initialized when real credentials are present.
@@ -252,6 +255,14 @@ const realUserProgressService = {
       bookmarkedLessons: [],
       lastOpened: null,
       streaks: 0,
+      readingTimeMinutes: 0,
+      totalQuizzesTaken: 0,
+      totalQuizScore: 0,
+      averageQuizScore: 0,
+      achievements: [],
+      dailyGoal: 30,
+      dailyGoalCompleted: false,
+      lastDailyGoalDate: null,
       createdAt: now,
       updatedAt: now
     };
@@ -288,6 +299,146 @@ const realUserProgressService = {
     if (progress) {
       const bookmarkedLessons = progress.bookmarkedLessons.filter((id) => id !== lessonId);
       await realUserProgressService.saveUserProgress({ ...progress, bookmarkedLessons });
+    }
+  },
+  updateReadingStats: async (userId, minutesSpent) => {
+    const progress = await realUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const readingTimeMinutes = (progress.readingTimeMinutes || 0) + minutesSpent;
+      const totalQuizzesTaken = progress.totalQuizzesTaken || 0;
+      const totalQuizScore = progress.totalQuizScore || 0;
+      const averageQuizScore = totalQuizzesTaken > 0 ? Math.round((totalQuizScore / totalQuizzesTaken) * 100) / 100 : 0;
+      const newAchievements = [...(progress.achievements || [])];
+      if (readingTimeMinutes >= 60 && !newAchievements.includes('first_hour')) {
+        newAchievements.push('first_hour');
+      }
+      if (readingTimeMinutes >= 300 && !newAchievements.includes('five_hours')) {
+        newAchievements.push('five_hours');
+      }
+      if (progress.completedLessons.length >= 1 && !newAchievements.includes('first_lesson')) {
+        newAchievements.push('first_lesson');
+      }
+      if (progress.completedLessons.length >= 5 && !newAchievements.includes('five_lessons')) {
+        newAchievements.push('five_lessons');
+      }
+      if (progress.completedLessons.length >= 10 && !newAchievements.includes('ten_lessons')) {
+        newAchievements.push('ten_lessons');
+      }
+      if (progress.streaks >= 3 && !newAchievements.includes('streak_3')) {
+        newAchievements.push('streak_3');
+      }
+      if (progress.streaks >= 7 && !newAchievements.includes('streak_7')) {
+        newAchievements.push('streak_7');
+      }
+      if (progress.streaks >= 30 && !newAchievements.includes('streak_30')) {
+        newAchievements.push('streak_30');
+      }
+      const today = new Date().toISOString().split('T')[0];
+      const lastDate = progress.lastDailyGoalDate;
+      const dailyGoalCompleted = lastDate === today && progress.dailyGoalCompleted;
+      await realUserProgressService.saveUserProgress({
+        ...progress,
+        readingTimeMinutes,
+        totalQuizzesTaken,
+        totalQuizScore,
+        averageQuizScore,
+        achievements: newAchievements,
+        dailyGoalCompleted,
+        lastDailyGoalDate: lastDate
+      });
+    }
+  },
+  recordQuizResult: async (userId, score, total) => {
+    const progress = await realUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const totalQuizzesTaken = (progress.totalQuizzesTaken || 0) + 1;
+      const totalQuizScore = (progress.totalQuizScore || 0) + score;
+      const averageQuizScore = totalQuizzesTaken > 0 ? Math.round((totalQuizScore / totalQuizzesTaken) * 100) / 100 : 0;
+      const newAchievements = [...(progress.achievements || [])];
+      if (score === total && !newAchievements.includes('perfect_quiz')) {
+        newAchievements.push('perfect_quiz');
+      }
+      if (totalQuizzesTaken >= 3 && !newAchievements.includes('three_quizzes')) {
+        newAchievements.push('three_quizzes');
+      }
+      if (averageQuizScore >= 0.8 && !newAchievements.includes('high_average')) {
+        newAchievements.push('high_average');
+      }
+      await realUserProgressService.saveUserProgress({
+        ...progress,
+        totalQuizzesTaken,
+        totalQuizScore,
+        averageQuizScore,
+        achievements: newAchievements
+      });
+    }
+  },
+  checkDailyGoal: async (userId) => {
+    const progress = await realUserProgressService.getUserProgress(userId);
+    if (!progress) return;
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = progress.lastDailyGoalDate;
+    if (lastDate !== today) {
+      const dailyGoalCompleted = (progress.readingTimeMinutes || 0) >= (progress.dailyGoal || 30);
+      await realUserProgressService.saveUserProgress({
+        ...progress,
+        dailyGoalCompleted,
+        lastDailyGoalDate: today
+      });
+    }
+  }
+};
+
+const realNotesService = {
+  getNotesByLesson: async (lessonId) => {
+    const q = query(collection(db, 'notes'), where('lessonId', '==', lessonId));
+    const notesSnapshot = await getDocs(q);
+    return notesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  },
+  addNote: async (noteData) => {
+    const docRef = await addDoc(collection(db, 'notes'), {
+      ...noteData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    return docRef.id;
+  },
+  updateNote: async (noteId, noteData) => {
+    await updateDoc(doc(db, 'notes', noteId), {
+      ...noteData,
+      updatedAt: new Date().toISOString()
+    });
+  },
+  deleteNote: async (noteId) => {
+    await deleteDoc(doc(db, 'notes', noteId));
+  }
+};
+
+const realSearchHistoryService = {
+  getSearchHistory: async () => {
+    const q = query(collection(db, 'search_history'), orderBy('timestamp', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.slice(0, 20).map((doc) => ({ id: doc.id, ...doc.data() }));
+  },
+  addSearch: async (query) => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    const q = query(collection(db, 'search_history'), where('query', '==', trimmed));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const existing = snapshot.docs[0];
+      await updateDoc(doc(db, 'search_history', existing.id), { timestamp: new Date().toISOString() });
+      return;
+    }
+    await addDoc(collection(db, 'search_history'), { query: trimmed, timestamp: new Date().toISOString() });
+  },
+  clearSearchHistory: async () => {
+    const q = query(collection(db, 'search_history'));
+    const snapshot = await getDocs(q);
+    const batch = writeBatch ? writeBatch(db) : null;
+    if (batch) {
+      snapshot.docs.forEach((doc) => batch.delete(doc(db, 'search_history', doc.id)));
+      if (batch._write) await batch.commit();
     }
   }
 };
@@ -335,6 +486,8 @@ export const quizzesService = isDemoMode ? mockQuizzesService : realQuizzesServi
 export const booksService = isDemoMode ? mockBooksService : realBooksService;
 export const userProgressService = isDemoMode ? mockUserProgressService : realUserProgressService;
 export const appSettingsService = isDemoMode ? mockAppSettingsService : realAppSettingsService;
+export const notesService = isDemoMode ? mockNotesService : realNotesService;
+export const searchHistoryService = isDemoMode ? mockSearchHistoryService : realSearchHistoryService;
 
 export default {
   auth: authService,
@@ -344,5 +497,7 @@ export default {
   quizzes: quizzesService,
   books: booksService,
   userProgress: userProgressService,
-  appSettings: appSettingsService
+  appSettings: appSettingsService,
+  notes: notesService,
+  searchHistory: searchHistoryService
 };
