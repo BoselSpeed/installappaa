@@ -8,6 +8,7 @@ const BookCard = ({ book }) => {
 
   const author = pick(book, 'author');
   const volumeCount = book.volumes?.length || 0;
+  const isLoaded = Boolean(book.volumes?.some((v) => v.bundled));
 
   return (
     <Link
@@ -38,7 +39,12 @@ const BookCard = ({ book }) => {
         </h3>
         {author && <p className="text-sm text-gray-600">{author}</p>}
         <div className="flex items-center gap-2 mt-2 text-xs">
-          <span className="bg-black text-white px-2 py-1 rounded">
+          {isLoaded && (
+            <span className="bg-black text-white px-2 py-1 rounded">
+              {t('loaded_with_app')}
+            </span>
+          )}
+          <span className="bg-gray-100 text-black border border-black px-2 py-1 rounded">
             {t('volumes')}
           </span>
           <span className="text-gray-600">

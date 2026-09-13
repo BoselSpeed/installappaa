@@ -70,6 +70,7 @@ const BookDetailPage = () => {
 
   const volumes = book.volumes || [];
   const volumeCount = volumes.length;
+  const isLoaded = Boolean(volumes.some((v) => v.bundled));
 
   return (
     <div className="bg-white">
@@ -97,6 +98,13 @@ const BookDetailPage = () => {
           {/* Details */}
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-black mb-4">{pick(book, 'title')}</h1>
+
+            {isLoaded && (
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-black bg-gray-100 border border-black rounded px-3 py-1 mb-4">
+                <span className="flex items-center justify-center h-5 w-5 rounded-full bg-black text-white text-xs">✓</span>
+                {t('loaded_with_app')}
+              </span>
+            )}
 
             <dl className="space-y-3 text-sm">
               {fields.map((field) => (

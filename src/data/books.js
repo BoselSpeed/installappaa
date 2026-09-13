@@ -222,7 +222,7 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1FcgySndQ_tGecVHcl1Axu5bcjBdzajuF/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/tafsir-al-baghawi-v1.pdf', downloadUrl: null, path: '0001-0343.pdf', sizeMb: 9.3 },
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '0001-0343.pdf', sizeMb: 9.3 },
       { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0344-0686.pdf', sizeMb: 8.5 },
       { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '0687-1029.pdf', sizeMb: 8.5 },
       { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1030-1372.pdf', sizeMb: 8.7 },
@@ -268,7 +268,7 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1FJ9TVi7Ssb9z4v5PFZR9-LDhwAcFIZl0/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: true, pdfUrl: '/books/musnad-abi-dawud-v1.pdf', downloadUrl: null, path: 'madt1p.pdf', sizeMb: 1.3 },
+      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt1p.pdf', sizeMb: 1.3 },
       { id: 'v2', number: 2, title_ar: 'المجلد الأول: الأحاديث 1 - 640', title_en: 'Volume 1: Hadiths 1 - 640', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt1.pdf', sizeMb: 8.6 },
       { id: 'v3', number: 3, title_ar: 'المجلد الثاني: الأحاديث 641 - 1469', title_en: 'Volume 2: Hadiths 641 - 1469', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt2.pdf', sizeMb: 11.1 },
       { id: 'v4', number: 4, title_ar: 'المجلد الثالث: الأحاديث 1470 - 2358', title_en: 'Volume 3: Hadiths 1470 - 2358', bundled: false, pdfUrl: null, downloadUrl: null, path: 'madt3.pdf', sizeMb: 10.5 },
@@ -401,7 +401,7 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1WaN7z9KBvvmGQrS_qB8derlWYJJGUoXe/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/sunan-al-nasai-v1.pdf', downloadUrl: null, path: '0001-0590.pdf', sizeMb: 9.2 },
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '0001-0590.pdf', sizeMb: 9.2 },
       { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '0591-1180.pdf', sizeMb: 13.5 },
       { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '1181-1770.pdf', sizeMb: 13.5 },
       { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: '1771-2360.pdf', sizeMb: 13.3 },
@@ -447,7 +447,7 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1k-BRprDbtC7VpB5saVTBagceu0PAgXKs/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/sunan-al-tirmidhi-v1.pdf', downloadUrl: null, path: 'Sunan_Tirmithi01.pdf', sizeMb: 8.6 },
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi01.pdf', sizeMb: 8.6 },
       { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi02.pdf', sizeMb: 7.2 },
       { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi03.pdf', sizeMb: 9.7 },
       { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'Sunan_Tirmithi04.pdf', sizeMb: 10.8 },
@@ -488,7 +488,7 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1afH4OzfUWtundYWzuSS7vC__NK0regaa/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'مقدمة', title_en: 'Introduction', bundled: true, pdfUrl: '/books/tafsir-al-qurtubi-v1.pdf', downloadUrl: null, path: '01_73651p.pdf', sizeMb: 0.6 },
+      { id: 'v1', number: 1, title_ar: 'مقدمة', title_en: 'Introduction', bundled: false, pdfUrl: null, downloadUrl: null, path: '01_73651p.pdf', sizeMb: 0.6 },
       { id: 'v2', number: 2, title_ar: 'المجلد ١: الفاتحة - البقرة ٣٩', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: '01_73651.pdf', sizeMb: 12.4 },
       { id: 'v3', number: 3, title_ar: 'المجلد ٢: البقرة ٤٠ - ١٦٤', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: '02_73652.pdf', sizeMb: 12.1 },
       { id: 'v4', number: 4, title_ar: 'المجلد ٣: البقرة ١٦٥ - ٢٢٢', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: '03_73653.pdf', sizeMb: 11.6 },
@@ -549,7 +549,7 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/10qPAffk3lx1NgTNj3b73GsSsxOjA1IKQ/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: true, pdfUrl: '/books/tafsir-al-tabari-v1.pdf', downloadUrl: null, path: 'taftabry01p.pdf', sizeMb: 4.6 },
+      { id: 'v1', number: 1, title_ar: 'مقدمة التحقيق', title_en: 'Introduction', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry01p.pdf', sizeMb: 4.6 },
       { id: 'v2', number: 2, title_ar: 'المجلد ١: الفاتحة - البقرة ٥٩', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry01.pdf', sizeMb: 12.7 },
       { id: 'v3', number: 3, title_ar: 'المجلد ٢: البقرة ٦٠ - ١٦٣', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry02.pdf', sizeMb: 13.1 },
       { id: 'v4', number: 4, title_ar: 'المجلد ٣: البقرة ١٦٤ - ٢٢٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'taftabry03.pdf', sizeMb: 13.0 },
@@ -611,7 +611,7 @@ const SEED_BOOKS = [
       pageUrl: 'https://drive.google.com/file/d/1qEWMYuHmlpH4WyhsqkvBqJgvyDWh0ugh/view'
     },
     volumes: [
-      { id: 'v1', number: 1, title_ar: 'المجلد ١: الفاتحة - النساء', title_en: 'Volume 1', bundled: true, pdfUrl: '/books/tafsir-al-shawkani-v1.pdf', downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني - الجزء الأول.pdf', sizeMb: 19.3 },
+      { id: 'v1', number: 1, title_ar: 'المجلد ١: الفاتحة - النساء', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني - الجزء الأول.pdf', sizeMb: 19.3 },
       { id: 'v2', number: 2, title_ar: 'المجلد ٢: المائدة - هود', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني - الجزء الثاني.pdf', sizeMb: 17.0 },
       { id: 'v3', number: 3, title_ar: 'المجلد ٣: يوسف - المؤمنون', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الثالث.pdf', sizeMb: 15.2 },
       { id: 'v4', number: 4, title_ar: 'المجلد ٤: النور - الدخان', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: null, path: 'فتح القدير الجامع بين فني الرواية والدراية من علم التفسير تفسير الشوكاني الجزء الرابع.pdf', sizeMb: 17.0 },
