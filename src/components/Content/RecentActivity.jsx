@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { lessonsService } from '../../firebase/service';
 import { useTranslation } from 'react-i18next';
 import { lessonUrl, useLocalized } from '../../utils/helpers';
+import { Card } from '../UI/Card';
+import { SectionTitle } from '../UI/PageHeader';
+import { ProgressBar } from '../UI/ProgressBar';
+import { Icon } from '../UI/Icon';
 
 const RecentActivity = ({ progress }) => {
   const { t } = useTranslation();
@@ -29,59 +33,64 @@ const RecentActivity = ({ progress }) => {
     return () => { cancelled = true; };
   }, [progress?.lastOpened]);
 
-  if (!progress || (!progress.lastOpened && !(progress.completedLessons?.length))) {
-    return (
-      <div className="bg-white rounded-lg shadow-md p-6 border border-black">
-        <h3 className="text-xl font-semibold mb-4 text-black">{t('recent_activity')}</h3>
-        <div className="text-center py-8">
-          <p className="text-gray-500">{t('no_recent_activity')}</p>
-        </div>
-      </div>
-    );
-  }
+  const completedCount = progress?.completedLessons?.length ?? 0;
+  const savedCount = progress?.bookmarkedLessons?.length ?? 0;
+  const hasActivity = Boolean(progress && (progress.lastOpened || completedCount > 0 || savedCount > 0));
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-black">
-      <h3 className="text-xl font-semibold mb-4 text-black">{t('recent_activity')}</h3>
-      <div className="space-y-4">
-        {lastLesson && (
-          <Link
-            to={lessonUrl(lastLesson)}
-            className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-black"
-          >
-            <div className="flex items-center">
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 mb-1">{t('last_opened')}</p>
-                <p className="font-medium text-black">{pick(lastLesson, 'title')}</p>
+    <Card className="p-5 sm:p-6">
+      <SectionTitle className="mb-5 flex items-center gap-2">
+        <Icon name="history" size="sm" className="text-ink-faint" />
+        {t('recent_activity')}
+      </SectionTitle>
+
+      {!hasActivity ? (
+        <div className="rounded-xl border border-dashed border-line px-4 py-10 text-center">
+          <p className="text-sm text-ink-muted">{t('no_recent_activity')}</p>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {lastLesson && (
+            <Link
+              to={lessonUrl(lastLesson)}
+              className="group flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-quiet p-4 transition-card duration-300 hover:border-ink-ghost hover:bg-surface"
+            >
+              <div className="min-w-0">
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  {t('last_opened')}
+                </p>
+                <p className="truncate font-semibold text-ink">{pick(lastLesson, 'title')}</p>
               </div>
-              <span className="text-black text-lg rtl:rotate-180">→</span>
-            </div>
-          </Link>
-        )}
+              <Icon
+                name="arrowRight"
+                size="md"
+                className="shrink-0 text-ink-faint transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-ink rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+              />
+            </Link>
+          )}
 
-        {(progress.completedLessons?.length ?? 0) > 0 && (
-          <div className="mt-4">
-            <p className="text-sm text-gray-600 mb-2">
-              {t('lessons_completed')}: {progress.completedLessons.length}
-            </p>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-black h-2 rounded-full transition-all"
-                style={{ width: `${Math.min(progress.completedLessons.length * 10, 100)}%` }}
-              ></div>
+          {completedCount > 0 && (
+            <div>
+              <div className="mb-2 flex items-center justify-between text-sm">
+                <span className="text-ink-muted">{t('lessons_completed')}</span>
+                <span className="font-semibold tabular-nums text-ink">{completedCount}</span>
+              </div>
+              <ProgressBar
+                value={Math.min(completedCount * 10, 100)}
+                label={t('lessons_completed')}
+              />
             </div>
-          </div>
-        )}
+          )}
 
-        {(progress.bookmarkedLessons?.length ?? 0) > 0 && (
-          <div className="pt-2 border-t border-gray-200">
-            <p className="text-sm text-gray-600">
-              {t('saved_lessons')}: {progress.bookmarkedLessons.length}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+          {savedCount > 0 && (
+            <div className="flex items-center gap-2 border-t border-line pt-4 text-sm text-ink-muted">
+              <Icon name="bookmark" size="sm" className="text-ink-faint" />
+              {t('saved_lessons')}: <span className="font-semibold tabular-nums text-ink">{savedCount}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </Card>
   );
 };
 

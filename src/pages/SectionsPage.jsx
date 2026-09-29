@@ -1,8 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { sectionsService, lessonsService, booksService } from '../firebase/service';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
+import { PageShell } from '../components/UI/PageShell';
+import { PageHeader } from '../components/UI/PageHeader';
+import { BackLink } from '../components/UI/BackLink';
+import { Card } from '../components/UI/Card';
+import { Badge } from '../components/UI/Badge';
+import { EmptyState } from '../components/UI/EmptyState';
+import { LoadingState } from '../components/UI/Spinner';
+import { Icon } from '../components/UI/Icon';
 
 const SectionsPage = () => {
   const { sectionId } = useParams();
@@ -73,99 +81,110 @@ const SectionsPage = () => {
       : { label: t('lessons'), count: lessonCounts[section.id] || 0 };
 
   if (loading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
-    );
+    return <LoadingState label={t('loading')} />;
   }
 
   if (error) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <p className="text-gray-500">{t('error_occurred')}</p>
-      </div>
+      <PageShell width="narrow">
+        <EmptyState icon="info" title={t('error_occurred')} />
+      </PageShell>
     );
   }
 
   return (
-    <div className="bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {!selectedSection ? (
-          <>
-            <h1 className="text-3xl font-bold mb-8 text-black">{t('sections')}</h1>
+    <PageShell width="wide">
+      {!selectedSection ? (
+        <>
+          <PageHeader title={t('sections')} />
 
-            {sections.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-gray-500 text-lg">{t('no_results')}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sections.map((section) => (
-                  <Link
+          {sections.length === 0 ? (
+            <EmptyState icon="grid" title={t('no_results')} />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {sections.map((section) => {
+                const badge = countBadge(section);
+                return (
+                  <Card
                     key={section.id}
+                    as={Link}
                     to={sectionLink(section)}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-black"
+                    interactive
+                    className="group flex flex-col p-5 focus-visible:border-ink sm:p-6"
                   >
-                    <h3 className="text-xl font-semibold mb-2 text-black">
+                    <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-ink transition-colors duration-300 group-hover:border-ink-ghost group-hover:bg-paper">
+                      <Icon name="book" size="md" />
+                    </span>
+
+                    <h2 className="text-lg font-bold leading-snug text-ink sm:text-xl">
                       {pick(section, 'title')}
-                    </h3>
-                    <p className="text-gray-600 mb-4 line-clamp-2">
+                    </h2>
+
+                    <p className="mt-2 mb-5 line-clamp-2 text-sm text-ink-muted">
                       {pick(section, 'description')}
                     </p>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <span className="bg-black text-white px-2 py-1 rounded text-xs">
-                        {countBadge(section).label}
-                      </span>
-                      <span className="rtl:mr-2 ltr:ml-2">{countBadge(section).count}</span>
+
+                    <div className="mt-auto flex items-center gap-2 text-sm text-ink-muted">
+                      <Badge variant="solid">{badge.label}</Badge>
+                      <span className="tabular-nums">{badge.count}</span>
                     </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="mb-6">
-              <Link to="/sections" className="text-black hover:text-gray-600 mb-4 inline-block">
-                ← {t('previous')} · {t('sections')}
-              </Link>
-              <h1 className="text-3xl font-bold mt-4 text-black">
-                {pick(selectedSection, 'title')}
-              </h1>
-              <p className="text-gray-600 mt-2">
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <BackLink to="/sections" className="mb-4">
+            {t('previous')} · {t('sections')}
+          </BackLink>
+
+          <header className="mb-6 mt-4 sm:mb-8">
+            <h1 className="text-[1.5rem] font-bold leading-tight text-ink sm:text-3xl lg:text-4xl">
+              {pick(selectedSection, 'title')}
+            </h1>
+            {pick(selectedSection, 'description') && (
+              <p className="mt-3 max-w-prose text-sm text-ink-muted sm:text-base">
                 {pick(selectedSection, 'description')}
               </p>
-            </div>
+            )}
+          </header>
 
+          {lessons.length === 0 ? (
+            <EmptyState icon="list" title={t('no_results')} />
+          ) : (
             <div className="space-y-4">
               {lessons.map((lesson) => (
-                <Link
+                <Card
                   key={lesson.id}
+                  as={Link}
                   to={`/section/${sectionId}/lesson/${lesson.id}`}
-                  className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-black"
+                  interactive
+                  className="group flex items-center justify-between gap-4 p-5 focus-visible:border-ink sm:p-6"
                 >
-                  <h3 className="text-xl font-semibold mb-2 text-black">
-                    {pick(lesson, 'title')}
-                  </h3>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <span className="bg-black text-white px-2 py-1 rounded text-xs rtl:ml-2 ltr:mr-2">
-                      {lesson.level ? t(lesson.level) : t('beginner')}
-                    </span>
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-bold leading-snug text-ink sm:text-xl">
+                      {pick(lesson, 'title')}
+                    </h2>
+                    <div className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
+                      <Badge variant="outline">
+                        {lesson.level ? t(lesson.level) : t('beginner')}
+                      </Badge>
+                    </div>
                   </div>
-                </Link>
+                  <Icon
+                    name="arrowRight"
+                    size="md"
+                    className="shrink-0 text-ink-faint transition-transform duration-300 group-hover:translate-x-0.5 rtl:rotate-180"
+                  />
+                </Card>
               ))}
-
-              {lessons.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">{t('no_results')}</p>
-                </div>
-              )}
             </div>
-          </>
-        )}
-      </div>
-    </div>
+          )}
+        </>
+      )}
+    </PageShell>
   );
 };
 

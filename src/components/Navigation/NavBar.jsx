@@ -2,58 +2,47 @@ import { Link } from 'react-router-dom';
 import { useAppSettings } from '../../hooks/useAppSettings';
 import { Logo } from '../UI/Logo';
 import { LanguageToggle } from '../UI/LanguageToggle';
+import { Icon } from '../UI/Icon';
+
+const NAV_ITEMS = [
+  { to: '/books', key: 'books', icon: 'books' },
+  { to: '/sections', key: 'browse_sections', icon: 'grid' },
+  { to: '/favorites', key: 'favorites', icon: 'bookmark' },
+  { to: '/statistics', key: 'stats', icon: 'chart' },
+  { to: '/achievements', key: 'achievements', icon: 'trophy' },
+  { to: '/settings', key: 'settings', icon: 'settings' },
+];
 
 const NavBar = () => {
   const { t } = useAppSettings();
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-            <Logo className="h-8 w-8 text-black" />
-            <span className="text-xl font-semibold text-black whitespace-nowrap">
-              {t('app_name')}
-            </span>
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/80">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-3">
+          <Link
+            to="/"
+            className="group flex min-h-[44px] items-center gap-2.5 text-ink"
+            aria-label={t('app_name')}
+          >
+            <Logo className="h-7 w-7 transition-colors duration-200 group-hover:text-ink-soft" />
+            <span className="text-base font-bold whitespace-nowrap sm:text-lg">{t('app_name')}</span>
           </Link>
 
-          <nav className="hidden sm:flex items-center space-x-4 rtl:space-x-reverse">
-            <Link
-              to="/books"
-              className="px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded hover:bg-gray-800 transition-colors"
-            >
-              {t('books')}
-            </Link>
-            <Link
-              to="/sections"
-              className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-            >
-              {t('browse_sections')}
-            </Link>
-            <Link
-              to="/favorites"
-              className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-            >
-              {t('favorites')}
-            </Link>
-            <Link
-              to="/statistics"
-              className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-            >
-              {t('stats')}
-            </Link>
-            <Link
-              to="/achievements"
-              className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-            >
-              {t('achievements')}
-            </Link>
-            <Link
-              to="/settings"
-              className="px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-            >
-              {t('settings')}
-            </Link>
+          <nav
+            className="hidden items-center gap-1 lg:flex"
+            aria-label={t('sections')}
+          >
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition-card duration-300 hover:bg-surface hover:text-ink"
+              >
+                <Icon name={item.icon} size="sm" />
+                <span>{t(item.key)}</span>
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center">
@@ -62,22 +51,24 @@ const NavBar = () => {
         </div>
       </div>
 
-      <nav className="sm:hidden flex items-center justify-around border-t border-gray-200 px-2 py-2">
-        <Link to="/books" className="px-3 py-2 text-sm font-medium text-white bg-black rounded transition-colors">
-          {t('books')}
-        </Link>
-        <Link to="/sections" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
-          {t('browse_sections')}
-        </Link>
-        <Link to="/favorites" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
-          {t('favorites')}
-        </Link>
-        <Link to="/statistics" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
-          {t('stats')}
-        </Link>
-        <Link to="/settings" className="px-3 py-2 text-sm font-medium text-black hover:bg-gray-50 rounded transition-colors">
-          {t('settings')}
-        </Link>
+      {/* Mobile / tablet navigation rail */}
+      <nav
+        className="border-t border-line lg:hidden"
+        aria-label={t('sections')}
+      >
+        <div className="mx-auto flex w-full max-w-7xl items-stretch gap-1 overflow-x-auto px-2 py-1.5 sm:justify-start sm:px-4">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              aria-label={t(item.key)}
+              className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors duration-200 hover:bg-surface hover:text-ink"
+            >
+              <Icon name={item.icon} size="sm" />
+              <span className="hidden min-[400px]:inline">{t(item.key)}</span>
+            </Link>
+          ))}
+        </div>
       </nav>
     </header>
   );

@@ -36,7 +36,7 @@ export const highlight = (text, query) => {
 
   while (foundAt !== -1) {
     if (foundAt > index) parts.push(text.slice(index, foundAt));
-    parts.push(<mark key={parts.length} className="bg-gray-200 text-black px-0.5 rounded">{text.slice(foundAt, foundAt + q.length)}</mark>);
+    parts.push(<mark key={parts.length} className="rounded-sm bg-ink px-1 text-white">{text.slice(foundAt, foundAt + q.length)}</mark>);
     index = foundAt + q.length;
     foundAt = lower.indexOf(qLower, index);
   }

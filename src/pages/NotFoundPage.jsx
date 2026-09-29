@@ -1,21 +1,18 @@
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Button } from '../components/UI/Button';
+import { Icon } from '../components/UI/Icon';
 
 const NotFoundPage = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-black mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-8">{t('not_found')}</p>
-        <Link
-          to="/"
-          className="inline-flex items-center px-6 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-        >
-          {t('go_home')}
-        </Link>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-paper px-6 py-20 text-center">
+      <p className="text-6xl font-bold tabular-nums text-ink sm:text-7xl">404</p>
+      <p className="mt-4 max-w-sm text-lg text-ink-muted">{t('not_found')}</p>
+      <Button to="/" size="lg" className="mt-8">
+        <Icon name="book" size="sm" />
+        {t('go_home')}
+      </Button>
     </div>
   );
 };

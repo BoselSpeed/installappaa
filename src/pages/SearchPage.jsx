@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { lessonsService, sectionsService, lessonContentService } from '../firebase/service';
 import { SearchBar } from '../components/UI/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { lessonUrl, useLocalized, highlight } from '../utils/helpers';
+import { PageShell } from '../components/UI/PageShell';
+import { SectionTitle } from '../components/UI/PageHeader';
+import { Card } from '../components/UI/Card';
+import { Badge } from '../components/UI/Badge';
+import { EmptyState } from '../components/UI/EmptyState';
+import { LoadingState } from '../components/UI/Spinner';
+import { Icon } from '../components/UI/Icon';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -72,83 +79,77 @@ const SearchPage = () => {
   }, [query]);
 
   return (
-    <div className="bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <SearchBar placeholder={t('search_placeholder')} />
-        </div>
-
-        {!query ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">{t('search_placeholder')}</p>
-          </div>
-        ) : loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {searched && lessonResults.length === 0 && sectionResults.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">{t('no_results')}</p>
-                <p className="text-gray-400 mt-2">{t('try_another_search')}</p>
-              </div>
-            )}
-
-            {lessonResults.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold mb-4 text-black">{t('lessons')}</h2>
-                <div className="space-y-4">
-                  {lessonResults.map(({ lesson, section }) => (
-                    <Link
-                      key={lesson.id}
-                      to={lessonUrl(lesson)}
-                      className="block bg-white rounded-lg shadow-md p-6 border border-black hover:shadow-lg transition-shadow"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xl font-semibold text-black">
-                          {highlight(pick(lesson, 'title'), query)}
-                        </h3>
-                        {section && (
-                          <span className="bg-black text-white px-2 py-1 rounded text-xs whitespace-nowrap rtl:mr-2 ltr:ml-2">
-                            {pick(section, 'title')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        {section ? pick(section, 'description') : t('lessons')}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {sectionResults.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold mb-4 text-black">{t('sections')}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {sectionResults.map((section) => (
-                    <Link
-                      key={section.id}
-                      to={`/sections/${section.id}`}
-                      className="bg-white rounded-lg shadow-md p-6 border border-black hover:shadow-lg transition-shadow"
-                    >
-                      <h3 className="text-xl font-semibold text-black mb-2">
-                        {highlight(pick(section, 'title'), query)}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-2">
-                        {highlight(pick(section, 'description'), query)}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+    <PageShell width="reading">
+      <div className="mb-8 sm:mb-10">
+        <SearchBar placeholder={t('search_placeholder')} />
       </div>
-    </div>
+
+      {!query ? (
+        <EmptyState icon="search" title={t('search_placeholder')} />
+      ) : loading ? (
+        <LoadingState label={t('loading')} />
+      ) : (
+        <div className="space-y-10 lg:space-y-12">
+          {searched && lessonResults.length === 0 && sectionResults.length === 0 && (
+            <EmptyState icon="inbox" title={t('no_results')} description={t('try_another_search')} />
+          )}
+
+          {lessonResults.length > 0 && (
+            <section>
+              <SectionTitle className="mb-4">{t('lessons')}</SectionTitle>
+              <div className="space-y-4">
+                {lessonResults.map(({ lesson, section }) => (
+                  <Card
+                    key={lesson.id}
+                    as={Link}
+                    to={lessonUrl(lesson)}
+                    interactive
+                    className="block p-5 focus-visible:border-ink sm:p-6"
+                  >
+                    <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                      <h3 className="min-w-0 text-lg font-bold text-ink sm:text-xl">
+                        {highlight(pick(lesson, 'title'), query)}
+                      </h3>
+                      {section && <Badge variant="outline">{pick(section, 'title')}</Badge>}
+                    </div>
+                    <p className="text-sm text-ink-muted">
+                      {section ? pick(section, 'description') : t('lessons')}
+                    </p>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {sectionResults.length > 0 && (
+            <section>
+              <SectionTitle className="mb-4">{t('sections')}</SectionTitle>
+              <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
+                {sectionResults.map((section) => (
+                  <Card
+                    key={section.id}
+                    as={Link}
+                    to={`/sections/${section.id}`}
+                    interactive
+                    className="p-5 focus-visible:border-ink sm:p-6"
+                  >
+                    <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-surface text-ink">
+                      <Icon name="book" size="md" />
+                    </span>
+                    <h3 className="text-lg font-bold text-ink">
+                      {highlight(pick(section, 'title'), query)}
+                    </h3>
+                    <p className="mt-2 line-clamp-2 text-sm text-ink-muted">
+                      {highlight(pick(section, 'description'), query)}
+                    </p>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+    </PageShell>
   );
 };
 

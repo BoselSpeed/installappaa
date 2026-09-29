@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
+import { Card } from '../UI/Card';
+import { Badge } from '../UI/Badge';
+import { Icon } from '../UI/Icon';
 
 const BookCard = ({ book }) => {
   const { t } = useTranslation();
@@ -11,50 +14,44 @@ const BookCard = ({ book }) => {
   const isLoaded = Boolean(book.volumes?.some((v) => v.bundled));
 
   return (
-    <Link
+    <Card
+      as={Link}
       to={`/books/${book.id}`}
-      className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-black overflow-hidden flex flex-col"
+      interactive
+      className="group flex flex-col overflow-hidden focus-visible:border-ink"
     >
-      <div className="aspect-[3/4] bg-white overflow-hidden border-b border-black flex items-center justify-center">
+      <div className="flex aspect-[3/4] items-center justify-center overflow-hidden border-b border-line bg-surface-quiet">
         {book.coverImage ? (
           <img
             src={book.coverImage}
             alt={pick(book, 'title')}
             loading="lazy"
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center w-full h-full p-6 text-center">
-            <span className="text-5xl mb-4">📖</span>
-            <span className="font-semibold text-black text-lg leading-snug">
-              {pick(book, 'title')}
-            </span>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-4 p-6 text-center">
+            <Icon name="book" size="xl" className="text-ink-faint" />
+            <span className="text-lg font-bold leading-snug text-ink">{pick(book, 'title')}</span>
           </div>
         )}
       </div>
 
-      <div className="p-4 flex flex-col gap-1 flex-1">
-        <h3 className="text-lg font-semibold text-black leading-snug">
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+        <h3 className="text-base font-bold leading-snug text-ink sm:text-lg">
           {pick(book, 'title')}
         </h3>
-        {author && <p className="text-sm text-gray-600">{author}</p>}
-        <div className="flex items-center gap-2 mt-2 text-xs">
-          {isLoaded && (
-            <span className="bg-black text-white px-2 py-1 rounded">
-              {t('loaded_with_app')}
-            </span>
-          )}
-          <span className="bg-gray-100 text-black border border-black px-2 py-1 rounded">
-            {t('volumes')}
-          </span>
-          <span className="text-gray-600">
+        {author && <p className="text-sm text-ink-muted">{author}</p>}
+
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-1 text-xs text-ink-muted">
+          {isLoaded && <Badge variant="solid">{t('loaded_with_app')}</Badge>}
+          <Badge variant="outline">
             {volumeCount > 0
               ? t('volume_count_value', { count: volumeCount })
               : t('volume_count_none')}
-          </span>
+          </Badge>
         </div>
       </div>
-    </Link>
+    </Card>
   );
 };
 

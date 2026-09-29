@@ -43,6 +43,8 @@
   "your_score": "نتيجتك",
   "correct_answers": "الإجابات الصحيحة",
   "review_answers": "مراجعة الإجابات",
+  "correct": "صحيح",
+  "incorrect": "خطأ",
   "loading": "جارٍ التحميل...",
   "error_occurred": "حدث خطأ",
   "try_again": "محاولة أخرى",

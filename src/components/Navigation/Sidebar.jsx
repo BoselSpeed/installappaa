@@ -1,14 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSectionsService } from '../../hooks/useSectionsService';
 import { booksService } from '../../firebase/service';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { Icon } from '../UI/Icon';
+import { cn } from '../../utils/cn';
+
+const UTILITY_LINKS = [
+  { to: '/books', key: 'books', icon: 'books' },
+  { to: '/statistics', key: 'stats', icon: 'chart' },
+  { to: '/achievements', key: 'achievements', icon: 'trophy' },
+  { to: '/settings', key: 'settings', icon: 'settings' },
+];
 
 const Sidebar = () => {
   const { sections, loading, error } = useSectionsService();
   const [books, setBooks] = useState([]);
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const location = useLocation();
 
   useEffect(() => {
     let cancelled = false;
@@ -34,12 +44,16 @@ const Sidebar = () => {
   const sectionTitle = (section) =>
     isRTL ? section.title_ar || section.title_en : section.title_en || section.title_ar;
 
+  const isActive = (to) => location.pathname === to;
+
+  const shell = 'hidden md:block w-64 shrink-0 border-e border-line bg-paper';
+
   if (loading) {
     return (
-      <aside className="hidden md:block w-64 shrink-0 border-r border-gray-200 rtl:border-r-0 rtl:border-l">
-        <div className="p-4 space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-10 bg-gray-200 rounded animate-pulse"></div>
+      <aside className={shell} aria-busy="true">
+        <div className="space-y-2 p-4 lg:p-5">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-11 animate-pulse rounded-xl bg-surface" />
           ))}
         </div>
       </aside>
@@ -48,63 +62,73 @@ const Sidebar = () => {
 
   if (error) {
     return (
-      <aside className="hidden md:block w-64 shrink-0 border-r border-gray-200 rtl:border-r-0 rtl:border-l">
-        <div className="p-4 text-red-500 text-sm">{t('error_occurred')}</div>
+      <aside className={shell}>
+        <div className="p-4 lg:p-5">
+          <p className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-muted">
+            {t('error_occurred')}
+          </p>
+        </div>
       </aside>
     );
   }
 
   return (
-    <aside className="hidden md:block w-64 shrink-0 bg-white border-r border-gray-200 rtl:border-r-0 rtl:border-l">
-      <div className="p-4">
-        <nav className="space-y-1 mb-5" aria-label={t('books')}>
-          <Link
-            to="/books"
-            className="flex items-center justify-between px-3 py-2 text-sm font-medium text-white bg-black rounded hover:bg-gray-800 transition-colors"
-          >
-            {t('books')}
-            <span aria-hidden="true">←</span>
-          </Link>
-        </nav>
+    <aside className={cn(shell)}>
+      <nav
+        className="sticky top-[7.625rem] max-h-[calc(100vh-9rem)] overflow-y-auto p-4 lg:top-16 lg:max-h-[calc(100vh-5rem)] lg:p-5"
+        aria-label={t('sections')}
+      >
+        <ul className="space-y-1">
+          {UTILITY_LINKS.map((item) => (
+            <li key={item.to}>
+              <Link
+                to={item.to}
+                aria-current={isActive(item.to) ? 'page' : undefined}
+                className={cn(
+                  'flex min-h-[44px] items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-card duration-300',
+                  isActive(item.to)
+                    ? 'bg-ink text-white'
+                    : 'text-ink-soft hover:bg-surface hover:text-ink'
+                )}
+              >
+                <Icon name={item.icon} size="sm" />
+                <span>{t(item.key)}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
 
-        <nav className="space-y-1 mb-5" aria-label={t('stats')}>
-          <Link
-            to="/statistics"
-            className="flex items-center justify-between px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-          >
-            {t('stats')}
-            <span aria-hidden="true">📊</span>
-          </Link>
-          <Link
-            to="/achievements"
-            className="flex items-center justify-between px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-          >
-            {t('achievements')}
-            <span aria-hidden="true">🏆</span>
-          </Link>
-        </nav>
-
-        <h2 className="text-lg font-semibold mb-4 text-black">{t('sections')}</h2>
-        <nav className="space-y-1" aria-label={t('sections')}>
+        <h2 className="mt-8 mb-3 px-3 text-xs font-bold uppercase tracking-wider text-ink-muted">
+          {t('sections')}
+        </h2>
+        <ul className="space-y-1">
           {sections
             .slice()
             .sort((a, b) => (a.order || 0) - (b.order || 0))
-            .map((section) => (
-              <Link
-                key={section.id}
-                to={sectionLink(section)}
-                className="flex items-center px-3 py-2 text-sm font-medium text-black bg-white border border-black rounded hover:bg-gray-50 transition-colors"
-              >
-                <span className={isRTL ? 'font-arabic' : ''}>
-                  {sectionTitle(section)}
-                </span>
-              </Link>
-            ))}
+            .map((section) => {
+              const to = sectionLink(section);
+              const active = location.pathname === to;
+              return (
+                <li key={section.id}>
+                  <Link
+                    to={to}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      'flex min-h-[44px] items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-card duration-300',
+                      active ? 'bg-surface text-ink' : 'text-ink-muted hover:bg-surface hover:text-ink'
+                    )}
+                  >
+                    <Icon name="book" size="sm" className="text-ink-faint" />
+                    <span className="truncate">{sectionTitle(section)}</span>
+                  </Link>
+                </li>
+              );
+            })}
           {sections.length === 0 && (
-            <p className="text-sm text-gray-500 px-3 py-2">{t('no_results')}</p>
+            <li className="px-3 py-2 text-sm text-ink-muted">{t('no_results')}</li>
           )}
-        </nav>
-      </div>
+        </ul>
+      </nav>
     </aside>
   );
 };

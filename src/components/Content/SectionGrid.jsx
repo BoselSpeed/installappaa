@@ -1,8 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { sectionsService, lessonsService, booksService } from '../../firebase/service';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
+import { Card } from '../UI/Card';
+import { Badge } from '../UI/Badge';
+import { SectionTitle } from '../UI/PageHeader';
+import { Icon } from '../UI/Icon';
+import { EmptyState } from '../UI/EmptyState';
 
 const SectionGrid = ({ title }) => {
   const [sections, setSections] = useState([]);
@@ -55,50 +60,59 @@ const SectionGrid = ({ title }) => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-md p-6 animate-pulse border border-gray-200">
-            <div className="h-6 bg-gray-200 rounded mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          </div>
-        ))}
+      <div>
+        {title && <SectionTitle className="mb-6">{title}</SectionTitle>}
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="rounded-2xl border border-line bg-paper p-5 sm:p-6">
+              <div className="mb-4 h-6 w-2/3 animate-pulse rounded-lg bg-surface" />
+              <div className="mb-2 h-4 w-full animate-pulse rounded bg-surface" />
+              <div className="mb-5 h-4 w-3/4 animate-pulse rounded bg-surface" />
+              <div className="h-6 w-20 animate-pulse rounded-full bg-surface" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (sections.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">{t('no_results')}</p>
-      </div>
-    );
+    return <EmptyState icon="grid" title={t('no_results')} />;
   }
 
   return (
     <div>
-      {title && <h2 className="text-2xl font-bold mb-6 text-black">{title}</h2>}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sections.map((section) => (
-          <Link
-            key={section.id}
-            to={sectionLink(section)}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-black"
-          >
-            <h3 className="text-xl font-semibold mb-2 text-black">
-              {pick(section, 'title')}
-            </h3>
-            <p className="text-gray-600 mb-4 line-clamp-2">
-              {pick(section, 'description')}
-            </p>
-            <div className="flex items-center text-sm text-gray-500">
-              <span className="bg-black text-white px-2 py-1 rounded text-xs">
-                {countBadge(section).label}
+      {title && <SectionTitle className="mb-6">{title}</SectionTitle>}
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {sections.map((section) => {
+          const badge = countBadge(section);
+          return (
+            <Card
+              key={section.id}
+              as={Link}
+              to={sectionLink(section)}
+              interactive
+              className="group flex flex-col p-5 focus-visible:border-ink sm:p-6"
+            >
+              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-ink transition-colors duration-300 group-hover:border-ink-ghost group-hover:bg-paper">
+                <Icon name="book" size="md" />
               </span>
-              <span className="rtl:mr-2 ltr:ml-2">{countBadge(section).count}</span>
-            </div>
-          </Link>
-        ))}
+
+              <h3 className="text-lg font-bold leading-snug text-ink sm:text-xl">
+                {pick(section, 'title')}
+              </h3>
+
+              <p className="mt-2 mb-5 line-clamp-2 text-sm text-ink-muted">
+                {pick(section, 'description')}
+              </p>
+
+              <div className="mt-auto flex items-center gap-2 text-sm text-ink-muted">
+                <Badge variant="solid">{badge.label}</Badge>
+                <span className="tabular-nums">{badge.count}</span>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

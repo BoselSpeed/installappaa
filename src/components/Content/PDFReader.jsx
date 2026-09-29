@@ -2,6 +2,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { useTranslation } from 'react-i18next';
+import { Icon } from '../UI/Icon';
+import { Button } from '../UI/Button';
+import { Spinner } from '../UI/Spinner';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -317,8 +320,9 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
     pinchStateRef.current = null;
   };
 
-  const toolbarButton = 'px-3 py-1.5 border border-black rounded text-sm text-black hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors';
-  const activeButton = 'bg-black text-white';
+  const toolbarButton =
+    'inline-flex min-h-[44px] items-center justify-center rounded-xl border border-line bg-paper px-3 text-sm text-ink-soft transition-card duration-300 hover:border-ink-ghost hover:bg-surface disabled:pointer-events-none disabled:opacity-40';
+  const activeButton = 'border-ink bg-ink text-white hover:bg-ink-soft';
 
   return (
     <div
@@ -326,31 +330,31 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''}`}
+      className={`overflow-hidden rounded-2xl border border-line bg-paper shadow-card ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''}`}
     >
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div className="flex flex-wrap items-center gap-2 border-b border-line bg-surface-quiet px-3 py-2.5 sm:px-4">
         <button
           onClick={handleZoomOut}
           disabled={zoom <= 50}
-          className={toolbarButton}
+          className={`${toolbarButton} w-11`}
           aria-label={t('zoom_out')}
           title={t('zoom_out')}
         >
-          −
+          <Icon name="minus" size="md" />
         </button>
-        <span className="text-sm text-black tabular-nums min-w-[2.5rem] text-center">{zoom}%</span>
+        <span className="min-w-[3rem] text-center text-sm tabular-nums text-ink">{zoom}%</span>
         <button
           onClick={handleZoomIn}
           disabled={zoom >= 300}
-          className={toolbarButton}
+          className={`${toolbarButton} w-11`}
           aria-label={t('zoom_in')}
           title={t('zoom_in')}
         >
-          +
+          <Icon name="plus" size="md" />
         </button>
 
-        <span className="w-px h-6 bg-gray-300 mx-1"></span>
+        <span className="mx-1 hidden h-6 w-px bg-line sm:block" />
 
         <button
           onClick={() => handleFit(FIT_WIDTH)}
@@ -365,19 +369,19 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
           {t('fit_page')}
         </button>
 
-        <span className="w-px h-6 bg-gray-300 mx-1"></span>
+        <span className="mx-1 hidden h-6 w-px bg-line sm:block" />
 
         <button
           onClick={() => jumpToPage(currentPage - 1)}
           disabled={currentPage <= 1}
-          className={toolbarButton}
+          className={`${toolbarButton} w-11`}
           aria-label={t('previous_page')}
           title={t('previous_page')}
         >
-          {t('previous')}
+          <Icon name="chevronRight" size="md" className="rtl:rotate-180" />
         </button>
 
-        <div className="flex items-center gap-1 text-sm text-black">
+        <div className="flex items-center gap-2 text-sm text-ink-soft">
           <input
             type="number"
             min="1"
@@ -386,10 +390,10 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
             key={currentPage}
             onBlur={handlePageInput}
             onKeyDown={handleKeyDown}
-            className="w-16 px-2 py-1 border border-black rounded text-center tabular-nums"
+            className="h-11 w-16 rounded-xl border border-line bg-paper px-2 text-center tabular-nums text-ink transition-card duration-300 hover:border-ink-ghost focus:border-ink"
             aria-label={t('go_to_page')}
           />
-          <span className="text-gray-500">
+          <span className="hidden text-ink-muted sm:inline">
             {t('of_pages', { count: numPages })}
           </span>
         </div>
@@ -397,37 +401,28 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
         <button
           onClick={() => jumpToPage(currentPage + 1)}
           disabled={currentPage >= numPages}
-          className={toolbarButton}
+          className={`${toolbarButton} w-11`}
           aria-label={t('next_page')}
           title={t('next_page')}
         >
-          {t('next')}
+          <Icon name="chevronLeft" size="md" className="rtl:rotate-180" />
         </button>
 
-        <button
-          onClick={toggleFullscreen}
-          className={`${toolbarButton} rtl:mr-auto ltr:ml-auto`}
-          aria-label={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
-          title={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
-        >
-          {isFullscreen ? (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
-          )}
-        </button>
+        <div className="ms-auto flex items-center gap-2">
+          <button
+            onClick={toggleFullscreen}
+            className={`${toolbarButton} w-11`}
+            aria-label={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
+            title={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
+          >
+            <Icon name={isFullscreen ? 'close' : 'maximize'} size="md" />
+          </button>
 
-        <a
-          href={pdfUrl}
-          download={fileName}
-          className={`${toolbarButton}`}
-        >
-          {t('download_pdf')}
-        </a>
+          <a href={pdfUrl} download={fileName} className={`${toolbarButton} gap-1.5`}>
+            <Icon name="download" size="sm" />
+            <span className="hidden sm:inline">{t('download_pdf')}</span>
+          </a>
+        </div>
       </div>
 
       {/* Pages */}
@@ -435,37 +430,34 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
         className={`pdf-reader-scroll overflow-y-auto ${isFullscreen ? 'h-screen' : ''}`}
       >
         {loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-3">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-            <p className="text-gray-500">{t('pdf_loading')}</p>
+          <div className="flex flex-col items-center justify-center gap-4 py-24">
+            <Spinner size="lg" />
+            <p className="text-sm text-ink-muted">{t('pdf_loading')}</p>
           </div>
         )}
 
         {error && !loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-3">
-            <p className="text-gray-500">{t('pdf_error')}</p>
-            <a
-              href={pdfUrl}
-              download={fileName}
-              className="px-4 py-2 border border-black rounded text-sm text-black hover:bg-gray-50 transition-colors"
-            >
+          <div className="flex flex-col items-center justify-center gap-4 px-4 py-24 text-center">
+            <p className="text-sm text-ink-muted">{t('pdf_error')}</p>
+            <Button href={pdfUrl} download={fileName} variant="secondary" size="sm">
+              <Icon name="download" size="sm" />
               {t('download_pdf')}
-            </a>
+            </Button>
           </div>
         )}
 
         {!loading && !error && (
-          <div className="py-6 space-y-6">
+          <div className="space-y-6 py-6">
             {Array.from({ length: numPages }, (_, i) => i + 1).map((pageNumber) => (
               <div
                 key={pageNumber}
                 ref={(el) => { pagesRef.current[pageNumber] = el; }}
-                className="pdf-page mx-auto shadow-sm border border-gray-200 bg-white"
+                className="pdf-page mx-auto border border-line bg-paper shadow-card"
                 style={{ width: 'fit-content' }}
                 data-page={pageNumber}
               >
                 <canvas></canvas>
-                <div className="text-center text-xs text-gray-400 py-1">
+                <div className="py-1 text-center text-xs tabular-nums text-ink-muted">
                   {pageNumber}
                 </div>
               </div>

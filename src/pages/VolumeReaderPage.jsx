@@ -1,12 +1,24 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
 import { booksService } from '../firebase/service';
 import { getStoredVolumeBlobUrl } from '../services/volumeStorage';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
+import { PageShell } from '../components/UI/PageShell';
+import { BackLink } from '../components/UI/BackLink';
+import { ProgressBar } from '../components/UI/ProgressBar';
+import { Card } from '../components/UI/Card';
+import { Spinner } from '../components/UI/Spinner';
 
 const PDFReader = lazy(() =>
   import('../components/Content/PDFReader').then((m) => ({ default: m.PDFReader }))
+);
+
+const PDFSkeleton = ({ label }) => (
+  <Card className="flex flex-col items-center justify-center gap-4 py-24">
+    <Spinner size="lg" />
+    <p className="text-sm text-ink-muted">{label}</p>
+  </Card>
 );
 
 const VolumeReaderPage = () => {
@@ -85,53 +97,36 @@ const VolumeReaderPage = () => {
     : '';
 
   return (
-    <div className="bg-white">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
-          <Link to={`/books/${bookId}`} className="text-black hover:text-gray-600">
-            ← {pick(book, 'title') || t('books')}
-          </Link>
-          <h1 className="text-2xl font-bold text-black">{volumeTitle}</h1>
-        </div>
-
-        <div className="sticky top-16 z-30 mb-6 bg-white">
-          <div className="flex justify-between items-center text-xs text-gray-500 mb-1">
-            <span>{t('reading_progress')}</span>
-            <span>{readingProgress}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
-            <div
-              className="bg-black h-1.5 rounded-full transition-all duration-150"
-              style={{ width: `${readingProgress}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-3 bg-gray-50 border border-gray-200 rounded-lg">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-            <p className="text-gray-500">{t('pdf_loading')}</p>
-          </div>
-        ) : (
-          <Suspense
-            fallback={
-              <div className="flex flex-col items-center justify-center py-24 gap-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-                <p className="text-gray-500">{t('pdf_loading')}</p>
-              </div>
-            }
-          >
-            {pdfUrl && (
-              <PDFReader
-                pdfUrl={pdfUrl}
-                fileName={`${bookId}-${volumeId}.pdf`}
-                onPageChange={handlePdfPageChange}
-              />
-            )}
-          </Suspense>
-        )}
+    <PageShell width="reading">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <BackLink to={`/books/${bookId}`}>
+          {pick(book, 'title') || t('books')}
+        </BackLink>
+        <h1 className="text-lg font-bold text-ink sm:text-xl lg:text-2xl">{volumeTitle}</h1>
       </div>
-    </div>
+
+      <div className="sticky top-[7.625rem] z-30 lg:top-16 mb-6 rounded-xl border border-line bg-paper/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-paper/80">
+        <div className="mb-2 flex items-center justify-between text-xs text-ink-muted">
+          <span>{t('reading_progress')}</span>
+          <span className="tabular-nums font-medium text-ink">{readingProgress}%</span>
+        </div>
+        <ProgressBar value={readingProgress} size="sm" label={t('reading_progress')} />
+      </div>
+
+      {loading ? (
+        <PDFSkeleton label={t('pdf_loading')} />
+      ) : (
+        <Suspense fallback={<PDFSkeleton label={t('pdf_loading')} />}>
+          {pdfUrl && (
+            <PDFReader
+              pdfUrl={pdfUrl}
+              fileName={`${bookId}-${volumeId}.pdf`}
+              onPageChange={handlePdfPageChange}
+            />
+          )}
+        </Suspense>
+      )}
+    </PageShell>
   );
 };
 

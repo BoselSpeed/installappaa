@@ -1,9 +1,20 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { quizzesService, lessonsService } from '../firebase/service';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { useTranslation } from 'react-i18next';
 import { useLocalized, lessonUrl } from '../utils/helpers';
+import { PageShell } from '../components/UI/PageShell';
+import { PageHeader, SectionTitle } from '../components/UI/PageHeader';
+import { BackLink } from '../components/UI/BackLink';
+import { Card } from '../components/UI/Card';
+import { Badge } from '../components/UI/Badge';
+import { Button } from '../components/UI/Button';
+import { ProgressBar } from '../components/UI/ProgressBar';
+import { EmptyState } from '../components/UI/EmptyState';
+import { LoadingState } from '../components/UI/Spinner';
+import { Icon } from '../components/UI/Icon';
+import { cn } from '../utils/cn';
 
 const QuizPage = () => {
   const { lessonId } = useParams();
@@ -79,198 +90,206 @@ const QuizPage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
-    );
+    return <LoadingState label={t('loading')} />;
   }
 
   const backLink = lesson ? lessonUrl(lesson) : '/sections';
 
   if (!quiz) {
     return (
-      <div className="bg-white">
-        <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-          <p className="text-gray-500 text-lg">{t('no_quiz')}</p>
-          <Link
-            to={backLink}
-            className="inline-block mt-6 px-6 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-          >
-            {t('back_to_lesson')}
-          </Link>
-        </div>
-      </div>
+      <PageShell width="narrow">
+        <EmptyState
+          icon="quiz"
+          title={t('no_quiz')}
+          action={
+            <Button to={backLink}>
+              {t('back_to_lesson')}
+            </Button>
+          }
+        />
+      </PageShell>
     );
   }
 
   if (showResult) {
     const percentage = Math.round((score / quiz.questions.length) * 100);
     return (
-      <div className="bg-white">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-lg shadow-md p-8 border border-black text-center mb-8">
-            <h2 className="text-2xl font-bold mb-4 text-black">{pick(quiz, 'title')}</h2>
-            <div className="text-6xl font-bold text-black mb-4">{percentage}%</div>
-            <p className="text-gray-600 mb-8">
-              {t('your_score')}: {score} {t('of')} {quiz.questions.length}
-            </p>
-            <div className="space-y-4">
-              <button
-                onClick={handleRetake}
-                className="block w-full px-6 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-              >
-                {t('retake')}
-              </button>
-              <Link
-                to={backLink}
-                className="block w-full px-6 py-3 bg-white text-black border border-black rounded hover:bg-gray-50 transition-colors"
-              >
-                {t('back_to_lesson')}
-              </Link>
-            </div>
+      <PageShell width="narrow">
+        <Card className="mb-8 p-6 text-center sm:p-8">
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">{pick(quiz, 'title')}</h1>
+          <p className="my-6 text-5xl font-bold tabular-nums text-ink sm:text-6xl">
+            {percentage}%
+          </p>
+          <p className="mb-8 text-sm text-ink-muted">
+            {t('your_score')}: <span className="tabular-nums">{score}</span> {t('of')}{' '}
+            <span className="tabular-nums">{quiz.questions.length}</span>
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button onClick={handleRetake} className="flex-1">
+              <Icon name="history" size="sm" />
+              {t('retake')}
+            </Button>
+            <Button to={backLink} variant="secondary" className="flex-1">
+              {t('back_to_lesson')}
+            </Button>
           </div>
+        </Card>
 
-          <h3 className="text-xl font-bold mb-4 text-black">{t('review_answers')}</h3>
-          <div className="space-y-6">
-            {quiz.questions.map((q, qIndex) => {
-              const userAnswer = selectedAnswers[qIndex];
-              const isCorrect = userAnswer === q.correctAnswer;
-              const options = pick(q, 'options');
+        <SectionTitle className="mb-5">{t('review_answers')}</SectionTitle>
+        <div className="space-y-4 sm:space-y-5">
+          {quiz.questions.map((q, qIndex) => {
+            const userAnswer = selectedAnswers[qIndex];
+            const isCorrect = userAnswer === q.correctAnswer;
+            const options = pick(q, 'options');
 
-              return (
-                <div key={qIndex} className="bg-white rounded-lg shadow-md p-6 border border-black">
-                  <div className="flex items-start justify-between mb-4">
-                    <p className="text-lg font-semibold text-black">
-                      {qIndex + 1}. {pick(q, 'question')}
-                    </p>
-                    <span
-                      className={`shrink-0 px-3 py-1 rounded text-sm font-medium rtl:mr-3 ltr:ml-3 ${
-                        isCorrect ? 'bg-gray-200 text-black' : 'bg-black text-white'
-                      }`}
-                    >
-                      {isCorrect ? '✓' : '✕'}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {options.map((option, oIndex) => {
-                      const isOptionCorrect = oIndex === q.correctAnswer;
-                      const isUserOption = oIndex === userAnswer;
-                      let classes = 'p-3 rounded border-2 text-sm ';
-                      if (isOptionCorrect) {
-                        classes += 'border-gray-400 bg-gray-100';
-                      } else if (isUserOption) {
-                        classes += 'border-black bg-gray-50';
-                      } else {
-                        classes += 'border-gray-200 bg-white text-gray-500';
-                      }
-                      return (
-                        <div key={oIndex} className={classes}>
-                          <span className="font-medium">
-                            {isOptionCorrect ? '✓ ' : isUserOption ? '✕ ' : ''}
-                          </span>
-                          {option}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {(pick(q, 'explanation')) && (
-                    <p className="mt-4 text-sm text-gray-600 border-t border-gray-200 pt-3">
-                      <strong>{t('explanation')}:</strong> {pick(q, 'explanation')}
-                    </p>
-                  )}
+            return (
+              <Card key={qIndex} className="p-5 sm:p-6">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <p className="text-base font-semibold leading-relaxed text-ink sm:text-lg">
+                    {qIndex + 1}. {pick(q, 'question')}
+                  </p>
+                  <Badge
+                    variant={isCorrect ? 'outline' : 'solid'}
+                    icon={isCorrect ? <Icon name="check" size="xs" strokeWidth={2.5} /> : <Icon name="close" size="xs" strokeWidth={2.5} />}
+                    className="mt-1 shrink-0"
+                  >
+                    {isCorrect ? t('correct') : t('incorrect')}
+                  </Badge>
                 </div>
-              );
-            })}
-          </div>
+
+                <ul className="space-y-2">
+                  {options.map((option, oIndex) => {
+                    const isOptionCorrect = oIndex === q.correctAnswer;
+                    const isUserOption = oIndex === userAnswer;
+                    return (
+                      <li
+                        key={oIndex}
+                        className={cn(
+                          'flex items-start gap-2 rounded-xl border px-3 py-2.5 text-sm',
+                          isOptionCorrect
+                            ? 'border-ink bg-surface-quiet font-medium text-ink'
+                            : isUserOption
+                              ? 'border-ink-ghost bg-surface text-ink-soft'
+                              : 'border-line bg-paper text-ink-muted'
+                        )}
+                      >
+                        {isOptionCorrect ? (
+                          <Icon name="check" size="sm" className="mt-0.5 shrink-0 text-ink" strokeWidth={2.5} />
+                        ) : isUserOption ? (
+                          <Icon name="close" size="sm" className="mt-0.5 shrink-0 text-ink-muted" strokeWidth={2.5} />
+                        ) : (
+                          <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full border border-line" />
+                        )}
+                        <span>{option}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {pick(q, 'explanation') && (
+                  <p className="mt-5 border-t border-line pt-4 text-sm leading-relaxed text-ink-muted">
+                    <strong className="font-semibold text-ink">{t('explanation')}:</strong>{' '}
+                    {pick(q, 'explanation')}
+                  </p>
+                )}
+              </Card>
+            );
+          })}
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   const questionText = pick(currentQuestion, 'question');
   const options = pick(currentQuestion, 'options');
   const selectedAnswer = selectedAnswers[currentQuestionIndex];
+  const hasSelection = selectedAnswer !== null && selectedAnswer !== undefined;
+  const questionProgress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
   return (
-    <div className="bg-white">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-black">{pick(quiz, 'title')}</h2>
-          <Link to={backLink} className="text-black hover:text-gray-600 text-sm">
-            {t('back_to_lesson')}
-          </Link>
-        </div>
+    <PageShell width="narrow">
+      <BackLink to={backLink} className="mb-4">
+        {t('back_to_lesson')}
+      </BackLink>
 
-        {/* Progress */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600">
-              {t('question')} {currentQuestionIndex + 1} {t('of')} {quiz.questions.length}
-            </span>
-            <span className="text-sm text-gray-600">
-              {score} / {quiz.questions.length}
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-black h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentQuestionIndex + 1) / quiz.questions.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Question */}
-        <div className="bg-white rounded-lg shadow-md p-8 border border-black mb-8">
-          <h3 className="text-2xl font-bold mb-8 text-black">{questionText}</h3>
-
-          <div className="space-y-4">
-            {options.map((option, index) => {
-              const isSelected = selectedAnswer === index;
-              const isCorrect = index === currentQuestion.correctAnswer;
-
-              let buttonClass = 'w-full text-right rtl:text-right ltr:text-left p-4 rounded border-2 transition-colors ';
-              if (selectedAnswer === null || selectedAnswer === undefined) {
-                buttonClass += 'border-gray-200 hover:border-black hover:bg-gray-50';
-              } else if (isSelected && isCorrect) {
-                buttonClass += 'border-gray-400 bg-gray-100';
-              } else if (isSelected && !isCorrect) {
-                buttonClass += 'border-black bg-gray-50';
-              } else if (!isSelected && isCorrect) {
-                buttonClass += 'border-gray-300 bg-gray-50';
-              } else {
-                buttonClass += 'border-gray-200 bg-white';
-              }
-
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleAnswerSelect(index)}
-                  disabled={selectedAnswer !== null && selectedAnswer !== undefined}
-                  className={buttonClass}
-                >
-                  <span className="text-lg">{option}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        {selectedAnswer !== null && selectedAnswer !== undefined && (
-          <div className="text-center">
-            <button
-              onClick={handleNextQuestion}
-              className="px-8 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-            >
-              {currentQuestionIndex < quiz.questions.length - 1 ? t('next') : t('submit')}
-            </button>
-          </div>
-        )}
+      <div className="mb-6 mt-4 sm:mb-8">
+        <PageHeader title={pick(quiz, 'title')} />
       </div>
-    </div>
+
+      <div className="mb-6 sm:mb-8">
+        <div className="mb-2 flex items-center justify-between text-sm text-ink-muted">
+          <span>
+            {t('question')} {currentQuestionIndex + 1} {t('of')}{' '}
+            <span className="tabular-nums">{quiz.questions.length}</span>
+          </span>
+          <span className="tabular-nums">
+            {score} / {quiz.questions.length}
+          </span>
+        </div>
+        <ProgressBar value={questionProgress} label={t('question')} />
+      </div>
+
+      <Card className="p-5 sm:p-8">
+        <h2 className="mb-6 text-lg font-bold leading-relaxed text-ink sm:text-2xl">
+          {questionText}
+        </h2>
+
+        <div className="space-y-3">
+          {options.map((option, index) => {
+            const isSelected = selectedAnswer === index;
+            const isCorrect = index === currentQuestion.correctAnswer;
+
+            return (
+              <button
+                key={index}
+                onClick={() => handleAnswerSelect(index)}
+                disabled={hasSelection}
+                aria-pressed={isSelected}
+                className={cn(
+                  'flex w-full min-h-[56px] items-center gap-3 rounded-xl border-2 px-4 py-3 text-start transition-card duration-300 disabled:cursor-default',
+                  !hasSelection
+                    ? 'border-line bg-paper hover:border-ink hover:bg-surface'
+                    : isSelected && isCorrect
+                      ? 'border-ink bg-surface-quiet'
+                      : isSelected && !isCorrect
+                        ? 'border-ink-soft bg-surface'
+                        : isCorrect
+                          ? 'border-ink-ghost bg-surface-quiet'
+                          : 'border-line bg-paper text-ink-muted'
+                )}
+              >
+                <span
+                  className={cn(
+                    'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold',
+                    isSelected
+                      ? 'border-ink bg-ink text-white'
+                      : 'border-line text-ink-muted'
+                  )}
+                >
+                  {String.fromCharCode(65 + index)}
+                </span>
+                <span className="text-base text-ink-body">{option}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Card>
+
+      {hasSelection && (
+        <div className="mt-6 flex justify-center sm:mt-8">
+          <Button onClick={handleNextQuestion} size="lg" className="w-full sm:w-auto">
+            {currentQuestionIndex < quiz.questions.length - 1 ? t('next') : t('submit')}
+            <Icon name="arrowRight" size="sm" className="rtl:rotate-180" />
+          </Button>
+        </div>
+      )}
+
+      <p className="mt-6 text-center text-xs text-ink-muted">
+        <Link to={backLink} className="underline underline-offset-4 hover:text-ink">
+          {t('back_to_lesson')}
+        </Link>
+      </p>
+    </PageShell>
   );
 };
 

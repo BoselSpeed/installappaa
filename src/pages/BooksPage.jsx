@@ -1,7 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { booksService } from '../firebase/service';
 import { BookCard } from '../components/UI/BookCard';
 import { useTranslation } from 'react-i18next';
+import { PageShell } from '../components/UI/PageShell';
+import { PageHeader } from '../components/UI/PageHeader';
+import { EmptyState } from '../components/UI/EmptyState';
+import { LoadingState } from '../components/UI/Spinner';
+import { Button } from '../components/UI/Button';
+import { Icon } from '../components/UI/Icon';
 
 const BooksPage = () => {
   const [books, setBooks] = useState([]);
@@ -32,40 +38,48 @@ const BooksPage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
-    );
+    return <LoadingState label={t('loading')} />;
   }
 
   if (error) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <p className="text-gray-500">{t('error_occurred')}</p>
-      </div>
+      <PageShell width="narrow">
+        <EmptyState
+          icon="info"
+          title={t('error_occurred')}
+          action={
+            <Button to="/books" variant="secondary">
+              {t('try_again')}
+            </Button>
+          }
+        />
+      </PageShell>
     );
   }
 
   return (
-    <div className="bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2 text-black">{t('books_library')}</h1>
-        <p className="text-gray-600 mb-8">{t('books_library_hint')}</p>
+    <PageShell width="wide">
+      <PageHeader title={t('books_library')} description={t('books_library_hint')} />
 
-        {books.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-gray-500 text-lg">{t('no_books')}</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      {books.length === 0 ? (
+        <EmptyState
+          icon="books"
+          title={t('no_books')}
+          action={
+            <Button to="/sections" variant="secondary">
+              <Icon name="grid" size="sm" />
+              {t('browse_sections')}
+            </Button>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+          {books.map((book) => (
+            <BookCard key={book.id} book={book} />
+          ))}
+        </div>
+      )}
+    </PageShell>
   );
 };
 

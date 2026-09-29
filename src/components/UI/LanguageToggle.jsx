@@ -1,31 +1,40 @@
 import { useAppSettings } from '../../hooks/useAppSettings';
+import { cn } from '../../utils/cn';
+
+const LANGUAGES = [
+  { code: 'ar', label: 'العربية' },
+  { code: 'en', label: 'English' },
+];
 
 const LanguageToggle = () => {
   const { t, updateLanguage, settings } = useAppSettings();
   const current = settings?.language;
 
   return (
-    <div className="flex items-center border border-black rounded overflow-hidden" role="group" aria-label="Language">
-      <button
-        onClick={() => updateLanguage('ar')}
-        className={`px-3 py-1 text-sm font-medium transition-colors ${
-          current === 'ar' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-50'
-        }`}
-        aria-pressed={current === 'ar'}
-        aria-label={t('switch_to_arabic')}
-      >
-        العربية
-      </button>
-      <button
-        onClick={() => updateLanguage('en')}
-        className={`px-3 py-1 text-sm font-medium transition-colors ${
-          current === 'en' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-50'
-        }`}
-        aria-pressed={current === 'en'}
-        aria-label={t('switch_to_english')}
-      >
-        English
-      </button>
+    <div
+      className="flex items-center overflow-hidden rounded-xl border border-line bg-paper p-0.5"
+      role="group"
+      aria-label="Language"
+    >
+      {LANGUAGES.map(({ code, label }) => {
+        const active = current === code;
+        return (
+          <button
+            key={code}
+            onClick={() => updateLanguage(code)}
+            className={cn(
+              'inline-flex min-h-[44px] items-center rounded-[0.625rem] px-3 text-sm font-medium transition-card duration-300',
+              active
+                ? 'bg-ink text-white'
+                : 'text-ink-muted hover:bg-surface hover:text-ink'
+            )}
+            aria-pressed={active}
+            aria-label={t(code === 'ar' ? 'switch_to_arabic' : 'switch_to_english')}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 };

@@ -1,12 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { useTranslation } from 'react-i18next';
 import { ACHIEVEMENTS } from '../utils/achievements';
+import { PageShell } from '../components/UI/PageShell';
+import { PageHeader, SectionTitle } from '../components/UI/PageHeader';
+import { Card } from '../components/UI/Card';
+import { Badge } from '../components/UI/Badge';
+import { Button } from '../components/UI/Button';
+import { ProgressBar } from '../components/UI/ProgressBar';
+import { LoadingState } from '../components/UI/Spinner';
+import { Icon } from '../components/UI/Icon';
+
+const StatCard = ({ icon, label, value }) => (
+  <Card className="p-5 transition-card duration-300 hover:shadow-card-hover sm:p-6">
+    <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-ink">
+      <Icon name={icon} size="md" />
+    </span>
+    <p className="mb-1 text-sm text-ink-muted">{label}</p>
+    <p className="text-2xl font-bold tabular-nums text-ink sm:text-3xl">{value}</p>
+  </Card>
+);
 
 const StatisticsPage = () => {
   const { progress, loading } = useUserProgress();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     readingTimeMinutes: 0,
     completedLessons: 0,
@@ -36,104 +53,88 @@ const StatisticsPage = () => {
   }, [progress]);
 
   if (loading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
-    );
+    return <LoadingState label={t('loading')} />;
   }
 
   const readingHours = Math.floor(stats.readingTimeMinutes / 60);
   const readingMins = stats.readingTimeMinutes % 60;
-  const avgPercent = stats.averageQuizScore * 100;
+  const avgPercent = Math.round(stats.averageQuizScore * 100);
   const totalBadges = Object.keys(ACHIEVEMENTS).length;
 
   return (
-    <div className="bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-black">{t('stats')}</h1>
+    <PageShell width="reading">
+      <PageHeader title={t('stats')} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-lg shadow-md border border-black p-6">
-            <div className="text-3xl mb-2">📚</div>
-            <h3 className="text-sm text-gray-600 mb-1">{t('lessons_completed')}</h3>
-            <p className="text-3xl font-bold text-black">{stats.completedLessons}</p>
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+        <StatCard
+          icon="books"
+          label={t('lessons_completed')}
+          value={stats.completedLessons}
+        />
+        <StatCard
+          icon="clock"
+          label={t('total_reading_time')}
+          value={`${readingHours > 0 ? `${readingHours}h ` : ''}${readingMins}m`}
+        />
+        <StatCard icon="flame" label={t('streak_days')} value={stats.streaks} />
+        <StatCard icon="quiz" label={t('quizzes_taken')} value={stats.totalQuizzesTaken} />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:gap-5 md:grid-cols-2">
+        <Card className="p-5 sm:p-6">
+          <SectionTitle className="mb-5 text-base sm:text-lg">{t('quiz_scores')}</SectionTitle>
+          {stats.totalQuizzesTaken === 0 ? (
+            <p className="text-sm text-ink-muted">{t('no_quiz')}</p>
+          ) : (
+            <div>
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-sm text-ink-muted">{t('average_score')}</span>
+                <span className="text-xl font-bold tabular-nums text-ink">
+                  {avgPercent}%
+                </span>
+              </div>
+              <ProgressBar value={avgPercent} label={t('average_score')} size="lg" />
+            </div>
+          )}
+        </Card>
+
+        <Card className="flex flex-col p-5 sm:p-6">
+          <SectionTitle className="mb-5 text-base sm:text-lg">{t('reading_goal')}</SectionTitle>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-sm text-ink-muted">
+              {t('daily_goal_minutes', { count: stats.dailyGoal })}
+            </span>
+            <Badge variant={stats.dailyGoalCompleted ? 'solid' : 'muted'}>
+              {stats.dailyGoalCompleted ? t('goal_reached') : t('in_progress')}
+            </Badge>
           </div>
+          <div className="mt-auto pt-6">
+            <ProgressBar
+              value={stats.dailyGoalCompleted ? 100 : Math.min((readingMins / stats.dailyGoal) * 100, 100)}
+              label={t('reading_goal')}
+            />
+          </div>
+        </Card>
+      </div>
 
-          <div className="bg-white rounded-lg shadow-md border border-black p-6">
-            <div className="text-3xl mb-2">⏰</div>
-            <h3 className="text-sm text-gray-600 mb-1">{t('total_reading_time')}</h3>
-            <p className="text-3xl font-bold text-black">
-              {readingHours > 0 ? `${readingHours}h ` : ''}{readingMins}m
+      <Card className="mt-4 flex flex-col gap-5 p-5 sm:mt-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-ink bg-ink text-white">
+            <Icon name="trophy" size="lg" />
+          </span>
+          <div>
+            <p className="text-base font-semibold text-ink">{t('achievements')}</p>
+            <p className="text-sm tabular-nums text-ink-muted">
+              {stats.achievements.length} / {totalBadges}
             </p>
           </div>
-
-          <div className="bg-white rounded-lg shadow-md border border-black p-6">
-            <div className="text-3xl mb-2">🔥</div>
-            <h3 className="text-sm text-gray-600 mb-1">{t('streak_days')}</h3>
-            <p className="text-3xl font-bold text-black">{stats.streaks}</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md border border-black p-6">
-            <div className="text-3xl mb-2">📝</div>
-            <h3 className="text-sm text-gray-600 mb-1">{t('quizzes_taken')}</h3>
-            <p className="text-3xl font-bold text-black">{stats.totalQuizzesTaken}</p>
-          </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-white rounded-lg shadow-md border border-black p-6">
-            <h2 className="text-xl font-semibold mb-4 text-black">{t('quiz_scores')}</h2>
-            {stats.totalQuizzesTaken === 0 ? (
-              <p className="text-gray-500">{t('no_quiz')}</p>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600">{t('average_score')}</span>
-                  <span className="text-2xl font-bold text-black">{avgPercent.toFixed(0)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="bg-black h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${avgPercent}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md border border-black p-6">
-            <h2 className="text-xl font-semibold mb-4 text-black">{t('reading_goal')}</h2>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-600">{t('daily_goal_minutes', { count: stats.dailyGoal })}</span>
-              <span className={`px-3 py-1 rounded text-sm font-medium ${
-                stats.dailyGoalCompleted
-                  ? 'bg-black text-white'
-                  : 'bg-gray-200 text-gray-600'
-              }`}>
-                {stats.dailyGoalCompleted ? t('goal_reached') : t('in_progress')}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md border border-black p-6">
-          <h2 className="text-xl font-semibold mb-4 text-black">{t('achievements')}</h2>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🏆</span>
-            <span className="text-gray-600">
-              {stats.achievements.length} / {totalBadges}
-            </span>
-          </div>
-          <Link
-            to="/achievements"
-            className="inline-block px-6 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-          >
-            {t('achievements')}
-          </Link>
-        </div>
-      </div>
-    </div>
+        <Button to="/achievements" variant="secondary">
+          {t('achievements')}
+          <Icon name="arrowRight" size="sm" className="rtl:rotate-180" />
+        </Button>
+      </Card>
+    </PageShell>
   );
 };
 

@@ -1,7 +1,30 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
+import { Card } from '../UI/Card';
+import { Button } from '../UI/Button';
+import { ProgressBar } from '../UI/ProgressBar';
+import { Icon } from '../UI/Icon';
+import { cn } from '../../utils/cn';
+
+const StatusMark = ({ tone, icon, label }) => (
+  <span
+    className={cn(
+      'flex flex-col items-end gap-1 text-xs font-medium',
+      tone === 'solid' ? 'text-ink' : 'text-ink-muted'
+    )}
+  >
+    <span
+      className={cn(
+        'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
+        tone === 'solid' ? 'bg-ink text-white' : 'border border-ink-ghost text-ink-muted'
+      )}
+    >
+      <Icon name={icon} size="xs" strokeWidth={tone === 'solid' ? 2.5 : 1.5} />
+    </span>
+    {label}
+  </span>
+);
 
 const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
   const { t } = useTranslation();
@@ -13,73 +36,47 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
 
   const statusRow = () => {
     if (state.bundled) {
-      return (
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-black">
-          <span className="flex items-center justify-center h-5 w-5 rounded-full bg-black text-white text-xs">✓</span>
-          {t('bundled_with_app')}
-        </span>
-      );
+      return <StatusMark tone="solid" icon="check" label={t('bundled_with_app')} />;
     }
     if (state.downloading) {
-      return (
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-black">
-          <span className="flex items-center justify-center h-5 w-5 rounded-full border border-black text-xs">…</span>
-          {t('downloading')}
-        </span>
-      );
+      return <StatusMark tone="muted" icon="download" label={t('downloading')} />;
     }
     if (state.downloaded) {
-      return (
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-black">
-          <span className="flex items-center justify-center h-5 w-5 rounded-full bg-black text-white text-xs">✓</span>
-          {t('available_offline')}
-        </span>
-      );
+      return <StatusMark tone="solid" icon="check" label={t('available_offline')} />;
     }
-    return (
-      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600">
-        <span className="flex items-center justify-center h-5 w-5 rounded-full border border-gray-400 text-xs">↓</span>
-        {t('not_downloaded')}
-      </span>
-    );
+    return <StatusMark tone="muted" icon="download" label={t('not_downloaded')} />;
   };
 
   const renderActions = () => {
     if (state.bundled || state.downloaded) {
       return (
-        <div className="flex flex-wrap gap-2 items-center">
-          <Link
-            to={`/books/${book.id}/volume/${volume.id}`}
-            className="px-4 py-2 bg-black text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
-          >
+        <div className="flex flex-wrap items-center gap-2">
+          <Button to={`/books/${book.id}/volume/${volume.id}`} size="sm">
+            <Icon name="file" size="sm" />
             {t('open_pdf')}
-          </Link>
+          </Button>
           {!state.bundled &&
             (confirmDelete ? (
-              <span className="flex items-center gap-2">
-                <button
+              <span className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
                   onClick={() => {
                     onDelete?.(volume);
                     setConfirmDelete(false);
                   }}
-                  className="px-4 py-2 bg-white text-black border border-black rounded text-sm font-medium hover:bg-gray-50 transition-colors"
                 >
+                  <Icon name="trash" size="sm" />
                   {t('confirm_delete')}
-                </button>
-                <button
-                  onClick={() => setConfirmDelete(false)}
-                  className="px-4 py-2 text-sm text-gray-500 hover:underline"
-                >
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
                   {t('cancel')}
-                </button>
+                </Button>
               </span>
             ) : (
-              <button
-                onClick={() => setConfirmDelete(true)}
-                className="px-4 py-2 bg-white text-black border border-black rounded text-sm font-medium hover:bg-gray-50 transition-colors"
-              >
+              <Button size="sm" variant="secondary" onClick={() => setConfirmDelete(true)}>
+                <Icon name="trash" size="sm" />
                 {t('delete_from_device')}
-              </button>
+              </Button>
             ))}
         </div>
       );
@@ -88,38 +85,33 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
     if (state.downloading) {
       return (
         <div className="w-full">
-          <div className="flex justify-between items-center text-xs text-gray-600 mb-1">
+          <div className="mb-2 flex items-center justify-between text-xs text-ink-muted">
             <span>{t('downloading')}</span>
-            <span>{state.progress}%</span>
+            <span className="tabular-nums">{state.progress}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-black h-2 rounded-full transition-all duration-150"
-              style={{ width: `${state.progress}%` }}
-            ></div>
-          </div>
+          <ProgressBar value={state.progress} label={t('downloading')} size="sm" />
         </div>
       );
     }
 
     return (
-      <button
-        onClick={() => onDownload?.(volume)}
-        className="px-4 py-2 bg-white text-black border border-black rounded text-sm font-medium hover:bg-gray-50 transition-colors"
-      >
+      <Button size="sm" variant="secondary" onClick={() => onDownload?.(volume)}>
+        <Icon name="download" size="sm" />
         {t('download')}
-      </button>
+      </Button>
     );
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-black p-5 flex flex-col gap-3">
+    <Card className="flex flex-col gap-4 p-5 transition-card duration-300 hover:shadow-card-hover sm:p-6">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">📖</span>
-          <div>
-            <h3 className="text-lg font-semibold text-black">{title}</h3>
-            <p className="text-sm text-gray-500">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink-muted">
+            <Icon name="book" size="md" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-base font-bold leading-snug text-ink sm:text-lg">{title}</h3>
+            <p className="mt-0.5 text-xs text-ink-muted">
               {sizeMb != null && sizeMb > 0 ? `PDF • ${sizeMb} MB` : 'PDF'}
             </p>
           </div>
@@ -128,14 +120,17 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       </div>
 
       {state.error && (
-        <div className="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-2 space-y-2">
-          <p>{state.error === 'download_error' ? t('download_error') : state.error}</p>
-          <p className="text-xs text-gray-500">{t('download_retry_hint')}</p>
+        <div className="space-y-1 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">
+          <p className="flex items-center gap-2">
+            <Icon name="info" size="sm" className="shrink-0 text-ink-muted" />
+            {state.error === 'download_error' ? t('download_error') : state.error}
+          </p>
+          <p className="ps-7 text-xs text-ink-muted">{t('download_retry_hint')}</p>
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 items-center mt-auto pt-1">{renderActions()}</div>
-    </div>
+      <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">{renderActions()}</div>
+    </Card>
   );
 };
 

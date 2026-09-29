@@ -1,10 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { booksService } from '../firebase/service';
 import { useVolumeDownloads } from '../hooks/useVolumeDownloads';
 import { VolumeCard } from '../components/Content/VolumeCard';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
+import { PageShell } from '../components/UI/PageShell';
+import { SectionTitle } from '../components/UI/PageHeader';
+import { BackLink } from '../components/UI/BackLink';
+import { Badge } from '../components/UI/Badge';
+import { EmptyState } from '../components/UI/EmptyState';
+import { LoadingState } from '../components/UI/Spinner';
+import { Icon } from '../components/UI/Icon';
 
 const BookDetailPage = () => {
   const { bookId } = useParams();
@@ -38,18 +45,14 @@ const BookDetailPage = () => {
   }, [bookId]);
 
   if (loading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
-    );
+    return <LoadingState label={t('loading')} />;
   }
 
   if (error || !book) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <p className="text-gray-500">{t('error_occurred')}</p>
-      </div>
+      <PageShell width="narrow">
+        <EmptyState icon="info" title={t('error_occurred')} />
+      </PageShell>
     );
   }
 
@@ -71,92 +74,96 @@ const BookDetailPage = () => {
   const volumes = book.volumes || [];
   const volumeCount = volumes.length;
   const isLoaded = Boolean(volumes.some((v) => v.bundled));
+  const description = pick(book, 'description');
 
   return (
-    <div className="bg-white">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <Link to="/books" className="text-black hover:text-gray-600 mb-6 inline-block">
-          ← {t('books')}
-        </Link>
+    <PageShell width="reading">
+      <BackLink to="/books" className="mb-4">
+        {t('books')}
+      </BackLink>
 
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Cover */}
-          <div className="w-56 shrink-0 mx-auto md:mx-0">
-            {book.coverImage ? (
-              <img
-                src={book.coverImage}
-                alt={pick(book, 'title')}
-                className="w-full rounded-lg shadow-md border border-black"
-              />
-            ) : (
-              <div className="aspect-[3/4] rounded-lg shadow-md border border-black bg-white flex items-center justify-center">
-                <span className="text-6xl">📖</span>
-              </div>
-            )}
-          </div>
-
-          {/* Details */}
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-black mb-4">{pick(book, 'title')}</h1>
-
-            {isLoaded && (
-              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-black bg-gray-100 border border-black rounded px-3 py-1 mb-4">
-                <span className="flex items-center justify-center h-5 w-5 rounded-full bg-black text-white text-xs">✓</span>
-                {t('loaded_with_app')}
-              </span>
-            )}
-
-            <dl className="space-y-3 text-sm">
-              {fields.map((field) => (
-                <div key={field.key} className="flex flex-wrap gap-2">
-                  <dt className="font-medium text-black w-40 shrink-0">{field.label}:</dt>
-                  <dd className="text-gray-700">{pick(book, field.key)}</dd>
-                </div>
-              ))}
-              <div className="flex flex-wrap gap-2">
-                <dt className="font-medium text-black w-40 shrink-0">{t('volume_count')}:</dt>
-                <dd className="text-gray-700">
-                  {volumeCount > 0
-                    ? t('volume_count_value', { count: volumeCount })
-                    : t('volume_count_none')}
-                </dd>
-              </div>
-            </dl>
-
-            {pick(book, 'description') && (
-              <div className="mt-6">
-                <h2 className="text-lg font-semibold text-black mb-2">{t('description')}</h2>
-                <p className="text-gray-700 leading-relaxed">{pick(book, 'description')}</p>
-              </div>
-            )}
-          </div>
+      <div className="mt-4 flex flex-col gap-6 sm:gap-8 md:flex-row md:gap-10">
+        <div className="mx-auto w-40 shrink-0 sm:w-48 md:mx-0 md:w-56">
+          {book.coverImage ? (
+            <img
+              src={book.coverImage}
+              alt={pick(book, 'title')}
+              className="w-full rounded-xl border border-line bg-paper object-cover shadow-card"
+            />
+          ) : (
+            <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl border border-line bg-surface">
+              <Icon name="book" size="xl" className="text-ink-faint" />
+            </div>
+          )}
         </div>
 
-        {/* Volumes */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-black mb-6">{t('volumes')}</h2>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-[1.5rem] font-bold leading-tight text-ink sm:text-3xl lg:text-4xl">
+            {pick(book, 'title')}
+          </h1>
 
-          {volumeCount === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">{t('no_volumes')}</p>
+          {isLoaded && (
+            <Badge variant="solid" className="mt-4" icon={<Icon name="check" size="xs" strokeWidth={2.5} />}>
+              {t('loaded_with_app')}
+            </Badge>
+          )}
+
+          <dl className="mt-6 divide-y divide-line border-y border-line">
+            {fields.map((field) => (
+              <div
+                key={field.key}
+                className="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:gap-4"
+              >
+                <dt className="text-sm font-semibold text-ink-muted sm:w-40 sm:shrink-0">
+                  {field.label}
+                </dt>
+                <dd className="text-sm text-ink-body">{pick(book, field.key)}</dd>
+              </div>
+            ))}
+            <div className="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:gap-4">
+              <dt className="text-sm font-semibold text-ink-muted sm:w-40 sm:shrink-0">
+                {t('volume_count')}
+              </dt>
+              <dd className="text-sm text-ink-body">
+                {volumeCount > 0
+                  ? t('volume_count_value', { count: volumeCount })
+                  : t('volume_count_none')}
+              </dd>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {volumes.map((volume) => (
-                <VolumeCard
-                  key={volume.id}
-                  book={book}
-                  volume={volume}
-                  state={getState(volume)}
-                  onDownload={download}
-                  onDelete={remove}
-                />
-              ))}
+          </dl>
+
+          {description && (
+            <div className="mt-8">
+              <SectionTitle className="mb-3">{t('description')}</SectionTitle>
+              <p className="max-w-prose text-sm leading-relaxed text-ink-body sm:text-base">
+                {description}
+              </p>
             </div>
           )}
         </div>
       </div>
-    </div>
+
+      <div className="mt-12 lg:mt-14">
+        <SectionTitle className="mb-6">{t('volumes')}</SectionTitle>
+
+        {volumeCount === 0 ? (
+          <EmptyState icon="layers" title={t('no_volumes')} />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
+            {volumes.map((volume) => (
+              <VolumeCard
+                key={volume.id}
+                book={book}
+                volume={volume}
+                state={getState(volume)}
+                onDownload={download}
+                onDelete={remove}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </PageShell>
   );
 };
 

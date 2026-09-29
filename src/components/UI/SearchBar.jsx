@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchHistoryService } from '../../firebase/service';
 import { useTranslation } from 'react-i18next';
+import { Icon } from './Icon';
+import { cn } from '../../utils/cn';
 
 const SearchBar = ({ placeholder, onSearch }) => {
   const [query, setQuery] = useState('');
@@ -18,7 +20,7 @@ const SearchBar = ({ placeholder, onSearch }) => {
     const loadHistory = async () => {
       try {
         const history = await searchHistoryService.getSearchHistory();
-        setSuggestions(history.map(item => item.query));
+        setSuggestions(history.map((item) => item.query));
       } catch (error) {
         console.error('Error loading search history:', error);
       }
@@ -26,31 +28,27 @@ const SearchBar = ({ placeholder, onSearch }) => {
     loadHistory();
   }, []);
 
+  const runSearch = (value) => {
+    if (onSearch) {
+      onSearch(value);
+    } else {
+      navigate(`/search?q=${encodeURIComponent(value)}`);
+    }
+    setShowSuggestions(false);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (query.trim()) {
-      searchHistoryService.addSearch(query.trim());
-      setSuggestions(prev => {
-        const filtered = prev.filter(s => s !== query.trim());
-        return [query.trim(), ...filtered].slice(0, 20);
-      });
-      if (onSearch) {
-        onSearch(query.trim());
-      } else {
-        navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-      }
-      setShowSuggestions(false);
-    }
+    const value = query.trim();
+    if (!value) return;
+    searchHistoryService.addSearch(value);
+    setSuggestions((prev) => [value, ...prev.filter((s) => s !== value)].slice(0, 20));
+    runSearch(value);
   };
 
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion);
-    setShowSuggestions(false);
-    if (onSearch) {
-      onSearch(suggestion);
-    } else {
-      navigate(`/search?q=${encodeURIComponent(suggestion)}`);
-    }
+    runSearch(suggestion);
   };
 
   const handleClearHistory = async () => {
@@ -85,11 +83,7 @@ const SearchBar = ({ placeholder, onSearch }) => {
       const transcript = event.results[0][0].transcript;
       setQuery(transcript);
       setIsListening(false);
-      if (onSearch) {
-        onSearch(transcript);
-      } else {
-        navigate(`/search?q=${encodeURIComponent(transcript)}`);
-      }
+      runSearch(transcript);
     };
 
     recognition.onerror = (event) => {
@@ -122,12 +116,20 @@ const SearchBar = ({ placeholder, onSearch }) => {
     };
   }, []);
 
+  const iconButton =
+    'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-card duration-300';
+
   return (
-    <div className="w-full max-w-2xl mx-auto relative">
-      <form onSubmit={handleSubmit} className="relative">
+    <div className="relative w-full">
+      <form onSubmit={handleSubmit} className="relative" role="search">
+        <Icon
+          name="search"
+          size="md"
+          className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-ink-faint"
+        />
         <input
           ref={inputRef}
-          type="text"
+          type="search"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -135,72 +137,84 @@ const SearchBar = ({ placeholder, onSearch }) => {
           }}
           onFocus={() => setShowSuggestions(true)}
           placeholder={placeholder || t('search_placeholder')}
-          className="w-full px-4 py-3 pr-10 pl-20 border border-black rounded-lg bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+          aria-label={placeholder || t('search_placeholder')}
+          className="w-full rounded-xl border border-line bg-paper py-3 pe-3 ps-12 text-base text-ink shadow-card transition-card duration-300 placeholder:text-ink-muted hover:border-ink-ghost focus:border-ink sm:text-base [&::-webkit-search-cancel-button]:appearance-none"
         />
-        <div className="absolute left-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+        <div className="absolute end-1.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
           <button
             type="button"
             onClick={isListening ? stopVoiceSearch : startVoiceSearch}
-            className={`p-2 rounded-full transition-colors ${
-              isListening ? 'text-red-600 bg-red-50' : 'text-black hover:text-gray-600'
-            }`}
+            className={cn(
+              iconButton,
+              isListening
+                ? 'bg-ink text-white'
+                : 'text-ink-muted hover:bg-surface hover:text-ink'
+            )}
             aria-label={t('voice_search')}
             title={t('voice_search')}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
+            <Icon name="mic" size="md" />
           </button>
           <button
             type="submit"
-            className="p-2 text-black hover:text-gray-600"
+            className={cn(iconButton, 'bg-ink text-white hover:bg-ink-soft')}
             aria-label={t('search_placeholder')}
+            title={t('search_placeholder')}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Icon name="arrowRight" size="md" className="rtl:rotate-180" />
           </button>
         </div>
       </form>
 
       {isListening && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-center">
-          <p className="text-red-600 text-sm font-medium">{t('voice_search_listening')}</p>
+        <div className="absolute inset-x-0 top-full z-50 mt-2 rounded-xl border border-ink bg-ink px-4 py-3 text-center">
+          <p className="flex items-center justify-center gap-2 text-sm font-medium text-white">
+            <Icon name="mic" size="sm" />
+            {t('voice_search_listening')}
+          </p>
         </div>
       )}
 
-      {voiceError && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-gray-100 border border-gray-200 rounded-lg text-center">
-          <p className="text-gray-600 text-sm">{voiceError}</p>
+      {voiceError && !isListening && (
+        <div className="absolute inset-x-0 top-full z-50 mt-2 rounded-xl border border-line bg-paper px-4 py-3 text-center shadow-pop">
+          <p className="text-sm text-ink-muted">{voiceError}</p>
         </div>
       )}
 
       {showSuggestions && suggestions.length > 0 && !isListening && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-black rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
-          <div className="p-2 border-b border-gray-100 flex items-center justify-between">
-            <span className="text-xs text-gray-500">{t('recent_searches')}</span>
+        <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-line bg-paper shadow-pop">
+          <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+            <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+              {t('recent_searches')}
+            </span>
             <button
+              type="button"
               onClick={handleClearHistory}
-              className="text-xs text-red-600 hover:text-red-800"
+              className="min-h-[44px] rounded-lg px-3 text-xs font-medium text-ink-muted transition-colors duration-200 hover:bg-surface hover:text-ink"
             >
               {t('clear_search_history')}
             </button>
           </div>
-          {suggestions.map((suggestion, index) => (
-            <button
-              key={index}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="w-full text-left px-4 py-2 hover:bg-gray-50 text-black text-sm border-b border-gray-100 last:border-b-0"
-            >
-              {suggestion}
-            </button>
-          ))}
+          <ul className="max-h-64 overflow-y-auto">
+            {suggestions.map((suggestion, index) => (
+              <li key={index}>
+                <button
+                  type="button"
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  className="flex w-full min-h-[44px] items-center gap-2 px-4 py-2 text-start text-sm text-ink-body transition-colors duration-200 last:border-b-0 hover:bg-surface"
+                >
+                  <Icon name="history" size="sm" className="shrink-0 text-ink-faint" />
+                  {suggestion}
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
       {showSuggestions && query.trim() && suggestions.length === 0 && !isListening && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-black rounded-lg shadow-lg z-50 p-4">
-          <p className="text-gray-500 text-sm text-center">{t('no_results')}</p>
+        <div className="absolute inset-x-0 top-full z-50 mt-2 rounded-xl border border-line bg-paper px-4 py-6 text-center shadow-pop">
+          <p className="text-sm text-ink-muted">{t('no_results')}</p>
         </div>
       )}
     </div>
