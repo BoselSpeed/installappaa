@@ -20,7 +20,17 @@ module.exports = {
   settings: {
     react: { version: '18.3' }
   },
-  ignorePatterns: ['dist', 'تطبيق الفقه', 'node_modules', '*.log'],
+  ignorePatterns: [
+    'dist',
+    'تطبيق الفقه',
+    // Prebuilt web bundles checked into the native projects — minified
+    // build output, not source we maintain.
+    'public',
+    'ايفون/App/App/public',
+    'android/app/src/main/assets/public',
+    'node_modules',
+    '*.log'
+  ],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
