@@ -732,7 +732,7 @@ const SEED_BOOKS = [
       'من أشهر دواوين الشعر العربي، جمع فيه أبو تمام مختارات من أشعار العرب في الحماسة والفخر والمديح، مع تحقيق عبد المنعم صالح.',
     description_en:
       'One of the most famous Arabic poetry anthologies, compiled by Abu Tammam featuring selections of Arab poetry on heroism, pride, and praise, edited by Abd al-Munim Salih.',
-    coverImage: null,
+    coverImage: '/covers/diwan-al-hamasa.jpg',
     order: 16,
     volumes: [
       {
@@ -773,7 +773,7 @@ const SEED_BOOKS = [
       'كتاب في علوم البلاغة العربية (المعاني والبيان والبديع) بأسلوب تعليمي واضح، من تأليف عيسى العاكوب وعلي الشتيوي.',
     description_en:
       'A book on Arabic rhetorical sciences (meanings, expression, and embellishment) in a clear pedagogical style, by Isa al-Aakub and Ali al-Shtaywi.',
-    coverImage: null,
+    coverImage: '/covers/al-kafi-fi-ulum-al-balagha.jpg',
     order: 17,
     volumes: [
       {
@@ -814,7 +814,7 @@ const SEED_BOOKS = [
       'مجموعة مختارة من أشعار العرب في الجاهلية والإسلام، جمعها المفضل الضبي، وتُعد من أهم مصادر الشعر الجاهلي.',
     description_en:
       'A selected collection of pre-Islamic and early Islamic Arabic poetry, compiled by al-Mufaddal al-Dabbi, one of the most important sources of pre-Islamic poetry.',
-    coverImage: null,
+    coverImage: '/covers/al-mufaddaliyat.jpg',
     order: 18,
     volumes: [
       {
@@ -855,7 +855,7 @@ const SEED_BOOKS = [
       'شرح للامية العرب لابن الوردي أو الشماخ، في الحكمة والزهد، من أهم الشروح اللغوية والأدبية.',
     description_en:
       'Commentary on Lamiyat al-Arab (by Ibn al-Wardi or al-Shammakh), on wisdom and asceticism, one of the most important linguistic and literary commentaries.',
-    coverImage: null,
+    coverImage: '/covers/sharh-lamiyat-al-arab.jpg',
     order: 19,
     volumes: [
       {
@@ -874,14 +874,14 @@ const SEED_BOOKS = [
     id: 'al-mukhtasar-fi-al-balagha',
     title_ar: 'المختصر في البلاغة',
     title_en: 'Al-Mukhtasar fi al-Balagha',
-    author_ar: '',
-    author_en: '',
+    author_ar: 'د. عبد القادر حسين',
+    author_en: 'Dr. Abd al-Qadir Husayn',
     muhaqqiq_ar: '',
     muhaqqiq_en: '',
     translator_ar: '',
     translator_en: '',
-    publisher_ar: '',
-    publisher_en: '',
+    publisher_ar: 'دار غريب للطباعة والنشر والتوزيع',
+    publisher_en: 'Dar Gharib',
     edition_ar: '',
     edition_en: '',
     year_ar: '',
@@ -896,7 +896,7 @@ const SEED_BOOKS = [
       'مختصر في علم البلاغة (المعاني والبيان والبديع) يلخص القواعد الأساسية بأسلوب مبسط.',
     description_en:
       'A concise treatise on Arabic rhetoric (meanings, expression, and embellishment) summarizing the fundamental rules in a simplified style.',
-    coverImage: null,
+    coverImage: '/covers/al-mukhtasar-fi-al-balagha.jpg',
     order: 20,
     volumes: [
       {
@@ -937,7 +937,7 @@ const SEED_BOOKS = [
       'من أمهات كتب الأدب، جمع فيها أبو زيد القرشي مختارات من أشعار العرب مع شرح غريبها، وهو من المصادر الأساسية للشعر الجاهلي والمخضرم.',
     description_en:
       'One of the foundational works of Arabic literature; Abu Zayd al-Qurashi compiled selections of Arab poetry with explanations of rare vocabulary, a primary source for pre-Islamic and mukhadram poetry.',
-    coverImage: null,
+    coverImage: '/covers/jamharat-ashar-al-arab.jpg',
     order: 21,
     volumes: [
       {
@@ -978,7 +978,7 @@ const SEED_BOOKS = [
       'المعلقات السبع الشهيرة مع شرح الزوزني، من أروع ما أنتجته الشعر العربي في الجاهلية.',
     description_en:
       'The famous Seven Mu\'allaqat with al-Zawzani\'s commentary, among the finest productions of pre-Islamic Arabic poetry.',
-    coverImage: null,
+    coverImage: '/covers/al-muallaqat-al-sab.jpg',
     order: 22,
     volumes: [
       {
@@ -1019,7 +1019,7 @@ const SEED_BOOKS = [
       'مختارات الأصمعي من أشعار العرب، إحدى المجموعات الثلاث الكبرى (المفضليات، المعَدّات، الأصمعيات) التي جمعها علماء العربية في العصر العباسي المبكر.',
     description_en:
       'Al-Asma\'i\'s selections of Arab poetry, one of the three major canonical anthologies (alongside al-Mufaddaliyat and al-Mudaqqat) compiled by early Abbasid-era scholars.',
-    coverImage: null,
+    coverImage: '/covers/al-asmayat.jpg',
     order: 23,
     volumes: [
       {
@@ -1060,7 +1060,7 @@ const SEED_BOOKS = [
       'كتاب الإمام الشاطبي في الاعتصام بالكتاب والسنة والتحذير من البدع، من أهم كتب أصول الفقه والمنهج.',
     description_en:
       'Imam al-Shatibi\'s work on adhering to the Quran and Sunnah and warning against innovations, a foundational text in usul al-fiqh and methodology.',
-    coverImage: null,
+    coverImage: '/covers/al-itisam.jpg',
     order: 24,
     volumes: [
       {
@@ -1101,7 +1101,7 @@ const SEED_BOOKS = [
       'كتاب في علوم البلاغة الثلاثة (المعاني، البيان، البديع) بأسلوب جامع ومفصل، للسيد أحمد الهاشمي.',
     description_en:
       'A comprehensive and detailed work on the three rhetorical sciences (meanings, expression, embellishment) by Al-Sayyid Ahmad al-Hashimi.',
-    coverImage: null,
+    coverImage: '/covers/jawahir-al-balagha.jpg',
     order: 25,
     volumes: [
       {
@@ -1142,7 +1142,7 @@ const SEED_BOOKS = [
       'من أشهر الكتب المدرسية في البلاغة العربية، قدمه علي الجارم ومصطفى أمين بأسلوب واضح ومنهجي للتعليم.',
     description_en:
       'One of the most famous Arabic rhetoric textbooks, presented by Ali al-Jarum and Mustafa Amin in a clear, systematic pedagogical style.',
-    coverImage: null,
+    coverImage: '/covers/al-balagha-al-wadiha.jpg',
     order: 26,
     volumes: [
       {
@@ -1183,7 +1183,7 @@ const SEED_BOOKS = [
       'دراسة تاريخية لتطور علم البلاغة العربية من النشأة إلى العصر الحديث، للدكتور شوقي ضيف، الطبعة التاسعة.',
     description_en:
       'A historical study of the development of Arabic rhetoric from its origins to the modern era, by Dr. Shawqi Daif, 9th edition.',
-    coverImage: null,
+    coverImage: '/covers/al-balagha-tatawwur-wa-tarikh.jpg',
     order: 27,
     volumes: [
       {
@@ -1202,8 +1202,8 @@ const SEED_BOOKS = [
     id: 'mukhtarat-al-shiir-al-jahili',
     title_ar: 'مختارات الشعر الجاهلي ودواوين الشعراء الستة الجاهليين',
     title_en: 'Selections of Pre-Islamic Poetry and the Six Poets\' Diwans',
-    author_ar: '',
-    author_en: '',
+    author_ar: 'عبد المتعال الصعيدي',
+    author_en: 'Abd al-Muta\'al al-Sa\'idi',
     muhaqqiq_ar: '',
     muhaqqiq_en: '',
     translator_ar: '',
@@ -1224,7 +1224,7 @@ const SEED_BOOKS = [
       'مجموعة مختارات من الشعر الجاهلي تتضمن دواوين الشعراء الستة المشهورين، مرجع أساسي لدراسة الشعر العربي القديم.',
     description_en:
       'A collection of pre-Islamic poetry selections including the diwans of the six famous poets, a fundamental reference for the study of classical Arabic poetry.',
-    coverImage: null,
+    coverImage: '/covers/mukhtarat-al-shiir-al-jahili.jpg',
     order: 28,
     volumes: [
       {
@@ -1243,8 +1243,8 @@ const SEED_BOOKS = [
     id: 'mawsuat-al-qabail-al-arabiyya',
     title_ar: 'موسوعة القبائل العربية',
     title_en: 'Mawsuat al-Qaba\'il al-Arabiyya',
-    author_ar: '',
-    author_en: '',
+    author_ar: 'محمد سليمان الطيب',
+    author_en: 'Muhammad Sulayman al-Tayyib',
     muhaqqiq_ar: '',
     muhaqqiq_en: '',
     translator_ar: '',
@@ -1265,7 +1265,7 @@ const SEED_BOOKS = [
       'موسوعة ضخمة في القبائل العربية، تتكون من عدة مجلدات تغطي أنساب القبائل وأخبارها وأشعارها. المجلد 9 غير متوفر في المصدر، والمتاح عشر مجلدات.',
     description_en:
       'A large encyclopedia of Arab tribes covering their lineages, histories, and poetry. Volume 9 is unavailable from the source; eleven volumes are available.',
-    coverImage: null,
+    coverImage: '/covers/mawsuat-al-qabail-al-arabiyya.jpg',
     order: 29,
     volumes: [
       { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1GKZErG6INtxlS45688XwFpQttzBrXsI1&export=download&confirm=t', sizeMb: 14.2 },
