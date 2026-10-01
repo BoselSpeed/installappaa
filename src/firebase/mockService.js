@@ -23,7 +23,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'book-v5';
+const SEED_VERSION = 'quiz-v6';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -204,10 +204,440 @@ const seedLessons = [
   }
 ];
 
-// The books are read as PDFs; no text blocks or quizzes are seeded.
+// Text blocks are only rendered for lessons without a `pdfUrl`
+// (LessonDetailPage prefers the PDF reader), and every seeded lesson is
+// PDF-backed, so no text blocks are seeded.
 const seedContent = [];
 
-const seedQuizzes = [];
+// One quiz per seeded lesson. Every seeded lesson is PDF-backed and shows a
+// "quiz" button, so an empty list meant /quiz/:lessonId always hit its
+// "no quiz" empty state.
+//
+// Shape (per docs/superpowers/specs): questions[] carry localized question and
+// options text plus the index of the correct option.
+const seedQuizzes = [
+  {
+    id: 'quiz-tawhid-book',
+    lessonId: 'tawhid-book',
+    title_ar: 'اختبار كتاب التوحيد',
+    title_en: 'Kitab al-Tawhid Quiz',
+    questions: [
+      {
+        question_ar: 'من هو مؤلف كتاب التوحيد؟',
+        question_en: 'Who is the author of Kitab al-Tawhid?',
+        options_ar: [
+          'الإمام محمد بن عبد الوهاب',
+          'شيخ الإسلام ابن تيمية',
+          'الإمام أحمد بن حنبل',
+          'الإمام الشافعي'
+        ],
+        options_en: [
+          'Imam Muhammad ibn Abd al-Wahhab',
+          'Shaykh al-Islam Ibn Taymiyyah',
+          'Imam Ahmad ibn Hanbal',
+          'Imam al-Shafi’i'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'كتاب التوحيد من كتب العقيدة التي كتبها الإمام محمد بن عبد الوهاب، بتخريج شيخ الإسلام ابن تيمية وغيره، وهو أشهر كتب العقيدة المعاصرة.',
+        explanation_en:
+          'Kitab al-Tawhid is one of the Aqeedah works of Imam Muhammad ibn Abd al-Wahhab, edited by Shaykh al-Islam Ibn Taymiyyah and others, and it is the best-known modern work on the subject.'
+      },
+      {
+        question_ar: 'ما المقصود بتوحيد الألوهية؟',
+        question_en: 'What does Tawhid al-Uluhiyyah mean?',
+        options_ar: [
+          'إفراد الله تعالى وحده بالعبادة التي لا يحق لأحد سواه',
+          'تصحيح أخطاء الطباعة في الكتب',
+          'بيان أحكام التجارة في الأسواق',
+          'ترجمة الكتب إلى اللغات الأخرى'
+        ],
+        options_en: [
+          'Singling out Allah alone for the worship that belongs to no one but Him',
+          'Correcting typographical errors in books',
+          'Setting out the rulings of trade in the markets',
+          'Translating books into other languages'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'أصل توحيد الألوهية إفراد الله تعالى وحده بما يختص به من العبادات والدعوات، فكل عبادة لا يصح أن تذهب إلى غير الله فهي شرك.',
+        explanation_en:
+          'Tawhid al-Uluhiyyah means dedicating to Allah alone the acts of worship that belong to no one but Him; any worship directed elsewhere is shirk.'
+      },
+      {
+        question_ar: 'ما الحكمة التي من أجلها وضع المؤلف هذا الكتاب؟',
+        question_en: 'Why did the author write this book?',
+        options_ar: [
+          'بيان حقيقة توحيد العبادة وحده لله تعالى، وبيان ما بطل من هذه الحقيقة بسبب الشرك',
+          'جمع شعر الشعراء الجاهليين',
+          'شرح قوانين الدولة التي تحكم المسلمين',
+          'تهذيب كتب النحو والصرف'
+        ],
+        options_en: [
+          'To set out the reality of worshipping Allah alone, and what spoils it through shirk',
+          'To collect pre-Islamic poetry',
+          'To explain the laws by which Muslims are governed',
+          'To refine grammar and morphology books'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'صرّح المؤلف في مقدمته أن الحكمة من الكتاب بيان توحيد العبادة لله وحده، وبيان أن هذه الحقيقة بطل منها ما كان قبل الإسلام.',
+        explanation_en:
+          'The author states in his preface that the purpose is to explain worshipping Allah alone and to expose the shirk that spoiled it before Islam.'
+      },
+      {
+        question_ar: 'ما نوعا الشرك اللذان حذّر المؤلف منهما؟',
+        question_en: 'Which two kinds of shirk does the author warn against?',
+        options_ar: [
+          'الشرك الأكبر والشرك الأصغر',
+          'الشرك الظاهر والشرك الخفي',
+          'شرك العبادة وشرك المحبة',
+          'شرك الحول وقوة الشبح'
+        ],
+        options_en: [
+          'Major shirk and minor shirk',
+          'Apparent shirk and hidden shirk',
+          'Shirk of worship and shirk of love',
+          'Shirk of hul (assimilating God to creation) and the strength of a jinn'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'بيّن المؤلف أن ضد توحيد الألوهية هو الشرك، وأن منه صغيرًا كالسريان، وكبيرًا كسوء العتق بغير الله، وكلاهما محرم.',
+        explanation_en:
+          'The author shows that the opposite of Tawhid al-Uluhiyyah is shirk, both minor (such as riya) and major (such as enslaving what is other than Allah to Him), and both are forbidden.'
+      },
+      {
+        question_ar: 'أي هذه الأمثلة أشهر ما استدل به المؤلف على الشرك الأصغر؟',
+        question_en: 'Which of these is the author’s best-known example of minor shirk?',
+        options_ar: ['الرياء', 'الكذب', 'الغيبة', 'الظلم'],
+        options_en: ['Riya (showing off)', 'Lying', 'Gheebah (backbiting)', 'Oppression'],
+        correctAnswer: 0,
+        explanation_ar:
+          'الرياء من أشهر أمثلة الشرك الأصغر؛ لأنه قصد الاستغناء بالنظر، فصار العمل لأجل من يعلمه من الخلق لا لأجل الله تعالى.',
+        explanation_en:
+          'Riya is one of the clearest examples of minor shirk, because it makes the deed partly for people to see rather than for Allah alone.'
+      }
+    ]
+  },
+  {
+    id: 'quiz-thalatha-book',
+    lessonId: 'thalatha-book',
+    title_ar: 'اختبار متن الأصول الثلاثة',
+    title_en: 'Thalathat al-Usul Quiz',
+    questions: [
+      {
+        question_ar: 'ما الأصول التي يجب على كل مسلم معرفتها والعمل بها؟',
+        question_en: 'What are the fundamentals every Muslim must know and act upon?',
+        options_ar: [
+          'معرفة العبد ربه، ومعرفة دينه، ومعرفة نبيه ﷺ',
+          'الأركان الأربعة',
+          'أركان الإيمان',
+          'مبادئ فقه المعاملات'
+        ],
+        options_en: [
+          'Knowing his Lord, knowing his religion, and knowing his Prophet ﷺ',
+          'The four pillars',
+          'The pillars of faith',
+          'The principles of transactional fiqh'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'هذا هو الموضوع الذي عقده المؤلف لكتابه، وقد بين أن الأصول ثلاثة لا رابع لها.',
+        explanation_en:
+          'This is the very subject the author set out to cover, and he shows that there are three fundamentals and no fourth.'
+      },
+      {
+        question_ar: 'ما أركان الإيمان التي عقدها المؤلف في متنه؟',
+        question_en: 'Which pillars of faith did the author establish in his text?',
+        options_ar: [
+          'الإيمان بالله، والإيمان برسوله، والإيمان باليوم الآخر',
+          'الإيمان بالله، والإيمان بالملائكة، والإيمان بالكتب فقط',
+          'الإيمان بالقدر، والإيمان بأصحابه، والإيمان بالسلف',
+          'الإيمان بالاجتهاد، والإيمان بالمذاهب، والإيمان بالمساجد'
+        ],
+        options_en: [
+          'Belief in Allah, belief in His Messenger, and belief in the Last Day',
+          'Belief in Allah, the angels, and the books only',
+          'Belief in Qadar, the Companions, and the Salaf',
+          'Belief in ijtihad, the schools, and the mosques'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'عقد المؤلف أركان الإيمان الثلاثة: الإيمان بالله، وب رسوله، وباليوم الآخر، ثم ذكر تفصيل كل ركن منها.',
+        explanation_en:
+          'The author establishes the three pillars: belief in Allah, in His Messenger, and in the Last Day, then details each one.'
+      },
+      {
+        question_ar: 'على كم أصل بُني متن الأصول الثلاثة؟',
+        question_en: 'How many fundamentals is Thalathat al-Usul built on?',
+        options_ar: ['ثلاثة', 'أربعة', 'خمسة', 'ستة'],
+        options_en: ['Three', 'Four', 'Five', 'Six'],
+        correctAnswer: 0,
+        explanation_ar: 'سُمّي المتن بذلك لكونه مختصرًا في بيان الأصول الثلاثة وأدلتها من الكتاب والسنة.',
+        explanation_en:
+          'It is named Thalathat (three) al-Usul because it briefly sets out the three fundamentals together with their evidences.'
+      },
+      {
+        question_ar: 'من أين استدل المؤلف على أصوله؟',
+        question_en: 'What are the author’s sources for these fundamentals?',
+        options_ar: ['الكتاب والسنة', 'العقل المجرد', 'أقوال الفلاسفة', 'الذوق والسلوك'],
+        options_en: ['The Quran and the Sunnah', 'Pure reason', 'The philosophers', 'Taste and spiritual states'],
+        correctAnswer: 0,
+        explanation_ar:
+          'صرّح المؤلف في أول المتن أن أصوله أدلتها من الكتاب والسنة، ولم يستند في أصل إلى قول أحد من القائلين.',
+        explanation_en:
+          'The author states at the outset that the evidences for his fundamentals come from the Quran and the Sunnah.'
+      },
+      {
+        question_ar: 'ما الذي أمر به المتن على من أراد أن يتعلم الدين ويتقنه؟',
+        question_en: 'What does the text command of one who wants to learn the religion properly?',
+        options_ar: [
+          'أن يتعلم الدين على يد عالم من أهل العلم بالسنة والكتاب',
+          'أن يعتمد على ما يقود إليه قلبه من الفطرة',
+          'أن يقرأ كتب الفلسفة والكلام',
+          'أن يجتهد في آراء الفقهاء فقط'
+        ],
+        options_en: [
+          'To learn the religion from a scholar versed in the Book and the Sunnah',
+          'To rely on whatever his innate disposition leads him to',
+          'To read the works of the philosophers and theologians',
+          'To follow the opinions of the jurists alone'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'بيّن المؤلف أن طلب العلم الشرعي لا يكون إلا طلبًا للعلم، وبيّن في مقدمة المتن فضل ذلك الطلب.',
+        explanation_en:
+          'The author shows that religious knowledge is only to be sought from those who know the Book and the Sunnah, and praises that pursuit.'
+      }
+    ]
+  },
+  {
+    id: 'quiz-wasitiyyah-book',
+    lessonId: 'wasitiyyah-book',
+    title_ar: 'اختبار العقيدة الواسطية',
+    title_en: 'Al-Aqidah al-Wasitiyyah Quiz',
+    questions: [
+      {
+        question_ar: 'من هو مؤلف العقيدة الواسطية؟',
+        question_en: 'Who is the author of Al-Aqidah al-Wasitiyyah?',
+        options_ar: [
+          'شيخ الإسلام ابن تيمية',
+          'الإمام ابن القيم',
+          'الإمام الذهبي',
+          'ابن رجب الحنبلي'
+        ],
+        options_en: [
+          'Shaykh al-Islam Ibn Taymiyyah',
+          'Imam Ibn al-Qayyim',
+          'Imam al-Dhahabi',
+          'Ibn Rajab al-Hanbali'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'العقيدة الواسطية من أشهر رسائل شيخ الإسلام ابن تيمية في العقيدة، وقد شرحها كثير من أهل السنة من بعده.',
+        explanation_en:
+          'Al-Aqidah al-Wasitiyyah is one of Shaykh al-Islam Ibn Taymiyyah’s best-known treatises on Aqeedah, and it has been commented on by many Ahl al-Sunnah since.'
+      },
+      {
+        question_ar: 'ما موضوع هذه الرسالة؟',
+        question_en: 'What is the subject of this treatise?',
+        options_ar: [
+          'بيان عقيدة أهل السنة والجماعة في الأسماء والصفات والقدر وما سوى ذلك',
+          'بيان أحكام المعاملات في الأسواق',
+          'شرح مختصر لكتب النحو',
+          'ترجمة سيرة النبي ﷺ'
+        ],
+        options_en: [
+          'Setting out the creed of Ahl al-Sunnah wal-Jama’ah concerning the names and attributes, Qadar, and the rest',
+          'Setting out the rulings of commercial transactions',
+          'A brief commentary on grammar books',
+          'Translating the life of the Prophet ﷺ'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'قصد المؤلف في الرسالة بيان ما اتفق عليه أهل السنة من العقيدة، وبيان مسائل الخلاف وذكر أقوال الأئمة فيها.',
+        explanation_en:
+          'The author’s aim is to state the creed on which Ahl al-Sunnah agree, and to lay out the disputed questions with the views of the leading scholars.'
+      },
+      {
+        question_ar: 'ما المنهج الذي سلكه المؤلف في عرض مسائل العقيدة؟',
+        question_en: 'What method did the author follow in presenting the issues of Aqeedah?',
+        options_ar: [
+          'بيان الاتفاق والاختلاف بين أهل السنة، وذكر أقوال الأئمة وأدلتهم',
+          'إسقاط أقوال المخالفين دون ذكر',
+          'الاكتفاء بالمذهب المختار دون غيره',
+          'الترتيب على أبواب الفقه'
+        ],
+        options_en: [
+          'Stating where Ahl al-Sunnah agree and differ, with the views and proofs of the scholars',
+          'Passing over the views of the opponents in silence',
+          'Giving only the chosen school with no mention of others',
+          'Arranging the material under the chapters of fiqh'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'هذه من سمات الرسالة؛ فهو يعرض المسألة ويذكر قول الأئمة فيها، ثم يبيّن الصواب وما له وجوه من الأدلة.',
+        explanation_en:
+          'This is characteristic of the treatise: each issue is presented with the views of the scholars, then the correct position and its reasons.'
+      },
+      {
+        question_ar: 'ماذا يفعل المؤلف حين يذكر أقوال الأئمة المختلفين في مسألة؟',
+        question_en: 'What does the author do when he mentions scholars who differ on an issue?',
+        options_ar: [
+          'يبيّن قول كل واحد، ويصوب ويخطئ، ويذكر دليله',
+          'يحذف القول المخالف ولا يذكره',
+          'ينقله دون بيان أيّها الصحيح',
+          'يجرح صاحب القول ولا يذكره'
+        ],
+        options_en: [
+          'He explains each view, states which is correct, and gives its proof',
+          'He deletes the contrary view without mentioning it',
+          'He reports it without saying which one is correct',
+          'He disparages its author and passes it by'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'منهج أهل السنة في الاختلاف أن يذكر كل ويبين الصحيح منه، لا أن يحذف ولا أن يجرح، وهذا ما سلكه المؤلف.',
+        explanation_en:
+          'The Salaf’s method is to report each view and clarify which is sound — neither to suppress it nor to attack its author.'
+      },
+      {
+        question_ar: 'من أين تُثبت الصفات أو تُنفي على قول أهل السنة؟',
+        question_en: 'According to Ahl al-Sunnah, from where are the attributes established and negated?',
+        options_ar: [
+          'من الكتاب والسنة الصحيحة، مع إثباتها وعدم نفيها وحفظها',
+          'من العقل وحده دون نص',
+          'من آراء أهل الخلاف',
+          'من الفطرة وحدها'
+        ],
+        options_en: [
+          'From the Book and the sound Sunnah, affirming them without negating them and preserving them',
+          'From reason alone, with no textual proof',
+          'From the opinions of the schools of difference',
+          'From innate human nature alone'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'قاعدة أهل السنة في الصفات أن يثبتوا ما أثبته الكتاب والسنة لله، ولا ينفون شيئًا منها، وينفون ضدّها فقط.',
+        explanation_en:
+          'Ahl al-Sunnah affirm whatever the Book and Sunnah establish for Allah, negate nothing of them, and reject only their opposites.'
+      }
+    ]
+  },
+  {
+    id: 'quiz-kashf-book',
+    lessonId: 'kashf-book',
+    title_ar: 'اختبار كشف الشبهات',
+    title_en: 'Kashf al-Shubuhat Quiz',
+    questions: [
+      {
+        question_ar: 'من هو مؤلف كشف الشبهات؟',
+        question_en: 'Who is the author of Kashf al-Shubuhat?',
+        options_ar: [
+          'الإمام محمد بن عبد الوهاب',
+          'شيخ الإسلام ابن تيمية',
+          'الإمام مالك بن أنس',
+          'الإمام أبو حنيفة'
+        ],
+        options_en: [
+          'Imam Muhammad ibn Abd al-Wahhab',
+          'Shaykh al-Islam Ibn Taymiyyah',
+          'Imam Malik ibn Anas',
+          'Imam Abu Hanifah'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'كشف الشبهات رسالة قصيرة ألّفها الإمام محمد بن عبد الوهاب، وهي من أشهر ما كُتب في رد الشبهات عن التوحيد.',
+        explanation_en:
+          'Kashf al-Shubuhat is a short treatise by Imam Muhammad ibn Abd al-Wahhab, among the best-known works refuting doubts about Tawheed.'
+      },
+      {
+        question_ar: 'ما موضوع الرسالة؟',
+        question_en: 'What is the subject of the treatise?',
+        options_ar: [
+          'كشف شبهات المخالفين في التوحيد والرد عليها بالبيان والبرهان',
+          'شرح مختصر لأحكام الربا',
+          'بيان أصول السياسية الداخلية',
+          'جمع الأحاديث الضعيفة'
+        ],
+        options_en: [
+          'Uncovering the doubts raised against Tawheed and refuting them with proof and demonstration',
+          'A brief explanation of the rulings of riba (usury)',
+          'A statement of internal political principles',
+          'Collecting weak hadith'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'المؤلف في هذه الرسالة يفك الشبهات التي يحتاج إلى توضيحها طالب الحق، ويورد شبه المخالفين ثم يبيّن فسادها.',
+        explanation_en:
+          'The author sets out the doubts a seeker of truth needs answered, quoting the opponent’s objection and then showing its falsity.'
+      },
+      {
+        question_ar: 'ما الأسلوب الذي استخدمه المؤلف في الرد على الشبهات؟',
+        question_en: 'What method did the author use to answer the doubts?',
+        options_ar: [
+          'البيان والبرهان، وإثبات الأدلة من الكتاب والسنة',
+          'الاكتفاء بالسخرية من المخالف',
+          'ترك الشبهات دون جواب',
+          'الاعتماد على الآراء والأقوال'
+        ],
+        options_en: [
+          'Clear demonstration and proof, establishing the evidence from the Book and the Sunnah',
+          'Answering with nothing but ridicule of the opponent',
+          'Leaving the doubts unanswered',
+          'Relying on opinions and sayings'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'صرّح المؤلف بأنه بيّن الشبه وأبطلها بالبيان والبرهان، وكل ذلك بأدلة الكتاب والسنة وآثار السلف.',
+        explanation_en:
+          'The author states that he uncovers the doubts and invalidates them by demonstration and proof, drawing on the Book, the Sunnah, and the Salaf.'
+      },
+      {
+        question_ar: 'لماذا سُمّيت الرسالة بهذا الاسم؟',
+        question_en: 'Why is the treatise given this name?',
+        options_ar: [
+          'لأنها تكشف ما في نفوس الناس من الشبهات وتبيّن فسادها',
+          'لأنها تجمع كتب المؤلف الأخرى',
+          'لأنها تتناول علوم الفلك',
+          'لأنها رسالة قصيرة جدًّا'
+        ],
+        options_en: [
+          'Because it uncovers the doubts lurking in people’s hearts and shows their falsity',
+          'Because it collects the author’s other works',
+          'Because it ventures into the sciences of astronomy',
+          'Because it is an extremely short letter'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'سُمّيت كشف الشبهات لبيان أن ما في القلب من شكوك إنما أثر فاسد، وأدلة الكتاب والسنة تبيّن بطلانه.',
+        explanation_en:
+          'It is named Kashf al-Shubuhat because the doubts in the heart are unsound, and the proofs of the Book and Sunnah show their falsity.'
+      },
+      {
+        question_ar: 'ماذا يلزم من عاد بعد بيان بطلان الشبه إلى ما أُبطل؟',
+        question_en: 'What follows for one who, after the falsity has been shown, returns to the doubts?',
+        options_ar: [
+          'يكون قد اختار البطل بعد بيانه',
+          'يكون قد أحسن الظن بالمؤلف',
+          'يجوز له العودة إلى رأيه',
+          'لا يلزمه شيء من ذلك'
+        ],
+        options_en: [
+          'He has knowingly chosen falsehood after it was made clear',
+          'He has shown good faith towards the author',
+          'He is free to return to his own view',
+          'Nothing at all follows from that'
+        ],
+        correctAnswer: 0,
+        explanation_ar:
+          'بيّن المؤلف أن من عاد بعد البيان إلى ما أُبطل فهو مسؤول عن ذلك، واستدل بقوله تعالى: (فَمَن يُرِدِ اللَّهُ بِهِ خَيْرًا فَهُوَ خَيْرٌ لَهُ).',
+        explanation_en:
+          'The author notes that whoever returns to what has been refuted after the proof bears the responsibility himself, citing the verse: whoever Allah intends good for, He will guide.'
+      }
+    ]
+  }
+];
 
 // ---------------------------------------------------------------------------
 // localStorage helpers
