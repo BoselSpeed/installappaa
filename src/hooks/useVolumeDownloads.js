@@ -74,7 +74,7 @@ export const useVolumeDownloads = (book) => {
         updateVolume(volume.id, {
           downloading: false,
           downloaded: false,
-          error: error.message || 'download_error'
+          error: error?.code || error?.message || 'download_error'
         });
       }
     },

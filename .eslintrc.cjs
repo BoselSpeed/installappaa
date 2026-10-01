@@ -31,6 +31,15 @@ module.exports = {
     'node_modules',
     '*.log'
   ],
+  overrides: [
+    {
+      // Node-side tooling: the production static server behind npm run serve.
+      files: ['**/*.cjs', '**/*.mjs'],
+      env: { node: true, es2022: true },
+      parserOptions: { sourceType: 'script' },
+      rules: { 'no-undef': 'error' }
+    }
+  ],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',

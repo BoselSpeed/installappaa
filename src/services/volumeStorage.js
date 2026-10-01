@@ -4,7 +4,16 @@
 // PDF blob — the book and its information are never touched.
 
 import { resolveVolumeUrl } from './supabaseStorage';
-import { extractZipMember, extractZipMemberWhole } from './zipRangeReader';
+import {
+  extractZipMember,
+  extractZipMemberWhole,
+  PROXY_UNAVAILABLE
+} from './zipRangeReader';
+
+// Error code for a cross-origin host that refuses to be fetched by the browser
+// (Google Drive sends no CORS headers). The UI turns this into an
+// "open in browser" link instead of a dead-end error.
+export const DOWNLOAD_BLOCKED = 'download_blocked';
 
 const DB_NAME = 'fiqh-app';
 const DB_VERSION = 1;
@@ -107,6 +116,9 @@ export const downloadVolume = async (book, volume, onProgress) => {
       } catch (error) {
         console.warn('Volume download method failed, trying next:', error);
         lastError = error;
+        // No proxy on this origin means the archive host is unreachable from the
+        // browser; the whole-archive attempt would fail for the same reason.
+        if (error?.code === PROXY_UNAVAILABLE) break;
       }
     }
     throw lastError || new Error('download_error');
@@ -117,7 +129,14 @@ export const downloadVolume = async (book, volume, onProgress) => {
     throw new Error('No download URL available for this volume');
   }
 
-  const response = await fetch(url);
+  let response;
+  try {
+    response = await fetch(url);
+  } catch (error) {
+    // A plain fetch to a cross-origin host without CORS headers throws here.
+    console.warn('Direct download blocked by the browser:', error);
+    throw new Error(DOWNLOAD_BLOCKED);
+  }
   if (!response.ok) {
     throw new Error(`Download failed (${response.status})`);
   }
@@ -172,5 +191,6 @@ export default {
   storeVolume,
   removeStoredVolume,
   downloadVolume,
-  storedVolumeSizeMb
+  storedVolumeSizeMb,
+  DOWNLOAD_BLOCKED
 };

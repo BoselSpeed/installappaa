@@ -42,10 +42,38 @@ const decodeName = (bytes, isUtf8) => {
 };
 
 // Same-origin reverse proxy exposed by the dev server (see vite.config.ts) and
-// by production backends. Used as a fallback when the archive host blocks
-// cross-origin browser fetches (Google Drive sends no CORS headers).
+// by production backends (see server/drive-proxy.mjs). Used as a fallback when
+// the archive host blocks cross-origin browser fetches (Google Drive sends no
+// CORS headers).
 const PROXY_PATH = '/__drive-proxy';
 const proxiedUrl = (url) => `${PROXY_PATH}?url=${encodeURIComponent(url)}`;
+
+// Error code surfaced to the UI when no proxy is available. Callers use it to
+// skip retries that cannot succeed and to offer an "open in browser" link.
+export const PROXY_UNAVAILABLE = 'proxy_unavailable';
+
+export class ProxyUnavailableError extends Error {
+  constructor(message) {
+    super(message || PROXY_UNAVAILABLE);
+    this.name = 'ProxyUnavailableError';
+    this.code = PROXY_UNAVAILABLE;
+  }
+}
+
+// On a plain static host the SPA fallback rewrites unknown paths to
+// index.html, so a request to /__drive-proxy "succeeds" with 200 + text/html
+// instead of failing. Detect that here — otherwise the ZIP parser later dies
+// with a misleading "Invalid ZIP archive" message.
+const proxyRespondedWithSpaShell = (res) =>
+  res.status === 404 || (res.headers.get('content-type') || '').includes('text/html');
+
+const fetchViaProxy = async (url, headers) => {
+  const res = await fetch(proxiedUrl(url), { headers });
+  if (proxyRespondedWithSpaShell(res)) {
+    throw new ProxyUnavailableError();
+  }
+  return res;
+};
 
 const isNativeApp = () =>
   typeof Capacitor !== 'undefined' &&
@@ -84,12 +112,12 @@ const rawGet = async (url, { headers = {} } = {}) => {
   } catch (err) {
     // CORS/net failure: retry through the same-origin proxy. It forwards the
     // exact same request server-side, so Range headers and bodies pass through.
-    res = await fetch(proxiedUrl(url), { headers });
+    res = await fetchViaProxy(url, headers);
   }
   if (res.status >= 400) {
     // Some hosts (Google Drive) reject browser requests with a 4xx. Retry
     // through the proxy before giving up.
-    res = await fetch(proxiedUrl(url), { headers });
+    res = await fetchViaProxy(url, headers);
   }
   const bytes = new Uint8Array(await res.arrayBuffer());
   return { status: res.status, bytes };
@@ -116,10 +144,10 @@ const fetchStream = async (url, { headers = {} } = {}) => {
   try {
     res = await fetch(url, { headers });
   } catch (err) {
-    res = await fetch(proxiedUrl(url), { headers });
+    res = await fetchViaProxy(url, headers);
   }
   if (res.status >= 400) {
-    res = await fetch(proxiedUrl(url), { headers });
+    res = await fetchViaProxy(url, headers);
   }
   return res;
 };
@@ -304,4 +332,4 @@ export const extractZipMemberWhole = async (url, path, onProgress) => {
   return new Blob([pdfBytes], { type: 'application/pdf' });
 };
 
-export default { extractZipMember, extractZipMemberWhole };
+export default { extractZipMember, extractZipMemberWhole, PROXY_UNAVAILABLE };

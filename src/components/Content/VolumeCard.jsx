@@ -33,7 +33,6 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
 
   const title = pick(volume, 'title') || `${t('volume')} ${volume.number || ''}`.trim();
   const sizeMb = volume.sizeMb;
-
   const statusRow = () => {
     if (state.bundled) {
       return <StatusMark tone="solid" icon="check" label={t('bundled_with_app')} />;
@@ -45,6 +44,37 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       return <StatusMark tone="solid" icon="check" label={t('available_offline')} />;
     }
     return <StatusMark tone="muted" icon="download" label={t('not_downloaded')} />;
+  };
+
+  // A download can fail for a reason the user can act on: the browser cannot
+  // reach the host at all, so point them at the original file instead of
+  // leaving them with a dead-end retry button.
+  const blocked = state.error === 'proxy_unavailable' || state.error === 'download_blocked';
+  const externalUrl = book?.source?.pageUrl || (blocked ? book?.source?.url : null);
+
+  const errorBlock = () => {
+    if (!state.error) return null;
+
+    const message = blocked ? t('download_blocked') : state.error === 'download_error' ? t('download_error') : state.error;
+    const hint = blocked ? t('download_blocked_hint') : t('download_retry_hint');
+
+    return (
+      <div className="space-y-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">
+        <p className="flex items-start gap-2">
+          <Icon name="info" size="sm" className="mt-0.5 shrink-0 text-ink-muted" />
+          <span>{message}</span>
+        </p>
+        <p className="ps-7 text-xs text-ink-muted">{hint}</p>
+        {externalUrl && (
+          <div className="ps-7">
+            <Button href={externalUrl} target="_blank" rel="noopener noreferrer" size="sm" variant="secondary">
+              <Icon name="arrowUpRight" size="sm" />
+              {t('open_in_browser')}
+            </Button>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const renderActions = () => {
@@ -119,15 +149,7 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
         <div className="shrink-0">{statusRow()}</div>
       </div>
 
-      {state.error && (
-        <div className="space-y-1 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">
-          <p className="flex items-center gap-2">
-            <Icon name="info" size="sm" className="shrink-0 text-ink-muted" />
-            {state.error === 'download_error' ? t('download_error') : state.error}
-          </p>
-          <p className="ps-7 text-xs text-ink-muted">{t('download_retry_hint')}</p>
-        </div>
-      )}
+      {errorBlock()}
 
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">{renderActions()}</div>
     </Card>

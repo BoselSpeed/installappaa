@@ -139,6 +139,13 @@ const BookDetailPage = () => {
       <div className="mt-12 lg:mt-14">
         <SectionTitle className="mb-6">{t('volumes')}</SectionTitle>
 
+        {book.source?.type === 'zip' && (
+          <p className="mb-6 flex items-start gap-2 rounded-xl border border-line bg-surface-quiet px-4 py-3 text-sm text-ink-muted">
+            <Icon name="layers" size="sm" className="mt-0.5 shrink-0" />
+            <span>{t('remote_archive_note')}</span>
+          </p>
+        )}
+
         {volumeCount === 0 ? (
           <EmptyState icon="layers" title={t('no_volumes')} />
         ) : (
