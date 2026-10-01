@@ -158,6 +158,46 @@ const seedSections = [
     description_en: 'Books of Arabic literature, poetry, and rhetoric: pre-Islamic poetry diwans, the Mu\'allaqat, rhetoric works, and classical literary texts.',
     order: 16,
     booksCount: 14
+  },
+  // Category entries. A section whose id is not a book id is treated as a
+  // category browser: SectionsPage links it to /books?category=<title_ar>, so
+  // every category in books.js needs one or its books are unreachable from
+  // /sections (see SectionsPage.categoryLabel / sectionLink).
+  {
+    id: 'cat-tawhid-aqeedah',
+    title_ar: 'التوحيد والعقيدة',
+    title_en: 'Tawhid and Aqeedah',
+    description_ar: 'كتب العقيدة والتوحيد: العقيدة الواسطية، كتاب التوحيد، متن الأصول الثلاثة، وكشف الشبهات — مباني الدين وأصول الإيمان.',
+    description_en: 'Works on Aqeedah and Tawhid: Al-Aqidah al-Wasitiyyah, Kitab al-Tawhid, Thalathat al-Usul, and Kashf al-Shubuhat — the foundations of the religion and of faith.',
+    order: 17,
+    booksCount: 4
+  },
+  {
+    id: 'cat-hadith',
+    title_ar: 'الحديث',
+    title_en: 'Hadith',
+    description_ar: 'دواوين السنة: صحيح البخاري، صحيح مسلم، سنن أبي داود، سنن الترمذي، وسنن النسائي.',
+    description_en: 'The canonical hadith collections: Sahih al-Bukhari, Sahih Muslim, Sunan Abi Dawud, Jami’ al-Tirmidhi, and Sunan al-Nasa’i.',
+    order: 18,
+    booksCount: 5
+  },
+  {
+    id: 'cat-tafsir',
+    title_ar: 'التفسير',
+    title_en: 'Tafsir',
+    description_ar: 'كتب تفسير القرآن الكريم: تفسير ابن كثير، والقرطبي، والطبري، والبغوي، والشوكاني.',
+    description_en: 'Commentaries on the Quran: Ibn Kathir, al-Qurtubi, al-Tabari, al-Baghawi, and al-Shawkani.',
+    order: 19,
+    booksCount: 5
+  },
+  {
+    id: 'cat-stories',
+    title_ar: 'القصص',
+    title_en: 'Stories',
+    description_ar: 'قصص مختارة من صحيح البخاري بأسلوب مبسط مناسب للناشئة، ترسيخًا لقيم السنة ومعانيها.',
+    description_en: 'Selected stories from Sahih al-Bukhari in a simple style suited for young readers, instilling the values and meanings of the Sunnah.',
+    order: 20,
+    booksCount: 1
   }
 ];
 
