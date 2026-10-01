@@ -1,7 +1,15 @@
 # Islamic Fiqh Learning Application - Implementation Plan
 
+> **Status note.** Everything below the "Overview" section is the *original*
+> implementation plan, written before the library was expanded. Its checkboxes
+> are historical and no longer track reality — several items marked `[ ]` were in
+> fact built (the whole design system in Phase 2, the UI primitives, auth hooks,
+> settings, streaks, notes, search history, achievements). Read the
+> "Implementation Status" block above it for what is actually true today, and the
+> issue list at the end of this file for what is genuinely outstanding.
+
 ## Implementation Status
-**Last updated:** 2026-08-08
+**Last updated:** 2026-10-01
 
 The application is functional end-to-end in **demo mode**: it runs entirely with
 locally seeded bilingual content when Firebase credentials are absent, and
@@ -12,33 +20,54 @@ Working features:
 - Project scaffolding, TypeScript build, Tailwind design system (black/white)
 - Bilingual UI (Arabic default) with RTL/LTR document direction switching
 - Navigation: sticky navbar with language toggle, desktop sidebar, footer
-- Home, Sections, Lesson reader, Search, Favorites, Settings, Quiz pages
-- Four books read as in-app PDFs (Kitab al-Tawhid, Thalathat al-Usul,
-  Al-Aqidah al-Wasitiyyah, Kashf al-Shubuhat) with page navigation, zoom,
-  jump-to-page, download, and per-page reading progress
-- Books & volumes system: library page, book detail page with rich metadata
-  (author, muhaqqiq, translator, publisher, edition, year, language,
-  category, madhab, description, cover), and per-book volume cards
-  - Volume 1 is bundled with the app (offline, PWA-precached); later volumes
-    download on demand and are stored locally (IndexedDB) for offline
-    reading; downloaded volumes can be deleted from the device
-  - Books maintained in `src/data/books.js` (add/edit any number of volumes
-    without touching app code); books service supports full CRUD
-    (mock + Firebase `books` collection)
-- Search across lesson/section titles and lesson content with highlighting
-- Quiz player: progress, scoring, results, review mode with explanations,
-  retake; seeded quizzes for every lesson
-- Progress & settings persistence (localStorage in demo mode, Firestore when
-  configured); demo account + sign-out
+- 14 routed pages: Home, Sections, Lesson reader, Books, Book detail, Volume
+  reader, Search, Favorites, Settings, Quiz, Achievements, Statistics, 404
+- **Library of 29 books / 146 volumes** across 5 categories (Tawhid and Aqeedah,
+  Tafsir, Hadith, Stories, Adab), all defined in `src/data/books.js`
+  - Volume 1 of each book is bundled with the app (offline, PWA-precached, 8
+    PDFs / ~36 MB); the remaining volumes download on demand and are stored in
+    IndexedDB for offline reading, and can be deleted from the device
+  - Remote volumes come from three sources, resolved at download time: a direct
+    `downloadUrl`, a Supabase `storagePath`, or a member `path` inside a remote
+    ZIP archive read over HTTP Range (`src/services/zipRangeReader.js`), which
+    fetches only the volume the reader tapped
+  - Books service supports full CRUD (mock + Firebase `books` collection)
+- Book detail page with rich metadata (author, muhaqqiq, translator, publisher,
+  edition, year, language, category, madhab, description, cover)
+- In-app PDF reader (pdf.js) with page navigation, zoom, jump-to-page and
+  per-page reading progress; covers fall back to a styled placeholder rather
+  than showing a broken image
+- Search across lesson and section titles with highlighting, plus voice search
+- Quiz player: progress, scoring, results, review mode with explanations, retake.
+  Five questions per lesson are seeded for each of the four PDF lessons
+- Notes (note/question per lesson), favourites, bookmarks, reading streaks,
+  achievements and statistics, persisted per user
+- Settings: language, font size, clear cache, demo-mode indicator and sign-out
+- `ErrorBoundary` wraps the whole app, so a render crash shows a retry screen
+  instead of a blank page
 - **Installable PWA** (vite-plugin-pwa, Workbox): offline-first caching of the
-  app shell, all JS/CSS/worker assets, and all four book PDFs; Arabic manifest
-  (تطبيق الفقه) with standalone display, icons (192/512/maskable), RTL
-  - Build output goes to `تطبيق الفقه/`; verified fully functional offline
-- ESLint config and typecheck pass
+  app shell, JS/CSS/worker assets and all bundled PDFs; Arabic manifest
+  (تطبيق الفقه), standalone display, RTL, icons (192/512/maskable); runtime
+  `CacheFirst` for other `/books/*.pdf` with `rangeRequests` enabled
+  - Build output goes to `تطبيق الفقه/`; verified functional offline
+- **Android APK** (`com.fiqh.app`) and an **iOS Xcode project** (`ايفون/`) built
+  from the same web bundle; native volume downloads go through `CapacitorHttp`,
+  bypassing Google Drive's CORS restrictions
+- `server/serve.mjs` — zero-dependency static server that also exposes the
+  `/__drive-proxy` endpoint the web build needs for archive downloads
+- Tooling: `npm run verify` runs typecheck, ESLint and `npm run
+  verify:content`, which validates `books.js` against the files in `public/`
+  (missing bundled PDFs or covers, unusable volumes, duplicate ids, unpaired
+  ar/en fields, categories with no section)
 
-Remaining work: real Firebase auth flows, content management/admin, advanced
-offline sync, performance optimization (code splitting), and the full testing
-suite described in Phases 5-8.
+Known gaps:
+- Firebase and Supabase are placeholder configs, so the app always runs in demo
+  mode and the real Firebase service layer is inert
+- The web build needs a server-side download proxy to fetch remote volumes;
+  see `docs/deployment.md`
+- No test suite yet (Phase 6)
+- Only eight of 146 volumes ship with the app; the rest are downloads
+- No route-level code splitting beyond the PDF reader chunk
 
 ## Overview
 This plan outlines the implementation steps for building the Islamic Fiqh learning application based on the approved design specification. The application will be built using React 18, Vite, TypeScript, Tailwind CSS, and Firebase with offline capabilities.
@@ -396,4 +425,24 @@ This plan outlines the implementation steps for building the Islamic Fiqh learni
 - Ready for content addition by Islamic scholars
 
 ---
-*Implementation plan created following design approval. Ready to begin development.*
+
+## Open issues
+
+Tracked here so the stale checkboxes above are not the only record of what is
+left. See `README.md` for how to run things and `docs/` for the guides.
+
+| # | Issue | Where |
+|---|---|---|
+| 1 | No test suite (Phase 6). `scripts/verify-content.mjs` covers the library data only. | — |
+| 2 | `src/firebase/config.js` and `src/supabase/config.js` are placeholders, so the real Firebase service layer and the Supabase volume source are inert. | `src/firebase/`, `src/supabase/` |
+| 3 | The web build needs a `/__drive-proxy` endpoint for remote-volume downloads. `server/serve.mjs` provides one but no hosting is configured. | `docs/deployment.md` |
+| 4 | Covers exist for 15 of 29 books; the 14 Adab books render a styled placeholder. | `public/covers/` |
+| 5 | Four books have no author filled in (`qisas-min-sahih-al-bukhari`, `al-mukhtasar-fi-al-balagha`, `mukhtarat-al-shiir-al-jahili`, `mawsuat-al-qabail-al-arabiyya`). Empty fields are hidden in the UI. | `src/data/books.js` |
+| 6 | `mawsuat-al-qabail-al-arabiyya` skips volume 9 deliberately — documented in its description, not a bug. | `src/data/books.js` |
+| 7 | Bundle is ~1.3 MB of JS; only the PDF reader is code-split. | `vite.config.ts` |
+| 8 | `firebase` is a declared dependency but the app only ever runs its demo path until credentials exist. | `package.json` |
+| 9 | Settings offers clear-cache only; export/import of user data is not implemented. | `src/pages/SettingsPage.jsx` |
+
+---
+*Implementation plan created following design approval. Status block and issue
+list updated 2026-10-01.*
