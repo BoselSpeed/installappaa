@@ -23,7 +23,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'quiz-v6';
+const SEED_VERSION = 'sections-v7';
 
 // ---------------------------------------------------------------------------
 // Seed data
