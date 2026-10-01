@@ -18,7 +18,6 @@ const BooksPage = () => {
   const { t } = useTranslation();
 
   const category = searchParams.get('category') || '';
-  const _categoryKey = category ? `category=${encodeURIComponent(category)}` : '';
 
   useEffect(() => {
     let cancelled = false;

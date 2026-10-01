@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
 import { Card } from '../UI/Card';
 import { Badge } from '../UI/Badge';
-import { Icon } from '../UI/Icon';
+import { BookCover } from '../Content/BookCover';
 
 const BookCard = ({ book }) => {
   const { t } = useTranslation();
@@ -21,19 +21,10 @@ const BookCard = ({ book }) => {
       className="group flex flex-col overflow-hidden focus-visible:border-ink"
     >
       <div className="flex aspect-[3/4] items-center justify-center overflow-hidden border-b border-line bg-surface-quiet">
-        {book.coverImage ? (
-          <img
-            src={book.coverImage}
-            alt={pick(book, 'title')}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-          />
-        ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-4 p-6 text-center">
-            <Icon name="book" size="xl" className="text-ink-faint" />
-            <span className="text-lg font-bold leading-snug text-ink">{pick(book, 'title')}</span>
-          </div>
-        )}
+        <BookCover
+          book={book}
+          imageClassName="transition-transform duration-300 group-hover:scale-[1.02]"
+        />
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">

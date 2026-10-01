@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { booksService } from '../firebase/service';
 import { useVolumeDownloads } from '../hooks/useVolumeDownloads';
 import { VolumeCard } from '../components/Content/VolumeCard';
+import { BookCover } from '../components/Content/BookCover';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
 import { PageShell } from '../components/UI/PageShell';
@@ -84,17 +85,9 @@ const BookDetailPage = () => {
 
       <div className="mt-4 flex flex-col gap-6 sm:gap-8 md:flex-row md:gap-10">
         <div className="mx-auto w-40 shrink-0 sm:w-48 md:mx-0 md:w-56">
-          {book.coverImage ? (
-            <img
-              src={book.coverImage}
-              alt={pick(book, 'title')}
-              className="w-full rounded-xl border border-line bg-paper object-cover shadow-card"
-            />
-          ) : (
-            <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl border border-line bg-surface">
-              <Icon name="book" size="xl" className="text-ink-faint" />
-            </div>
-          )}
+          <div className="aspect-[3/4] w-full overflow-hidden rounded-xl border border-line bg-paper shadow-card">
+            <BookCover book={book} eager />
+          </div>
         </div>
 
         <div className="min-w-0 flex-1">
