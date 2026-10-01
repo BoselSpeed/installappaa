@@ -48,6 +48,8 @@
   "loading": "Loading...",
   "error_occurred": "An Error Occurred",
   "try_again": "Try Again",
+  "error_boundary_title": "Something Went Wrong",
+  "error_boundary_hint": "This page could not be displayed. Reload to try again, or head back to the library.",
   "not_found": "Page Not Found",
   "go_home": "Go to Home",
   "offline": "You are offline",

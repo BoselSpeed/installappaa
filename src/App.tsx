@@ -14,29 +14,32 @@ import { AchievementsPage } from './pages/AchievementsPage'
 import { StatisticsPage } from './pages/StatisticsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { AppProviders } from './components/AppProviders'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 function App() {
   return (
-    <AppProviders>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/sections" element={<SectionsPage />} />
-          <Route path="/sections/:sectionId" element={<SectionsPage />} />
-          <Route path="/section/:sectionId/lesson/:lessonId" element={<LessonDetailPage />} />
-          <Route path="/books" element={<BooksPage />} />
-          <Route path="/books/:bookId" element={<BookDetailPage />} />
-          <Route path="/books/:bookId/volume/:volumeId" element={<VolumeReaderPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/quiz/:lessonId" element={<QuizPage />} />
-          <Route path="/achievements" element={<AchievementsPage />} />
-          <Route path="/statistics" element={<StatisticsPage />} />
-        </Route>
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AppProviders>
+    <ErrorBoundary>
+      <AppProviders>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/sections" element={<SectionsPage />} />
+            <Route path="/sections/:sectionId" element={<SectionsPage />} />
+            <Route path="/section/:sectionId/lesson/:lessonId" element={<LessonDetailPage />} />
+            <Route path="/books" element={<BooksPage />} />
+            <Route path="/books/:bookId" element={<BookDetailPage />} />
+            <Route path="/books/:bookId/volume/:volumeId" element={<VolumeReaderPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/quiz/:lessonId" element={<QuizPage />} />
+            <Route path="/achievements" element={<AchievementsPage />} />
+            <Route path="/statistics" element={<StatisticsPage />} />
+          </Route>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AppProviders>
+    </ErrorBoundary>
   )
 }
 
