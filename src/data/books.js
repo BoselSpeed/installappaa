@@ -91,7 +91,7 @@ const SEED_BOOKS = [
       'متن للإمام محمد بن عبد الوهاب في الأصول الثلاثة التي يجب على كل مسلم معرفتها والعمل بها: معرفة العبد ربه، ومعرفة دينه، ومعرفة نبيه ﷺ، مع أدلتها من الكتاب والسنة.',
     description_en:
       'A text by Imam Muhammad ibn Abd al-Wahhab on the three fundamentals every Muslim must know and act upon: knowing his Lord, his religion, and his Prophet, with their evidences from the Quran and Sunnah.',
-    coverImage: '/covers/thalathat-al-usul.jpg',
+    coverImage: '/covers/thalatha-al-usul.jpg',
     order: 2,
     volumes: [
       {
