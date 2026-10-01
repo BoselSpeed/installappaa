@@ -32,6 +32,8 @@ Working features:
     ZIP archive read over HTTP Range (`src/services/zipRangeReader.js`), which
     fetches only the volume the reader tapped
   - Books service supports full CRUD (mock + Firebase `books` collection)
+  - Every book has a real cover image rendered from page 1 of its own PDF, so no
+    book falls back to the placeholder
 - Book detail page with rich metadata (author, muhaqqiq, translator, publisher,
   edition, year, language, category, madhab, description, cover)
 - In-app PDF reader (pdf.js) with page navigation, zoom, jump-to-page and
@@ -436,8 +438,8 @@ left. See `README.md` for how to run things and `docs/` for the guides.
 | 1 | No test suite (Phase 6). `scripts/verify-content.mjs` covers the library data only. | — |
 | 2 | `src/firebase/config.js` and `src/supabase/config.js` are placeholders, so the real Firebase service layer and the Supabase volume source are inert. | `src/firebase/`, `src/supabase/` |
 | 3 | The web build needs a `/__drive-proxy` endpoint for remote-volume downloads. `server/serve.mjs` provides one but no hosting is configured. | `docs/deployment.md` |
-| 4 | Covers exist for 15 of 29 books; the 14 Adab books render a styled placeholder. | `public/covers/` |
-| 5 | Four books have no author filled in (`qisas-min-sahih-al-bukhari`, `al-mukhtasar-fi-al-balagha`, `mukhtarat-al-shiir-al-jahili`, `mawsuat-al-qabail-al-arabiyya`). Empty fields are hidden in the UI. | `src/data/books.js` |
+| 4 | ~~Covers exist for 15 of 29 books~~ **Resolved 2026-10-01** — all 29 books now have a cover rendered from page 1 of their own PDF. | `public/covers/` |
+| 5 | ~~Four books have no author~~ **Resolved 2026-10-01** for three of them (`al-mukhtasar-fi-al-balagha` = د. عبد القادر حسين, `mukhtarat-al-shiir-al-jahili` = عبد المتعال الصعيدي, `mawsuat-al-qabail-al-arabiyya` = محمد سليمان الطيب). Still empty: `qisas-min-sahih-al-bukhari` — its title pages are decorative art that OCR cannot read, and the preface names only al-Bukhari as the source. Empty fields are hidden in the UI. | `src/data/books.js` |
 | 6 | `mawsuat-al-qabail-al-arabiyya` skips volume 9 deliberately — documented in its description, not a bug. | `src/data/books.js` |
 | 7 | Bundle is ~1.3 MB of JS; only the PDF reader is code-split. | `vite.config.ts` |
 | 8 | `firebase` is a declared dependency but the app only ever runs its demo path until credentials exist. | `package.json` |
