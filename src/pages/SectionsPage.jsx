@@ -69,16 +69,36 @@ const SectionsPage = () => {
     bookById[book.id] = book;
   });
 
-  const sectionLink = (section) =>
-    bookById[section.id] ? `/books/${section.id}` : `/sections/${section.id}`;
+  // A section is either a single book, a category of books, or a set of
+  // lessons. Categories link to the library filtered by that category.
+  const categoryLabel = (section) => {
+    const match = books.find((book) => book.category_ar === section.title_ar);
+    return match ? match.category_ar : '';
+  };
 
-  const countBadge = (section) =>
-    bookById[section.id]
-      ? {
-          label: t('volumes_short'),
-          count: (bookById[section.id].volumes || []).length
-        }
-      : { label: t('lessons'), count: lessonCounts[section.id] || 0 };
+  const sectionLink = (section) => {
+    if (bookById[section.id]) return `/books/${section.id}`;
+    const cat = categoryLabel(section);
+    if (cat) return `/books?category=${encodeURIComponent(cat)}`;
+    return `/sections/${section.id}`;
+  };
+
+  const countBadge = (section) => {
+    if (bookById[section.id]) {
+      return {
+        label: t('volumes_short'),
+        count: (bookById[section.id].volumes || []).length
+      };
+    }
+    const cat = categoryLabel(section);
+    if (cat) {
+      return {
+        label: t('books'),
+        count: books.filter((book) => book.category_ar === cat).length
+      };
+    }
+    return { label: t('lessons'), count: lessonCounts[section.id] || 0 };
+  };
 
   if (loading) {
     return <LoadingState label={t('loading')} />;

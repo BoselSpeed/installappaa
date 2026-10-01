@@ -149,6 +149,15 @@ const seedSections = [
     description_ar: 'مجموعة من خمسين قصة منتقاة من صحيح البخاري بأسلوب مبسط مناسب للأطفال والناشئة، لترسيخ القيم والمعاني من السنة النبوية.',
     description_en: 'A collection of fifty stories selected from Sahih al-Bukhari in a simple style suited for children and young readers.',
     order: 15
+  },
+  {
+    id: 'adab',
+    title_ar: 'أدب',
+    title_en: 'Adab',
+    description_ar: ' كتب الأدب والشعر والبلاغة العربية: دواوين الشعر الجاهلي، المعلقات، كتب البلاغة، وكتب الأدب الكلاسيكية.',
+    description_en: 'Books of Arabic literature, poetry, and rhetoric: pre-Islamic poetry diwans, the Mu\'allaqat, rhetoric works, and classical literary texts.',
+    order: 16,
+    booksCount: 14
   }
 ];
 

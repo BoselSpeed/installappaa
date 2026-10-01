@@ -705,6 +705,581 @@ const SEED_BOOKS = [
         sizeMb: 2.4
       }
     ]
+  },
+  {
+    id: 'diwan-al-hamasa',
+    title_ar: 'ديوان الحماسة',
+    title_en: 'Diwan al-Hamasa',
+    author_ar: 'أبو تمام حبيب بن أوس الطائي',
+    author_en: 'Abu Tammam Habib ibn Aws al-Ta\'i',
+    muhaqqiq_ar: 'عبد المنعم صالح',
+    muhaqqiq_en: 'Abd al-Munim Salih',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'من أشهر دواوين الشعر العربي، جمع فيه أبو تمام مختارات من أشعار العرب في الحماسة والفخر والمديح، مع تحقيق عبد المنعم صالح.',
+    description_en:
+      'One of the most famous Arabic poetry anthologies, compiled by Abu Tammam featuring selections of Arab poetry on heroism, pride, and praise, edited by Abd al-Munim Salih.',
+    coverImage: null,
+    order: 16,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=16EaV9BzVyh6jnurTCLr2jZ0REjSpAg0h&export=download&confirm=t',
+        sizeMb: 8.5
+      }
+    ]
+  },
+  {
+    id: 'al-kafi-fi-ulum-al-balagha',
+    title_ar: 'الكافي في علوم البلاغة العربية',
+    title_en: 'Al-Kafi fi Ulum al-Balagha al-Arabiyya',
+    author_ar: 'عيسى بن إبراهيم العاكوب، علي بن سعد الشتيوي',
+    author_en: 'Isa ibn Ibrahim al-Aakub, Ali ibn Saad al-Shtaywi',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'كتاب في علوم البلاغة العربية (المعاني والبيان والبديع) بأسلوب تعليمي واضح، من تأليف عيسى العاكوب وعلي الشتيوي.',
+    description_en:
+      'A book on Arabic rhetorical sciences (meanings, expression, and embellishment) in a clear pedagogical style, by Isa al-Aakub and Ali al-Shtaywi.',
+    coverImage: null,
+    order: 17,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1DVExBCIucCRX-7wAU2ZedNJYcvhXnvqE&export=download&confirm=t',
+        sizeMb: 12.3
+      }
+    ]
+  },
+  {
+    id: 'al-mufaddaliyat',
+    title_ar: 'المفضليات',
+    title_en: 'Al-Mufaddaliyat',
+    author_ar: 'المفضل بن محمد الضبي',
+    author_en: 'Al-Mufaddal ibn Muhammad al-Dabbi',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'مجموعة مختارة من أشعار العرب في الجاهلية والإسلام، جمعها المفضل الضبي، وتُعد من أهم مصادر الشعر الجاهلي.',
+    description_en:
+      'A selected collection of pre-Islamic and early Islamic Arabic poetry, compiled by al-Mufaddal al-Dabbi, one of the most important sources of pre-Islamic poetry.',
+    coverImage: null,
+    order: 18,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1OI1ClN_xG1_z9jmEJ0jAUPXE1u5U2hB1&export=download&confirm=t',
+        sizeMb: 9.7
+      }
+    ]
+  },
+  {
+    id: 'sharh-lamiyat-al-arab',
+    title_ar: 'شرح لامية العرب',
+    title_en: 'Sharh Lamiyat al-Arab',
+    author_ar: 'أبو إسحاق الزجاج',
+    author_en: 'Abu Ishaq al-Zajjaj',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'شرح للامية العرب لابن الوردي أو الشماخ، في الحكمة والزهد، من أهم الشروح اللغوية والأدبية.',
+    description_en:
+      'Commentary on Lamiyat al-Arab (by Ibn al-Wardi or al-Shammakh), on wisdom and asceticism, one of the most important linguistic and literary commentaries.',
+    coverImage: null,
+    order: 19,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1Pi-D-bF6GcoRMTRSjbHvRdrKVNOss1sg&export=download&confirm=t',
+        sizeMb: 6.8
+      }
+    ]
+  },
+  {
+    id: 'al-mukhtasar-fi-al-balagha',
+    title_ar: 'المختصر في البلاغة',
+    title_en: 'Al-Mukhtasar fi al-Balagha',
+    author_ar: '',
+    author_en: '',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'مختصر في علم البلاغة (المعاني والبيان والبديع) يلخص القواعد الأساسية بأسلوب مبسط.',
+    description_en:
+      'A concise treatise on Arabic rhetoric (meanings, expression, and embellishment) summarizing the fundamental rules in a simplified style.',
+    coverImage: null,
+    order: 20,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1QzQA9b0DX05yzsxTubC4x-1htg0U9_uG&export=download&confirm=t',
+        sizeMb: 5.4
+      }
+    ]
+  },
+  {
+    id: 'jamharat-ashar-al-arab',
+    title_ar: 'جمهرة أشعار العرب',
+    title_en: 'Jamharat Ash\'ar al-Arab',
+    author_ar: 'أبو زيد القرشي',
+    author_en: 'Abu Zayd al-Qurashi',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'من أمهات كتب الأدب، جمع فيها أبو زيد القرشي مختارات من أشعار العرب مع شرح غريبها، وهو من المصادر الأساسية للشعر الجاهلي والمخضرم.',
+    description_en:
+      'One of the foundational works of Arabic literature; Abu Zayd al-Qurashi compiled selections of Arab poetry with explanations of rare vocabulary, a primary source for pre-Islamic and mukhadram poetry.',
+    coverImage: null,
+    order: 21,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1Z8BCtA878IcoydI_xOMSZXYKlBfTxt93&export=download&confirm=t',
+        sizeMb: 11.2
+      }
+    ]
+  },
+  {
+    id: 'al-muallaqat-al-sab',
+    title_ar: 'المعلقات السبع',
+    title_en: 'Al-Mu\'allaqat al-Sab\'',
+    author_ar: 'الشاعرون السبعة (امرؤ القيس، طرفة، زهير، لبيد، عمرو بن كلثوم، عنترة، الحارث بن حلزة)',
+    author_en: 'The Seven Poets (Imru al-Qays, Tarafa, Zuhayr, Labid, Amr ibn Kulthum, Antara, al-Harith ibn Hilliza)',
+    muhaqqiq_ar: 'محمد عبد الغني الزوزني',
+    muhaqqiq_en: 'Muhammad Abd al-Ghani al-Zawzani',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'المعلقات السبع الشهيرة مع شرح الزوزني، من أروع ما أنتجته الشعر العربي في الجاهلية.',
+    description_en:
+      'The famous Seven Mu\'allaqat with al-Zawzani\'s commentary, among the finest productions of pre-Islamic Arabic poetry.',
+    coverImage: null,
+    order: 22,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1_rgQgtHWAkJajC_lP3263PmiyaFjFp4d&export=download&confirm=t',
+        sizeMb: 14.6
+      }
+    ]
+  },
+  {
+    id: 'al-asmayat',
+    title_ar: 'الأصمعيات',
+    title_en: 'Al-Asma\'iyyat',
+    author_ar: 'الأصمعي (عبد الملك بن قريب)',
+    author_en: 'Al-Asma\'i (Abd al-Malik ibn Qarib)',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'مختارات الأصمعي من أشعار العرب، إحدى المجموعات الثلاث الكبرى (المفضليات، المعَدّات، الأصمعيات) التي جمعها علماء العربية في العصر العباسي المبكر.',
+    description_en:
+      'Al-Asma\'i\'s selections of Arab poetry, one of the three major canonical anthologies (alongside al-Mufaddaliyat and al-Mudaqqat) compiled by early Abbasid-era scholars.',
+    coverImage: null,
+    order: 23,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1cWBUeXXfAB3piFbaOknJ-aImdU4h4r7F&export=download&confirm=t',
+        sizeMb: 7.9
+      }
+    ]
+  },
+  {
+    id: 'al-itisam',
+    title_ar: 'الاعتصام',
+    title_en: 'Al-Itisam',
+    author_ar: 'أحمد بن شمس الدين الشاطبي',
+    author_en: 'Ahmad ibn Shams al-Din al-Shatibi',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'كتاب الإمام الشاطبي في الاعتصام بالكتاب والسنة والتحذير من البدع، من أهم كتب أصول الفقه والمنهج.',
+    description_en:
+      'Imam al-Shatibi\'s work on adhering to the Quran and Sunnah and warning against innovations, a foundational text in usul al-fiqh and methodology.',
+    coverImage: null,
+    order: 24,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1o5cpb49vdHk_7bsojLrzYbn7ABs1_X3P&export=download&confirm=t',
+        sizeMb: 18.3
+      }
+    ]
+  },
+  {
+    id: 'jawahir-al-balagha',
+    title_ar: 'جواهر البلاغة في المعاني والبيان والبديع',
+    title_en: 'Jawahir al-Balagha',
+    author_ar: 'السيد أحمد الهاشمي',
+    author_en: 'Al-Sayyid Ahmad al-Hashimi',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'كتاب في علوم البلاغة الثلاثة (المعاني، البيان، البديع) بأسلوب جامع ومفصل، للسيد أحمد الهاشمي.',
+    description_en:
+      'A comprehensive and detailed work on the three rhetorical sciences (meanings, expression, embellishment) by Al-Sayyid Ahmad al-Hashimi.',
+    coverImage: null,
+    order: 25,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1tQT7qYYsDwZq4JYQbsiDHerbOEBYMGgZ&export=download&confirm=t',
+        sizeMb: 15.7
+      }
+    ]
+  },
+  {
+    id: 'al-balagha-al-wadiha',
+    title_ar: 'البلاغة الواضحة',
+    title_en: 'Al-Balagha al-Wadiha',
+    author_ar: 'علي الجارم، مصطفى أمين',
+    author_en: 'Ali al-Jarum, Mustafa Amin',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'من أشهر الكتب المدرسية في البلاغة العربية، قدمه علي الجارم ومصطفى أمين بأسلوب واضح ومنهجي للتعليم.',
+    description_en:
+      'One of the most famous Arabic rhetoric textbooks, presented by Ali al-Jarum and Mustafa Amin in a clear, systematic pedagogical style.',
+    coverImage: null,
+    order: 26,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1tUmjPZIpgXUANNQM-sfR5kLbRgKM76V1&export=download&confirm=t',
+        sizeMb: 9.1
+      }
+    ]
+  },
+  {
+    id: 'al-balagha-tatawwur-wa-tarikh',
+    title_ar: 'البلاغة تطور وتاريخ',
+    title_en: 'Al-Balagha: Tatawwur wa Tarikh',
+    author_ar: 'شوقي ضيف',
+    author_en: 'Shawqi Daif',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'دراسة تاريخية لتطور علم البلاغة العربية من النشأة إلى العصر الحديث، للدكتور شوقي ضيف، الطبعة التاسعة.',
+    description_en:
+      'A historical study of the development of Arabic rhetoric from its origins to the modern era, by Dr. Shawqi Daif, 9th edition.',
+    coverImage: null,
+    order: 27,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1yNMH7CGCk1GVlw_kJqZNKuFZSQo6wutH&export=download&confirm=t',
+        sizeMb: 13.4
+      }
+    ]
+  },
+  {
+    id: 'mukhtarat-al-shiir-al-jahili',
+    title_ar: 'مختارات الشعر الجاهلي ودواوين الشعراء الستة الجاهليين',
+    title_en: 'Selections of Pre-Islamic Poetry and the Six Poets\' Diwans',
+    author_ar: '',
+    author_en: '',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'مجموعة مختارات من الشعر الجاهلي تتضمن دواوين الشعراء الستة المشهورين، مرجع أساسي لدراسة الشعر العربي القديم.',
+    description_en:
+      'A collection of pre-Islamic poetry selections including the diwans of the six famous poets, a fundamental reference for the study of classical Arabic poetry.',
+    coverImage: null,
+    order: 28,
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://drive.usercontent.google.com/download?id=1ylvZm42Yf-zzdPyNK_DHNWCM5CSZ3tTm&export=download&confirm=t',
+        sizeMb: 10.8
+      }
+    ]
+  },
+  {
+    id: 'mawsuat-al-qabail-al-arabiyya',
+    title_ar: 'موسوعة القبائل العربية',
+    title_en: 'Mawsuat al-Qaba\'il al-Arabiyya',
+    author_ar: '',
+    author_en: '',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'موسوعة ضخمة في القبائل العربية، تتكون من عدة مجلدات تغطي أنساب القبائل وأخبارها وأشعارها. المجلد 9 غير متوفر في المصدر، والمتاح عشر مجلدات.',
+    description_en:
+      'A large encyclopedia of Arab tribes covering their lineages, histories, and poetry. Volume 9 is unavailable from the source; eleven volumes are available.',
+    coverImage: null,
+    order: 29,
+    volumes: [
+      { id: 'v1', number: 1, title_ar: 'المجلد ١', title_en: 'Volume 1', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1GKZErG6INtxlS45688XwFpQttzBrXsI1&export=download&confirm=t', sizeMb: 14.2 },
+      { id: 'v2', number: 2, title_ar: 'المجلد ٢', title_en: 'Volume 2', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1Gssm96R7mV7buTGalQIqmOltI-hekiQe&export=download&confirm=t', sizeMb: 15.1 },
+      { id: 'v3', number: 3, title_ar: 'المجلد ٣', title_en: 'Volume 3', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1fnLavSSYyx-ubuuXms1ZH6KIiYQ8nRXg&export=download&confirm=t', sizeMb: 12.3 },
+      { id: 'v4', number: 4, title_ar: 'المجلد ٤', title_en: 'Volume 4', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1I9vThAfv2O6tOByMWf3FMX76AbGFUmLB&export=download&confirm=t', sizeMb: 11.8 },
+      { id: 'v5', number: 5, title_ar: 'المجلد ٥', title_en: 'Volume 5', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1nuBCrz2OYU5e1FthoCkR1qQmgagutREI&export=download&confirm=t', sizeMb: 13.9 },
+      { id: 'v6', number: 6, title_ar: 'المجلد ٦', title_en: 'Volume 6', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1HLccW2FKHZuNTddCgV4QhoXgfo1wvpzi&export=download&confirm=t', sizeMb: 10.7 },
+      { id: 'v7', number: 7, title_ar: 'المجلد ٧', title_en: 'Volume 7', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1raqquMyLJYLWC2owQKoYx1gKb8E93alH&export=download&confirm=t', sizeMb: 16.4 },
+      { id: 'v8', number: 8, title_ar: 'المجلد ٨', title_en: 'Volume 8', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1D9fa1IG1tYUV-JCwx2h7wRq2MoVP9og7&export=download&confirm=t', sizeMb: 15.8 },
+      { id: 'v10', number: 10, title_ar: 'المجلد ١٠', title_en: 'Volume 10', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1_6YwpgiUf4DH6w3XJiHMEW5IZZnKnAzN&export=download&confirm=t', sizeMb: 16.1 },
+      { id: 'v11', number: 11, title_ar: 'المجلد ١١', title_en: 'Volume 11', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1_fdtM7jkZOF9ffQa_QAcCBzREn2xzQvO&export=download&confirm=t', sizeMb: 13.2 },
+      { id: 'v12', number: 12, title_ar: 'المجلد ١٢', title_en: 'Volume 12', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1957uQeJAU4iOMk8y1xfYM8GjS3zFwpua&export=download&confirm=t', sizeMb: 5.3 }
+    ]
   }
 ];
 

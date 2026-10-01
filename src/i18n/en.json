@@ -94,6 +94,8 @@
   "download_pdf": "Download PDF",
   "books": "Books",
   "books_library": "Book Library",
+  "all_books": "All Books",
+  "category_book_count": "{{count}} books in this category",
   "books_library_hint": "Read books right inside the app. Books loaded with the app work offline; the rest download on demand.",
   "no_books": "No books yet",
   "no_volumes": "No volumes for this book yet",

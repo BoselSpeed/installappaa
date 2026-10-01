@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { booksService } from '../firebase/service';
 import { BookCard } from '../components/UI/BookCard';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +14,11 @@ const BooksPage = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+
+  const category = searchParams.get('category') || '';
+  const _categoryKey = category ? `category=${encodeURIComponent(category)}` : '';
 
   useEffect(() => {
     let cancelled = false;
@@ -22,7 +27,9 @@ const BooksPage = () => {
       setError(null);
       try {
         const data = await booksService.getAllBooks();
-        if (!cancelled) setBooks(data);
+        if (cancelled) return;
+        const sorted = data.slice().sort((a, b) => (a.order || 0) - (b.order || 0));
+        setBooks(category ? sorted.filter((b) => b.category_ar === category) : sorted);
       } catch (err) {
         console.error('Error loading books:', err);
         if (!cancelled) setError(err);
@@ -35,7 +42,7 @@ const BooksPage = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [category]);
 
   if (loading) {
     return <LoadingState label={t('loading')} />;
@@ -57,9 +64,23 @@ const BooksPage = () => {
     );
   }
 
+  const title = category ? category : t('books_library');
+  const description = category
+    ? t('category_book_count', { count: books.length })
+    : t('books_library_hint');
+
   return (
     <PageShell width="wide">
-      <PageHeader title={t('books_library')} description={t('books_library_hint')} />
+      <PageHeader title={title} description={description} />
+
+      {category && (
+        <div className="mb-6">
+          <Button to="/books" variant="secondary">
+            <Icon name="arrowRight" size="sm" className="rtl:rotate-180" />
+            {t('all_books')}
+          </Button>
+        </div>
+      )}
 
       {books.length === 0 ? (
         <EmptyState
