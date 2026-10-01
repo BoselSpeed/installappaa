@@ -7,14 +7,15 @@
 ## المتطلبات (Requirements)
 
 - جهاز Mac يعمل بنظام macOS مع **Xcode** (أحدث إصدار مثبت من App Store).
-- حساب مطوّر Apple مجاني أو مدفوع (هر الفراش للحزم على الجهاز أو رفع للتطبيقات).
-- Capacitor 8 يستخدم Swift Package Manager — لا حاجة لتثبيت CocoaPods.
+- حساب مطوّر Apple مجاني أو مدفوع (لشحن الحزم على الجهاز أو الرفع للتطبيقات).
+- Capacitor 8 يستخدم Swift Package Manager — لا حاجة إلى CocoaPods، ولذلك لا يوجد
+  ملف `.xcworkspace`: افتح المشروع مباشرة.
 
 ## خطوات البناء (Build steps)
 
 1. انسخ هذا المجلد إلى جهاز Mac أو افتح المشروع من مساره.
-2. افتح ملف:
-   `ايفون/App/App.xcworkspace`
+2. افتح ملف المشروع في Xcode:
+   `ايفون/App/App.xcodeproj`
 3. في Xcode:
    - اختر الهدف `App`.
    - في تبويب **Signing & Capabilities**:
@@ -33,9 +34,25 @@
 - للنشر في App Store: استخدم الحساب المدفوع وارفع الـ Archive عبر
   **App Store Connect**.
 
+## تحديث أصول الويب بعد تعديل الشيفرة
+
+مجلد المشروع اسمه `ايفون` وليس `ios`، لذلك لا يعرف Capacitor CLI هذه المنصة ولا
+يصلح فيه الأمر `npx cap sync ios`. انسخ نتيجة البناء يدوياً بدلاً منه:
+
+```bash
+npm run build
+rsync -a --delete "تطبيق الفقه/" "ايفون/App/App/public/"
+```
+
+ثم أعد فتح المشروع في Xcode. على macOS можно استخدام `ditto` بدل `rsync`:
+
+```bash
+ditto "تطبيق الفقه" "ايفون/App/App/public"
+```
+
 ## ملاحظات تقنية
 
 - التنزيل الداخلي للمجلدات (مثل الأندرويد) يعمل عبر CapacitorHttp الناتيف،
   المفعّل في `capacitor.config.json`، فيتجاوز قيود CORS الخاصة بـ Google Drive.
-- عند تعديل شيفرة الويب، أعد البناء ثم انسخ النتيجة بتشغيل:
-  `npx cap sync ios` ثم افتح المشروع من جديد.
+- في نسخة الويب لا يوجد هذا التجاوز، ولذلك تحتاج إلى وسيط تنزيل على الخادم —
+  راجع `docs/deployment.md`.

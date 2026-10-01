@@ -68,7 +68,7 @@ App
 ├── Services (Firebase wrappers)
 ├── Utils (formatters, validators, constants)
 ├── Types (TypeScript interfaces)
-�└── i18n (ar.json, en.json translation files)
+└── i18n (ar.json, en.json translation files)
 ```
 
 ## 8. Responsiveness & Accessibility
