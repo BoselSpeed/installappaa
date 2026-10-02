@@ -9,12 +9,12 @@
 > issue list at the end of this file for what is genuinely outstanding.
 
 ## Implementation Status
-**Last updated:** 2026-10-01
+**Last updated:** 2026-10-02
 
-The application is functional end-to-end in **demo mode**: it runs entirely with
-locally seeded bilingual content when Firebase credentials are absent, and
-automatically uses the real Firebase backend once `src/firebase/config.js` is
-filled in.
+The application is functional end-to-end and has **no backend at all**: content
+and progress live on the device, and every page reads them through
+`src/services/appService.js`. There is nothing to configure, and the build
+deploys to any static host.
 
 Working features:
 - Project scaffolding, TypeScript build, Tailwind design system (black/white)
@@ -25,13 +25,9 @@ Working features:
 - **Library of 29 books / 146 volumes** across 5 categories (Tawhid and Aqeedah,
   Tafsir, Hadith, Stories, Adab), all defined in `src/data/books.js`
   - Volume 1 of each book is bundled with the app (offline, PWA-precached, 8
-    PDFs / ~36 MB); the remaining volumes download on demand and are stored in
-    IndexedDB for offline reading, and can be deleted from the device
-  - Remote volumes come from three sources, resolved at download time: a direct
-    `downloadUrl`, a Supabase `storagePath`, or a member `path` inside a remote
-    ZIP archive read over HTTP Range (`src/services/zipRangeReader.js`), which
-    fetches only the volume the reader tapped
-  - Books service supports full CRUD (mock + Firebase `books` collection)
+    PDFs / ~36 MB); volumes hosted elsewhere open at their original location,
+    because a static site cannot fetch another origin
+  - Books service supports full CRUD over the on-device store
   - Every book has a real cover image rendered from page 1 of its own PDF, so no
     book falls back to the placeholder
 - Book detail page with rich metadata (author, muhaqqiq, translator, publisher,
@@ -44,7 +40,7 @@ Working features:
   Five questions per lesson are seeded for each of the four PDF lessons
 - Notes (note/question per lesson), favourites, bookmarks, reading streaks,
   achievements and statistics, persisted per user
-- Settings: language, font size, clear cache, demo-mode indicator and sign-out
+- Settings: language, font size, and clearing the cached PDFs
 - `ErrorBoundary` wraps the whole app, so a render crash shows a retry screen
   instead of a blank page
 - **Installable PWA** (vite-plugin-pwa, Workbox): offline-first caching of the
@@ -52,23 +48,23 @@ Working features:
   (تطبيق الفقه), standalone display, RTL, icons (192/512/maskable); runtime
   `CacheFirst` for other `/books/*.pdf` with `rangeRequests` enabled
   - Build output goes to `تطبيق الفقه/`; verified functional offline
-- **Android APK** (`com.fiqh.app`) built from the same web bundle; native volume
-  downloads go through `CapacitorHttp`, bypassing Google Drive's CORS
-  restrictions
-- `server/serve.mjs` — zero-dependency static server that also exposes the
-  `/__drive-proxy` endpoint the web build needs for archive downloads
+- **Android APK** (`com.fiqh.app`) built from the same web bundle, with a native
+  `PDFView` reader: TOC from the PDF outline, page navigation, jump-to-page,
+  night mode, bookmarks, notes, reading progress, and text search through
+  PDFBox
 - Tooling: `npm run verify` runs typecheck, ESLint and `npm run
   verify:content`, which validates `books.js` against the files in `public/`
   (missing bundled PDFs or covers, unusable volumes, duplicate ids, unpaired
   ar/en fields, categories with no section)
 
 Known gaps:
-- Firebase and Supabase are placeholder configs, so the app always runs in demo
-  mode and the real Firebase service layer is inert
-- The web build needs a server-side download proxy to fetch remote volumes;
-  see `docs/deployment.md`
+- Only eight of 146 volumes ship with the app; the rest open at their source
+  rather than being readable in-app, because there is no server to fetch them
+  through
+- The native reader cannot highlight or select text: `android-pdf-viewer`
+  exposes no text layer, so search is page-level and highlights are stored from
+  copied text
 - No test suite yet (Phase 6)
-- Only eight of 146 volumes ship with the app; the rest are downloads
 - No route-level code splitting beyond the PDF reader chunk
 
 ## Overview
@@ -436,15 +432,15 @@ left. See `README.md` for how to run things and `docs/` for the guides.
 | # | Issue | Where |
 |---|---|---|
 | 1 | No test suite (Phase 6). `scripts/verify-content.mjs` covers the library data only. | — |
-| 2 | `src/firebase/config.js` and `src/supabase/config.js` are placeholders, so the real Firebase service layer and the Supabase volume source are inert. | `src/firebase/`, `src/supabase/` |
-| 3 | The web build needs a `/__drive-proxy` endpoint for remote-volume downloads. `server/serve.mjs` provides one but no hosting is configured. | `docs/deployment.md` |
+| 2 | *(resolved)* — the Firebase and Supabase layers were removed; the app is entirely on-device. | `src/services/appService.js` |
+| 3 | *(resolved)* — the proxy was removed; unbundled volumes open at their source instead. | `docs/deployment.md` |
 | 4 | ~~Covers exist for 15 of 29 books~~ **Resolved 2026-10-01** — all 29 books now have a cover rendered from page 1 of their own PDF. | `public/covers/` |
 | 5 | ~~Four books have no author~~ **Resolved 2026-10-01** for three of them (`al-mukhtasar-fi-al-balagha` = د. عبد القادر حسين, `mukhtarat-al-shiir-al-jahili` = عبد المتعال الصعيدي, `mawsuat-al-qabail-al-arabiyya` = محمد سليمان الطيب). Still empty: `qisas-min-sahih-al-bukhari` — its title pages are decorative art that OCR cannot read, and the preface names only al-Bukhari as the source. Empty fields are hidden in the UI. | `src/data/books.js` |
 | 6 | `mawsuat-al-qabail-al-arabiyya` skips volume 9 deliberately — documented in its description, not a bug. | `src/data/books.js` |
 | 7 | Bundle is ~1.3 MB of JS; only the PDF reader is code-split. | `vite.config.ts` |
-| 8 | `firebase` is a declared dependency but the app only ever runs its demo path until credentials exist. | `package.json` |
+| 8 | *(resolved)* — `firebase` and `fflate` were dropped from `package.json`. | `package.json` |
 | 9 | Settings offers clear-cache only; export/import of user data is not implemented. | `src/pages/SettingsPage.jsx` |
 
 ---
 *Implementation plan created following design approval. Status block and issue
-list updated 2026-10-01.*
+list updated 2026-10-02.*
