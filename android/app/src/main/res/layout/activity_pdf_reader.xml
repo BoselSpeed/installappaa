@@ -34,7 +34,7 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <!-- ---- Top bar: navigation, title, TOC, search ---- -->
+    <!-- ==== Top bar: navigation, title, TOC, search ==== -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -60,7 +60,7 @@
         app:trackColorActive="@color/reader_accent"
         app:trackColorInactive="@color/reader_divider" />
 
-    <!-- ---- Bottom bar: page indicator and reader tools ---- -->
+    <!-- ==== Bottom bar: page indicator and reader tools ==== -->
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
@@ -118,7 +118,7 @@
             app:tint="@color/reader_on_surface" />
     </LinearLayout>
 
-    <!-- ---- Floating page-number entry (like the web reader) ---- -->
+    <!-- ==== Floating page-number entry (like the web reader) ==== -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/pageInputLayout"
         style="@style/Widget.Fiqh.PageInput"

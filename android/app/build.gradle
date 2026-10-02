@@ -19,6 +19,12 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    compileOptions {
+        // Java 17 to match Kotlin's jvmTarget below. AGP requires the two to
+        // agree, and Capacitor leaves the Java level unset.
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
     buildFeatures {
         // Generates the *Binding classes the reader uses to bind its layouts
         // without findViewById, which is what keeps the code null-safe.
@@ -72,7 +78,9 @@ dependencies {
 
 kotlin {
     compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+        // Must match compileOptions above, or javac/kotlinc disagree and the
+        // build fails with "invalid source release".
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
