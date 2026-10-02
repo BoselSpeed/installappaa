@@ -12,6 +12,10 @@ const MAX_DPR = 2;
 const FIT_WIDTH = 'width';
 const FIT_PAGE = 'page';
 
+// Render one viewport worth of pages above and below the visible area so
+// scrolling feels instant.
+const PRELOAD_MARGIN = '100% 0px 100% 0px';
+
 const docPromises = {};
 
 const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
@@ -19,6 +23,7 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
   const [doc, setDoc] = useState(null);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageInput, setPageInput] = useState('1');
   const [zoom, setZoom] = useState(100);
   const [fitMode, setFitMode] = useState(FIT_WIDTH);
   const [loading, setLoading] = useState(true);
@@ -26,9 +31,11 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const containerRef = useRef(null);
+  const scrollerRef = useRef(null);
   const pagesRef = useRef({});
   const renderedRef = useRef(new Set());
   const tasksRef = useRef({});
+  const visibleRef = useRef(new Set());
   const scaleRef = useRef(1);
   const currentPageRef = useRef(1);
   const fitModeRef = useRef(FIT_WIDTH);
@@ -39,6 +46,11 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
   useEffect(() => {
     onPageChangeRef.current = onPageChange;
   }, [onPageChange]);
+
+  // The page box always shows the page the reader is on.
+  useEffect(() => {
+    setPageInput(String(currentPage));
+  }, [currentPage]);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,11 +78,10 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
 
   const computeScale = useCallback((mode) => {
     const el = containerRef.current;
-    if (!el || !doc) return scaleRef.current;
+    if (!el || !doc) return Promise.resolve(scaleRef.current);
     const width = el.clientWidth;
     const height = el.clientHeight || window.innerHeight;
-    const page = doc.getPage(1);
-    return page.then((p) => {
+    return doc.getPage(1).then((p) => {
       const viewport = p.getViewport({ scale: 1 });
       let scale;
       if (mode === FIT_PAGE) {
@@ -132,78 +143,94 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
   }, [doc]);
 
   const renderVisiblePages = useCallback(() => {
-    if (!doc) return;
-    const el = containerRef.current;
-    if (!el) return;
-    const containerTop = el.getBoundingClientRect().top;
-    const containerHeight = el.clientHeight;
-    for (let i = 1; i <= doc.numPages; i++) {
-      const page = pagesRef.current[i];
-      if (!page) continue;
-      const rect = page.getBoundingClientRect();
-      if (rect.bottom >= containerTop - containerHeight && rect.top <= containerTop + containerHeight * 2) {
-        renderPage(i);
-      }
-    }
-  }, [doc, renderPage]);
+    visibleRef.current.forEach((pageNumber) => renderPage(pageNumber));
+  }, [renderPage]);
 
-  const handleScroll = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const containerTop = el.getBoundingClientRect().top;
-    let active = 1;
-    let best = Infinity;
-    for (let i = 1; i <= numPages; i++) {
-      const page = pagesRef.current[i];
-      if (!page) continue;
-      const rect = page.getBoundingClientRect();
-      const distance = Math.abs(rect.top - containerTop);
-      if (distance < best) {
-        best = distance;
-        active = i;
-      }
-    }
-    if (active !== currentPageRef.current) {
-      currentPageRef.current = active;
-      setCurrentPage(active);
-      onPageChangeRef.current?.(active, numPages);
-    }
-    renderVisiblePages();
-  }, [numPages, renderVisiblePages]);
-
+  // Track visible pages with an observer instead of walking every page on each
+  // scroll event, which forced a layout per page on long books.
   useEffect(() => {
-    if (!doc) return;
-    computeScale(fitModeRef.current).then((scale) => {
-      scaleRef.current = scale;
-      cancelAllRenders();
-      renderVisiblePages();
+    const root = scrollerRef.current;
+    if (!doc || !root) return undefined;
+
+    const visible = visibleRef.current;
+    visible.clear();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const rootTop = root.getBoundingClientRect().top;
+        entries.forEach((entry) => {
+          const pageNumber = Number(entry.target.dataset.page);
+          if (!pageNumber) return;
+          if (entry.isIntersecting) {
+            visible.add(pageNumber);
+            renderPage(pageNumber);
+          } else {
+            visible.delete(pageNumber);
+          }
+        });
+
+        let best = 0;
+        let bestDistance = Infinity;
+        visible.forEach((pageNumber) => {
+          const el = pagesRef.current[pageNumber];
+          if (!el) return;
+          const distance = Math.abs(el.getBoundingClientRect().top - rootTop);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            best = pageNumber;
+          }
+        });
+
+        if (best && best !== currentPageRef.current) {
+          currentPageRef.current = best;
+          setCurrentPage(best);
+          onPageChangeRef.current?.(best, numPages);
+        }
+      },
+      { root, rootMargin: PRELOAD_MARGIN, threshold: 0 }
+    );
+
+    Object.keys(pagesRef.current).forEach((key) => {
+      const el = pagesRef.current[key];
+      if (el) observer.observe(el);
     });
-  }, [doc, computeScale, renderVisiblePages, cancelAllRenders]);
 
-  useEffect(() => {
-    if (!doc) return;
-    const ro = new ResizeObserver(() => {
-      if (!fitModeRef.current) return;
-      computeScale(fitModeRef.current).then((scale) => {
-        scaleRef.current = scale;
-        cancelAllRenders();
-        renderVisiblePages();
-      });
-    });
-    if (containerRef.current) ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, [doc, computeScale, renderVisiblePages, cancelAllRenders]);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleScroll);
     return () => {
-      el.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      observer.disconnect();
+      visible.clear();
     };
-  }, [handleScroll]);
+  }, [doc, numPages, renderPage]);
+
+  // Recompute the scale when the container changes size (rotation, window
+  // resize, fullscreen) and repaint the pages that are on screen.
+  useEffect(() => {
+    if (!doc) return undefined;
+    const el = containerRef.current;
+    if (!el) return undefined;
+
+    let frame = 0;
+    const repaint = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        computeScale(fitModeRef.current).then((scale) => {
+          scaleRef.current = scale;
+          cancelAllRenders();
+          renderVisiblePages();
+        });
+      });
+    };
+
+    repaint();
+
+    const ro = new ResizeObserver(repaint);
+    ro.observe(el);
+    if (scrollerRef.current) ro.observe(scrollerRef.current);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+    };
+  }, [doc, computeScale, renderVisiblePages, cancelAllRenders]);
 
   const applyZoom = (mode, customZoom) => {
     const nextMode = mode || fitModeRef.current;
@@ -247,22 +274,26 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
   const jumpToPage = (pageNumber) => {
     const target = Math.min(Math.max(1, pageNumber), numPages);
     const pageEl = pagesRef.current[target];
-    if (pageEl && containerRef.current) {
-      const top = pageEl.offsetTop - containerRef.current.offsetTop;
-      containerRef.current.scrollTo({ top, behavior: 'smooth' });
-      renderVisiblePages();
+    const scroller = scrollerRef.current;
+    if (pageEl && scroller) {
+      const delta =
+        pageEl.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
+      scroller.scrollTo({ top: delta, behavior: 'smooth' });
     }
   };
 
-  const handlePageInput = (e) => {
+  const commitPageInput = (e) => {
     const value = parseInt(e.target.value, 10);
-    if (Number.isFinite(value)) jumpToPage(value);
+    if (Number.isFinite(value)) {
+      jumpToPage(value);
+    }
+    // Snap the box back to the real page if the entry was out of range.
+    setPageInput(String(currentPage));
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      const value = parseInt(e.target.value, 10);
-      if (Number.isFinite(value)) jumpToPage(value);
+      e.currentTarget.blur();
     }
   };
 
@@ -332,101 +363,114 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
       onTouchEnd={handleTouchEnd}
       className={`overflow-hidden rounded-2xl border border-line bg-paper shadow-card ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''}`}
     >
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-line bg-surface-quiet px-3 py-2.5 sm:px-4">
+      {/* Fullscreen shows only the reader, so the exit control sits alone in
+          one corner instead of a toolbar over the pages. */}
+      {isFullscreen ? (
         <button
-          onClick={handleZoomOut}
-          disabled={zoom <= 50}
-          className={`${toolbarButton} w-11`}
-          aria-label={t('zoom_out')}
-          title={t('zoom_out')}
+          onClick={toggleFullscreen}
+          className="absolute end-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface/90 text-ink-soft shadow-card backdrop-blur-sm transition-colors duration-300 hover:bg-surface hover:text-ink"
+          aria-label={t('exit_fullscreen')}
+          title={t('exit_fullscreen')}
         >
-          <Icon name="minus" size="md" />
+          <Icon name="close" size="md" />
         </button>
-        <span className="min-w-[3rem] text-center text-sm tabular-nums text-ink">{zoom}%</span>
-        <button
-          onClick={handleZoomIn}
-          disabled={zoom >= 300}
-          className={`${toolbarButton} w-11`}
-          aria-label={t('zoom_in')}
-          title={t('zoom_in')}
-        >
-          <Icon name="plus" size="md" />
-        </button>
-
-        <span className="mx-1 hidden h-6 w-px bg-line sm:block" />
-
-        <button
-          onClick={() => handleFit(FIT_WIDTH)}
-          className={`${toolbarButton} ${fitMode === FIT_WIDTH && zoom === 100 ? activeButton : ''}`}
-        >
-          {t('fit_width')}
-        </button>
-        <button
-          onClick={() => handleFit(FIT_PAGE)}
-          className={`${toolbarButton} ${fitMode === FIT_PAGE && zoom === 100 ? activeButton : ''}`}
-        >
-          {t('fit_page')}
-        </button>
-
-        <span className="mx-1 hidden h-6 w-px bg-line sm:block" />
-
-        <button
-          onClick={() => jumpToPage(currentPage - 1)}
-          disabled={currentPage <= 1}
-          className={`${toolbarButton} w-11`}
-          aria-label={t('previous_page')}
-          title={t('previous_page')}
-        >
-          <Icon name="chevronRight" size="md" className="rtl:rotate-180" />
-        </button>
-
-        <div className="flex items-center gap-2 text-sm text-ink-soft">
-          <input
-            type="number"
-            min="1"
-            max={numPages}
-            defaultValue={1}
-            key={currentPage}
-            onBlur={handlePageInput}
-            onKeyDown={handleKeyDown}
-            className="h-11 w-16 rounded-xl border border-line bg-paper px-2 text-center tabular-nums text-ink transition-card duration-300 hover:border-ink-ghost focus:border-ink"
-            aria-label={t('go_to_page')}
-          />
-          <span className="hidden text-ink-muted sm:inline">
-            {t('of_pages', { count: numPages })}
-          </span>
-        </div>
-
-        <button
-          onClick={() => jumpToPage(currentPage + 1)}
-          disabled={currentPage >= numPages}
-          className={`${toolbarButton} w-11`}
-          aria-label={t('next_page')}
-          title={t('next_page')}
-        >
-          <Icon name="chevronLeft" size="md" className="rtl:rotate-180" />
-        </button>
-
-        <div className="ms-auto flex items-center gap-2">
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 border-b border-line bg-surface-quiet px-3 py-2.5 sm:px-4">
           <button
-            onClick={toggleFullscreen}
+            onClick={handleZoomOut}
+            disabled={zoom <= 50}
             className={`${toolbarButton} w-11`}
-            aria-label={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
-            title={isFullscreen ? t('exit_fullscreen') : t('fullscreen')}
+            aria-label={t('zoom_out')}
+            title={t('zoom_out')}
           >
-            <Icon name={isFullscreen ? 'close' : 'maximize'} size="md" />
+            <Icon name="minus" size="md" />
+          </button>
+          <span className="min-w-[3rem] text-center text-sm tabular-nums text-ink">{zoom}%</span>
+          <button
+            onClick={handleZoomIn}
+            disabled={zoom >= 300}
+            className={`${toolbarButton} w-11`}
+            aria-label={t('zoom_in')}
+            title={t('zoom_in')}
+          >
+            <Icon name="plus" size="md" />
           </button>
 
-          <a href={pdfUrl} download={fileName} className={`${toolbarButton} gap-1.5`}>
-            <Icon name="download" size="sm" />
-            <span className="hidden sm:inline">{t('download_pdf')}</span>
-          </a>
+          <span className="mx-1 hidden h-6 w-px bg-line sm:block" />
+
+          <button
+            onClick={() => handleFit(FIT_WIDTH)}
+            className={`${toolbarButton} ${fitMode === FIT_WIDTH && zoom === 100 ? activeButton : ''}`}
+          >
+            {t('fit_width')}
+          </button>
+          <button
+            onClick={() => handleFit(FIT_PAGE)}
+            className={`${toolbarButton} ${fitMode === FIT_PAGE && zoom === 100 ? activeButton : ''}`}
+          >
+            {t('fit_page')}
+          </button>
+
+          <span className="mx-1 hidden h-6 w-px bg-line sm:block" />
+
+          <button
+            onClick={() => jumpToPage(currentPage - 1)}
+            disabled={currentPage <= 1}
+            className={`${toolbarButton} w-11`}
+            aria-label={t('previous_page')}
+            title={t('previous_page')}
+          >
+            <Icon name="chevronRight" size="md" className="rtl:rotate-180" />
+          </button>
+
+          <div className="flex items-center gap-2 text-sm text-ink-soft">
+            <input
+              type="number"
+              min="1"
+              max={numPages}
+              value={pageInput}
+              onChange={(e) => setPageInput(e.target.value)}
+              onBlur={commitPageInput}
+              onKeyDown={handleKeyDown}
+              className="h-11 w-16 rounded-xl border border-line bg-paper px-2 text-center tabular-nums text-ink transition-card duration-300 hover:border-ink-ghost focus:border-ink"
+              aria-label={t('go_to_page')}
+            />
+            <span className="hidden text-ink-muted sm:inline">
+              {t('of_pages', { count: numPages })}
+            </span>
+          </div>
+
+          <button
+            onClick={() => jumpToPage(currentPage + 1)}
+            disabled={currentPage >= numPages}
+            className={`${toolbarButton} w-11`}
+            aria-label={t('next_page')}
+            title={t('next_page')}
+          >
+            <Icon name="chevronLeft" size="md" className="rtl:rotate-180" />
+          </button>
+
+          <div className="ms-auto flex items-center gap-2">
+            <button
+              onClick={toggleFullscreen}
+              className={`${toolbarButton} w-11`}
+              aria-label={t('fullscreen')}
+              title={t('fullscreen')}
+            >
+              <Icon name="maximize" size="md" />
+            </button>
+
+            <a href={pdfUrl} download={fileName} className={`${toolbarButton} gap-1.5`}>
+              <Icon name="download" size="sm" />
+              <span className="hidden sm:inline">{t('download_pdf')}</span>
+            </a>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Pages */}
       <div
+        ref={scrollerRef}
         className={`pdf-reader-scroll overflow-y-auto ${isFullscreen ? 'h-screen' : ''}`}
       >
         {loading && (
