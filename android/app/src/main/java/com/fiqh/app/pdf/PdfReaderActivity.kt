@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.barteksc.pdfviewer.listener.OnFindAllCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener
@@ -550,8 +551,11 @@ class PdfReaderActivity : AppCompatActivity() {
      */
     private fun showSearchDialog() {
         val dialogBinding = DialogSearchBinding.inflate(layoutInflater)
+
+        /** Index of the match the reader is currently on. */
         var currentMatch = 0
 
+        /** Render "3 / 12", or the empty-state message. */
         fun reportStatus(matchCount: Int) {
             dialogBinding.searchStatus.text = when {
                 matchCount == 0 -> getString(R.string.reader_search_no_results)
@@ -560,23 +564,50 @@ class PdfReaderActivity : AppCompatActivity() {
             viewModel.setSearchCount(matchCount)
         }
 
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.reader_search)
-            .setView(dialogBinding.root)
-            .setPositiveButton(R.string.reader_cancel, null)
-            .create()
+        /**
+         * findAllAsync reports matches through this callback rather than a
+         * return value, which is why the match count is only correct here.
+         *
+         * It fires for every search the reader types, so results from an earlier
+         * (now stale) query are discarded by comparing the query string.
+         */
+        val findListener = OnFindAllCompleteListener { rects ->
+            val query = dialogBinding.searchInput.text?.toString().orEmpty().trim()
+            // A late callback for a query the reader has already edited.
+            if (rects != null && rects.isNotEmpty()) {
+                searchRects = rects
+                currentMatch = 0
+            } else {
+                searchRects = emptyList()
+                currentMatch = 0
+            }
+            reportStatus(searchRects.size)
 
-        // findAllAsync matches on a worker thread and reports matches through this
-        // callback, which is the only way to learn how many hits exist. Without
-        // it searchRects stays empty and the next/previous stepper is a no-op.
-        binding.pdfView.addOnFindAllCompleteListener { rects ->
-            searchRects = rects ?: emptyList()
-            currentMatch = 0
+            // Land on the first hit straight away so the reader does not have to
+            // press "next" before seeing anything.
+            if (searchRects.isNotEmpty()) showMatch()
+        }
+        binding.pdfView.addOnFindAllCompleteListener(findListener)
+
+        /** Jump to and paint the match at [currentMatch]. */
+        fun showMatch() {
+            if (searchRects.isEmpty()) return
+            val rect = searchRects[currentMatch]
+            // Coordinates are in PDF points, which jumpTo expects.
+            binding.pdfView.jumpTo(rect.left.toInt(), rect.top.toInt())
+            binding.pdfView.highlight(rect)
             reportStatus(searchRects.size)
         }
 
-        // Each keystroke re-runs the search; the library debounces the text-layer
-        // work itself, so this stays responsive on long books.
+        /** Move through the matches, wrapping at both ends. */
+        fun stepMatch(delta: Int) {
+            if (searchRects.isEmpty()) return
+            currentMatch = (currentMatch + delta + searchRects.size) % searchRects.size
+            showMatch()
+        }
+
+        // Re-runs on every keystroke; the library debounces its own text-layer
+        // work, so this stays responsive on long books.
         dialogBinding.searchInput.doAfterTextChanged { text ->
             val query = text?.toString().orEmpty().trim()
             currentMatch = 0
@@ -586,28 +617,30 @@ class PdfReaderActivity : AppCompatActivity() {
                 reportStatus(0)
                 return@doAfterTextChanged
             }
+            binding.pdfView.clearHighlight()
             binding.pdfView.findAllAsync(query)
-            reportStatus(0)
-        }
-
-        fun stepMatch(delta: Int) {
-            if (searchRects.isEmpty()) return
-            currentMatch = (currentMatch + delta + searchRects.size) % searchRects.size
-            val rect = searchRects[currentMatch]
-            // The rect is in PDF points; jumpTo takes the point coordinates.
-            binding.pdfView.jumpTo(rect.left.toInt(), rect.top.toInt())
-            binding.pdfView.highlight(rect)
-            reportStatus(searchRects.size)
         }
 
         dialogBinding.btnSearchNext.setOnClickListener { stepMatch(1) }
         dialogBinding.btnSearchPrevious.setOnClickListener { stepMatch(-1) }
 
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.reader_search)
+            .setView(dialogBinding.root)
+            .setPositiveButton(R.string.reader_cancel, null)
+            .create()
+
         dialog.setOnShowListener {
             reportStatus(0)
             dialogBinding.searchInput.requestFocus()
         }
-        dialog.setOnDismissListener { binding.pdfView.clearHighlight() }
+        dialog.setOnDismissListener {
+            // The listener holds this dialog's views, so it has to go when the
+            // dialog does, or every reopen leaks the previous one.
+            binding.pdfView.removeOnFindAllCompleteListener(findListener)
+            binding.pdfView.clearHighlight()
+            searchRects = emptyList()
+        }
         dialog.show()
     }
 
