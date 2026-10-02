@@ -25,8 +25,14 @@
     <string name="reader_search_previous">النتيجة السابقة</string>
     <string name="reader_search_next">النتيجة التالية</string>
     <string name="reader_search_results">%1$d / %2$d</string>
+    <string name="reader_search_result_with_page">النتيجة %1$d من %2$d — صفحة %3$d</string>
     <string name="reader_search_no_results">لا توجد نتائج</string>
     <string name="reader_search_hint_empty">اكتب كلمة للبحث</string>
+    <string name="reader_search_whole_words">كلمات مطابقة كاملة</string>
+    <!-- Shown while the text layer is being read for the first time. -->
+    <string name="reader_search_indexing">جارٍ قراءة نص الكتاب…</string>
+    <!-- A scan has no text layer, so this is the honest answer rather than "0 results". -->
+    <string name="reader_search_no_text_layer">لا يحتوي هذا الكتاب على طبقة نصية قابلة للبحث</string>
 
     <!-- Table of contents -->
     <string name="reader_table_of_contents">الفهرس</string>

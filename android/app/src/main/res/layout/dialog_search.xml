@@ -2,8 +2,9 @@
 <!--
     Full-text search inside the document.
 
-    Shows a match counter plus previous / next controls, mirroring the behaviour
-    of the web reader's search bar so the two feel the same.
+    The renderer has no text API, so results are page numbers supplied by
+    PdfTextSearch: a hit navigates to its page, and the snippet below the
+    controls shows the sentence it matched so the result explains itself.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -31,22 +32,43 @@
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Whole-words match, which is the difference between "صلاة" and the letters
+         that happen to sit inside a longer word. -->
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/searchWholeWords"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/reader_gutter"
+        android:text="@string/reader_search_whole_words" />
+
+    <!-- "3 / 12", or why there is nothing to show. -->
+    <TextView
+        android:id="@+id/searchStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/reader_gutter"
+        android:textColor="@color/reader_on_surface_variant"
+        android:textSize="13sp"
+        tools:text="3 / 12" />
+
+    <!-- The text around the current hit. -->
+    <TextView
+        android:id="@+id/searchSnippet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/reader_gutter"
+        android:ellipsize="end"
+        android:maxLines="4"
+        android:textColor="@color/reader_on_surface_variant"
+        android:textSize="13sp"
+        tools:text="…ثم إذن لا يجب على المكلف أن يعلم…" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:orientation="horizontal"
         android:paddingTop="@dimen/reader_gutter">
-
-        <!-- "3 / 12" match position, or a "no results" message. -->
-        <TextView
-            android:id="@+id/searchStatus"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/reader_on_surface_variant"
-            android:textSize="13sp"
-            tools:text="3 / 12" />
 
         <ImageButton
             android:id="@+id/btnSearchPrevious"
@@ -68,14 +90,4 @@
             android:src="@drawable/ic_pdf_arrow_down"
             app:tint="@color/reader_on_surface" />
     </LinearLayout>
-
-    <!-- Highlight colour swatches, offered while creating a highlight. -->
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/highlightColors"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/reader_gutter"
-        android:visibility="gone"
-        app:singleSelection="true"
-        tools:visibility="visible" />
 </LinearLayout>

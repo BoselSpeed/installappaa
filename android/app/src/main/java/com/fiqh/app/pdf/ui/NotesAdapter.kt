@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.fiqh.app.pdf.R
+import com.fiqh.app.R
 import com.fiqh.app.pdf.data.Note
-import com.fiqh.app.pdf.databinding.ItemNoteBinding
+import com.fiqh.app.databinding.ItemNoteBinding
 
 /**
  * The reader's notes for the open book.

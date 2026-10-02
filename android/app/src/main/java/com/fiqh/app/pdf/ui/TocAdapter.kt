@@ -5,22 +5,23 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.barteksc.pdfviewer.listener.PdfRenderer.Page
-import com.fiqh.app.pdf.databinding.ItemTocBinding
+import com.fiqh.app.databinding.ItemTocBinding
+import com.shockwave.pdfium.PdfDocument
 
 /**
  * Table of contents for the open book.
  *
- * AndroidPdfViewer's [Page.title] is only populated for PDFs that ship an
- * outline (a tagged/bookmarked PDF); scanned books usually return null, in which
- * case the activity hides this sheet and offers numeric jump only.
+ * Entries come from the PDF outline, which only a tagged (bookmarked) PDF
+ * carries; a scanned book returns an empty list and the activity offers the
+ * numeric page jump instead.
  *
- * [onEntryClick] receives the destination page index, which is what
- * [PdfReaderActivity] jumps to.
+ * [onEntryClick] receives the destination page index, which is what the activity
+ * jumps to. Nesting is flattened into [TocEntry] with a depth, because the
+ * outline is a tree and the item layout expresses hierarchy as indentation.
  */
 class TocAdapter(
     private val onEntryClick: (Int) -> Unit
-) : ListAdapter<Page, TocAdapter.ViewHolder>(DIFF) {
+) : ListAdapter<TocEntry, TocAdapter.ViewHolder>(DIFF) {
 
     class ViewHolder(val binding: ItemTocBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -30,23 +31,74 @@ class TocAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val page = getItem(position)
-        val context = holder.binding.root.context
+        val entry = getItem(position)
 
-        // page.title can be null even inside a partially-tagged PDF.
-        holder.binding.tocTitle.text = page.title ?: ""
-        holder.binding.tocPage.text = (page.index + 1).toString()
+        // Outline titles can be null in a partially-tagged PDF, so fall back to a
+        // generic label rather than leaving the row blank.
+        holder.binding.tocTitle.text = entry.title
 
-        // Pages with a title are section starts; indent nothing and let long
-        // titles wrap instead, so a level-based indent is unnecessary here.
-        holder.binding.root.setOnClickListener { onEntryClick(page.index) }
+        // The outline stores an absolute page index; readers count from 1.
+        holder.binding.tocPage.text = (entry.pageIndex + 1).toString()
+
+        // Sections nest, so the depth becomes indentation instead of a bullet
+        // column: one visual cue is enough, and it costs no extra width.
+        val indent = (entry.depth * INDENT_DP) * holder.binding.root.resources
+            .displayMetrics.density
+        holder.binding.tocTitle.setPadding(
+            indent.toInt(),
+            holder.binding.tocTitle.paddingTop,
+            holder.binding.tocTitle.paddingRight,
+            holder.binding.tocTitle.paddingBottom
+        )
+
+        holder.binding.root.setOnClickListener { onEntryClick(entry.pageIndex) }
     }
 
     private companion object {
-        val DIFF = object : DiffUtil.ItemCallback<Page>() {
-            override fun areItemsTheSame(old: Page, new: Page) = old.index == new.index
-            override fun areContentsTheSame(old: Page, new: Page) =
-                old.index == new.index && old.title == new.title
+        const val INDENT_DP = 14
+
+        val DIFF = object : DiffUtil.ItemCallback<TocEntry>() {
+            override fun areItemsTheSame(old: TocEntry, new: TocEntry) =
+                old.pageIndex == new.pageIndex && old.title == new.title
+
+            override fun areContentsTheSame(old: TocEntry, new: TocEntry) =
+                old == new
         }
     }
+}
+
+/** One flattened outline row. */
+data class TocEntry(
+    val title: String,
+    val pageIndex: Int,
+    val depth: Int
+)
+
+/**
+ * Flatten a PDF outline tree into a display list.
+ *
+ * The order is preserved rather than sorted: an outline is authored in reading
+ * order, and sorting by page would break entries that deliberately point
+ * backwards or to an appendix.
+ */
+fun List<PdfDocument.Bookmark>.flatten(): List<TocEntry> {
+    val out = mutableListOf<TocEntry>()
+
+    fun walk(bookmarks: List<PdfDocument.Bookmark>, depth: Int) {
+        bookmarks.forEach { bookmark ->
+            val page = bookmark.pageIdx
+            // A negative index is the PDF's way of saying "no destination".
+            if (page >= 0) {
+                out += TocEntry(
+                    title = bookmark.title?.takeIf { it.isNotBlank() } ?: "",
+                    pageIndex = page.toInt(),
+                    depth = depth
+                )
+            }
+            bookmark.children?.let { walk(it, depth + 1) }
+        }
+    }
+
+    walk(this, 0)
+    return out
 }

@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.fiqh.app.pdf.R
-import com.fiqh.app.pdf.databinding.ItemBookmarkBinding
+import com.fiqh.app.R
+import com.fiqh.app.databinding.ItemBookmarkBinding
 
 /**
  * List of the reader's saved pages for the open book.

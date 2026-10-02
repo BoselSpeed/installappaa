@@ -25,3 +25,9 @@ yarn-error.log*
 
 # Android SDK location (machine-specific)
 local.properties
+
+# Android build output
+android/app/build/
+android/build/
+android/.gradle/
+android/app/schemas/

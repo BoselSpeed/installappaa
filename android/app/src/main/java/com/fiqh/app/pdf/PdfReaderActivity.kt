@@ -1,43 +1,54 @@
 package com.fiqh.app.pdf
 
-import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
+import java.io.File
+import java.io.IOException
+import java.net.URL
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.barteksc.pdfviewer.listener.OnFindAllCompleteListener
-import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
-import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
-import com.github.barteksc.pdfviewer.listener.OnPageScrollListener
-import com.github.barteksc.pdfviewer.util.PdfFileUtils
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.slider.Slider
-import com.google.android.material.snackbar.Snackbar
+import com.fiqh.app.R
+import com.fiqh.app.databinding.ActivityPdfReaderBinding
+import com.fiqh.app.databinding.DialogBookmarksBinding
+import com.fiqh.app.databinding.DialogNotesBinding
+import com.fiqh.app.databinding.DialogPageJumpBinding
+import com.fiqh.app.databinding.DialogSearchBinding
+import com.fiqh.app.databinding.DialogTableOfContentsBinding
 import com.fiqh.app.pdf.data.Bookmark
 import com.fiqh.app.pdf.data.Note
-import com.fiqh.app.pdf.databinding.ActivityPdfReaderBinding
-import com.fiqh.app.pdf.databinding.DialogBookmarksBinding
-import com.fiqh.app.pdf.databinding.DialogNotesBinding
-import com.fiqh.app.pdf.databinding.DialogPageJumpBinding
-import com.fiqh.app.pdf.databinding.DialogSearchBinding
-import com.fiqh.app.pdf.databinding.DialogTableOfContentsBinding
+import com.fiqh.app.pdf.prefs.PdfPrefs
+import com.fiqh.app.pdf.search.PdfTextSearch
 import com.fiqh.app.pdf.ui.BookmarksAdapter
 import com.fiqh.app.pdf.ui.NotesAdapter
 import com.fiqh.app.pdf.ui.PdfReaderViewModel
 import com.fiqh.app.pdf.ui.TocAdapter
+import com.fiqh.app.pdf.ui.flatten
+import com.github.barteksc.pdfviewer.PDFView
+import com.github.barteksc.pdfviewer.listener.OnErrorListener
+import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
+import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
+import com.github.barteksc.pdfviewer.listener.OnPageScrollListener
+import com.github.barteksc.pdfviewer.listener.OnRenderListener
+import com.github.barteksc.pdfviewer.source.AssetSource
+import com.github.barteksc.pdfviewer.source.UriSource
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.slider.Slider
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 /**
  * The native PDF reader.
@@ -54,16 +65,17 @@ import java.io.IOException
  *
  * ## Why state lives in Room
  *
- * A PDF is read-only, so bookmarks, notes, highlights and progress cannot be
- * written back into the document. They live in the database, keyed by book slug,
- * which is why they survive re-downloading or replacing the file.
+ * A PDF is read-only, so bookmarks, notes and highlights cannot be written back
+ * into the document. They live in the database, keyed by book slug, which is why
+ * they survive replacing the file.
  *
- * ## Text features
+ * ## Text search
  *
- * Search, selection, copy and highlighting only work because the underlying
- * library extracts a real text layer. A scanned PDF with no text layer still
- * renders, but yields no search hits and no selectable text; the activity says
- * so rather than failing silently.
+ * PDFView renders through pdfium, which publishes no text API, so search is
+ * served by [PdfTextSearch]: PDFBox reads the text layer once and the activity
+ * navigates to the pages that match. That class explains why a hit is a page
+ * number rather than a painted rectangle. A scanned book has no text layer at
+ * all, and legitimately reports no results.
  */
 class PdfReaderActivity : AppCompatActivity() {
 
@@ -88,14 +100,23 @@ class PdfReaderActivity : AppCompatActivity() {
     /** Pages of the open book that carry a bookmark, for the toggle icon. */
     private var bookmarkPages: Set<Int> = emptySet()
 
-    /** Pages of the open book that carry at least one saved highlight. */
-    private var highlightedPages: Set<Int> = emptySet()
-
-    /** Rectangles of the most recent search, used to paint the query. */
-    private var searchRects: List<android.graphics.RectF> = emptyList()
-
     /** Book slug currently open; used to scope every database read. */
     private var bookKey: String = ""
+
+    /** URI of the open book, kept for the text index. */
+    private var documentUri: String = ""
+
+    /**
+     * Text index for [documentUri], built on first search and reused after.
+     *
+     * Null means "not built yet", which is different from "built and empty": a
+     * scanned book yields an index with no hits, and rebuilding it per keystroke
+     * would re-parse the whole file.
+     */
+    private var textSearch: PdfTextSearch? = null
+
+    /** Cancelled when the search dialog closes, so a slow parse stops early. */
+    private var searchBuildJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,9 +132,10 @@ class PdfReaderActivity : AppCompatActivity() {
         }
 
         bookKey = contract.bookKey
+        documentUri = contract.uri
         viewModel.bind(bookKey)
         viewModel.prefs.orientationLock.let { lock ->
-            if (lock != com.fiqh.app.pdf.prefs.PdfPrefs.ORIENTATION_UNSET) {
+            if (lock != PdfPrefs.ORIENTATION_UNSET) {
                 requestedOrientation = lock
             }
         }
@@ -164,83 +186,143 @@ class PdfReaderActivity : AppCompatActivity() {
             contract.title.ifBlank { getString(R.string.pdf_reader_title) }
         setLoading(true)
 
-        binding.pdfView.addOnLoadListener(object : OnLoadCompleteListener {
-            override fun onLoadComplete(nPages: Int) {
-                pageCount = nPages
-                // Slider needs a range of at least 2 for its min/max to be valid.
-                binding.pageSlider.valueTo = maxOf(nPages, 2).toFloat()
-                setLoading(false)
-                updatePageIndicator(binding.pdfView.currentPage)
+        // A network book has to be fetched first: pdfium needs a seekable file,
+        // not a stream.
+        if (contract.uri.startsWith("http")) {
+            openRemote(contract)
+            return
+        }
 
-                val requested = contract.page
-                if (requested != null) {
-                    jumpToPage(requested)
-                } else {
-                    lifecycleScope.launch {
-                        val saved = viewModel.loadProgress()
-                        if (saved != null) jumpToPage(saved.pageIndex)
+        // fromAsset/fromUri return a Configurator, and every rendering option is
+        // set on that Configurator rather than on PDFView itself. Chaining off
+        // the wrong receiver is why the reader did not compile at first.
+        runCatching { configure(binding.pdfView.fromSource(sourceFor(contract.uri)), contract) }
+            .onFailure { onOpenFailed() }
+    }
+
+    /** Apply the reader's options and listeners to [configurator], then load. */
+    private fun configure(configurator: PDFView.Configurator, contract: Contract) {
+        val continuous = viewModel.prefs.continuousScroll
+
+        configurator
+            .swipeHorizontal(true)
+            // Turning snapping off is the whole difference between paged and
+            // continuous reading: one page then flows into the next.
+            .pageSnap(!continuous)
+            .spacing(if (continuous) 0 else PAGE_SPACING_DP)
+            .nightMode(viewModel.prefs.nightMode)
+            .enableSwipe(true)
+            .onLoad(object : OnLoadCompleteListener {
+                override fun loadComplete(nPages: Int) {
+                    pageCount = nPages
+                    // A Slider needs a range of at least 2 for min/max to be valid.
+                    binding.pageSlider.valueTo = maxOf(nPages, 2).toFloat()
+                    setLoading(false)
+                    updatePageIndicator(binding.pdfView.currentPage)
+
+                    val requested = contract.page
+                    if (requested != null) {
+                        jumpToPage(requested)
+                    } else {
+                        lifecycleScope.launch {
+                            val saved = viewModel.loadProgress()
+                            if (saved != null) jumpToPage(saved.pageIndex)
+                        }
                     }
                 }
-            }
-
-            override fun onLoadFailed(throwable: Throwable) {
-                setLoading(false)
-                Toast.makeText(
-                    this@PdfReaderActivity,
-                    R.string.reader_error_open_failed,
-                    Toast.LENGTH_LONG
-                ).show()
-                finish()
-            }
-        })
-
-        binding.pdfView.addOnPageChangeListener(object : OnPageChangeListener {
-            override fun onPageChanged(page: Int, pageCount: Int) {
-                updatePageIndicator(page)
-                refreshBookmarkIcon(page)
-                if (!suppressProgressSave) {
-                    viewModel.saveProgress(page, 0f)
+            })
+            .onError(object : OnErrorListener {
+                override fun onError(t: Throwable) {
+                    setLoading(false)
+                    Toast.makeText(
+                        this@PdfReaderActivity,
+                        R.string.reader_error_open_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    finish()
                 }
-            }
-        })
-
-        binding.pdfView.addOnPageScrollListener(object : OnPageScrollListener {
-            override fun onPageScrolled(page: Int, scrollOffset: Float) {
-                // In continuous mode the visible page only settles after the
-                // gesture ends, so the intra-page offset is recorded here.
-                if (viewModel.prefs.continuousScroll) {
-                    viewModel.saveProgress(page, scrollOffset)
+            })
+            .onPageChange(object : OnPageChangeListener {
+                override fun onPageChanged(page: Int, pageCount: Int) {
+                    updatePageIndicator(page)
+                    refreshBookmarkIcon(page)
+                    if (!suppressProgressSave) {
+                        viewModel.saveProgress(page, 0f)
+                    }
                 }
+            })
+            .onPageScroll(object : OnPageScrollListener {
+                override fun onPageScrolled(page: Int, scrollOffset: Float) {
+                    // In continuous mode the visible page only settles after the
+                    // gesture ends, so the intra-page offset is recorded here.
+                    if (viewModel.prefs.continuousScroll) {
+                        viewModel.saveProgress(page, scrollOffset)
+                    }
+                }
+            })
+            .onRender(object : OnRenderListener {
+                override fun onInitiallyRendered(nbPages: Int) {
+                    // The first paint is where the surface stops being blank,
+                    // which can be after loadComplete on a slow document.
+                    setLoading(false)
+                }
+            })
+            .load()
+    }
+
+    /**
+     * Translate the web layer's URI shapes into a PDFView document source.
+     *
+     * The web bridge rewrites a bundled `/books/x.pdf` into
+     * `file:///android_asset/public/books/x.pdf`, which is an AssetManager path
+     * rather than a filesystem one; anything else with a scheme belongs to the
+     * ContentResolver.
+     */
+    private fun sourceFor(uri: String) = when {
+        uri.startsWith(ASSET_URI_PREFIX) -> AssetSource(uri.removePrefix(ASSET_URI_PREFIX))
+        uri.contains("://") -> UriSource(Uri.parse(uri))
+        // A bare path is treated as an asset inside the APK.
+        else -> AssetSource(uri)
+    }
+
+    /**
+     * Download a remote book to cache, then open the local copy.
+     *
+     * pdfium needs a seekable file rather than a stream, so an http(s) book is
+     * fetched to cache first; that copy also survives rotation without
+     * re-downloading. The transfer runs off the main thread because a
+     * several-megabyte book would otherwise block the window for its duration.
+     */
+    private fun openRemote(contract: Contract) {
+        lifecycleScope.launch {
+            val cached = withContext(Dispatchers.IO) {
+                runCatching {
+                    val target = File(cacheDir, "books/${contract.uri.hashCode()}.pdf")
+                    target.parentFile?.mkdirs()
+                    URL(contract.uri).openStream().use { input ->
+                        target.outputStream().use(input::copyTo)
+                    }
+                    target
+                }.getOrNull()
             }
-        })
 
-        // A custom config stream is optional; without one the library uses its
-        // own defaults, so a null config is a valid input, not an error.
-        val config = try {
-            PdfFileUtils.loadConfig(null, null)
-        } catch (e: IOException) {
-            null
-        }
-
-        when {
-            contract.uri.startsWith("http") ->
-                binding.pdfView.loadUrl(contract.uri, config)
-
-            contract.uri.contains("://") ->
-                // file:// or content:// supplied by the web layer.
-                binding.pdfView.loadUri(Uri.parse(contract.uri))
-
-            else -> try {
-                // A bare path is treated as an asset inside the APK.
-                binding.pdfView.loadAsset(contract.uri, config)
-            } catch (e: IOException) {
-                Toast.makeText(
-                    this, R.string.reader_error_missing_file, Toast.LENGTH_LONG
-                ).show()
-                finish()
-                return
+            if (cached == null) {
+                onOpenFailed()
+                return@launch
             }
+
+            // The options are identical to a local open; only the source differs, which is
+            // why both paths end in the same configure() call.
+            runCatching { configure(binding.pdfView.fromFile(cached), contract) }
+                .onFailure { onOpenFailed() }
         }
+    }
+
+    /** Report a book that could not be opened, and leave the reader. */
+    private fun onOpenFailed() {
+        setLoading(false)
+        Toast.makeText(this, R.string.reader_error_open_failed, Toast.LENGTH_LONG).show()
+        finish()
     }
 
     // ---- Toolbar -----------------------------------------------------------
@@ -353,7 +435,7 @@ class PdfReaderActivity : AppCompatActivity() {
         binding.pageInput.clearFocus()
     }
 
-    /** Full page-jump dialog, opened from the table of contents. */
+    /** Full page-jump dialog, offered from the table of contents. */
     private fun showPageJumpDialog() {
         val dialogBinding = DialogPageJumpBinding.inflate(layoutInflater)
         dialogBinding.pageJumpCaption.text =
@@ -416,10 +498,6 @@ class PdfReaderActivity : AppCompatActivity() {
             bookmarkPages = list.map { it.pageIndex }.toSet()
             refreshBookmarkIcon(binding.pdfView.currentPage)
         }
-        viewModel.highlights.observe(this) { list ->
-            highlightedPages = list.map { it.pageIndex }.toSet()
-            applyHighlightsOnPage(binding.pdfView.currentPage)
-        }
     }
 
     /**
@@ -455,9 +533,7 @@ class PdfReaderActivity : AppCompatActivity() {
     private fun showBookmarksDialog() {
         val dialogBinding = DialogBookmarksBinding.inflate(layoutInflater)
         val adapter = BookmarksAdapter(
-            onJumpToPage = { page ->
-                jumpToPage(page)
-            },
+            onJumpToPage = { page -> jumpToPage(page) },
             onDelete = { bookmark -> viewModel.deleteBookmark(bookmark) }
         )
         dialogBinding.bookmarksRecycler.layoutManager = LinearLayoutManager(this)
@@ -545,80 +621,99 @@ class PdfReaderActivity : AppCompatActivity() {
     /**
      * In-document search.
      *
-     * Search runs against the PDF's text layer, so a scanned document with no
-     * text layer always reports zero hits; that case is explained rather than
-     * left as a silent empty result.
+     * The index is built once, lazily, on a background thread. Until it exists
+     * the dialog says it is indexing rather than reporting zero hits, because
+     * "no results" and "not searched yet" are different answers and only one of
+     * them is true.
      */
     private fun showSearchDialog() {
         val dialogBinding = DialogSearchBinding.inflate(layoutInflater)
 
-        /** Index of the match the reader is currently on. */
-        var currentMatch = 0
+        /** Pages that matched the current query, in reading order. */
+        var hits: List<Int> = emptyList()
 
-        /** Render "3 / 12", or the empty-state message. */
-        fun reportStatus(matchCount: Int) {
-            dialogBinding.searchStatus.text = when {
-                matchCount == 0 -> getString(R.string.reader_search_no_results)
-                else -> getString(R.string.reader_search_results, currentMatch + 1, matchCount)
-            }
-            viewModel.setSearchCount(matchCount)
-        }
+        /** Index into [hits] of the page currently shown. */
+        var currentHit = 0
 
-        /**
-         * findAllAsync reports matches through this callback rather than a
-         * return value, which is why the match count is only correct here.
-         *
-         * It fires for every search the reader types, so results from an earlier
-         * (now stale) query are discarded by comparing the query string.
-         */
-        val findListener = OnFindAllCompleteListener { rects ->
-            val query = dialogBinding.searchInput.text?.toString().orEmpty().trim()
-            // A late callback for a query the reader has already edited.
-            if (rects != null && rects.isNotEmpty()) {
-                searchRects = rects
-                currentMatch = 0
-            } else {
-                searchRects = emptyList()
-                currentMatch = 0
-            }
-            reportStatus(searchRects.size)
-
-            // Land on the first hit straight away so the reader does not have to
-            // press "next" before seeing anything.
-            if (searchRects.isNotEmpty()) showMatch()
-        }
-        binding.pdfView.addOnFindAllCompleteListener(findListener)
-
-        /** Jump to and paint the match at [currentMatch]. */
-        fun showMatch() {
-            if (searchRects.isEmpty()) return
-            val rect = searchRects[currentMatch]
-            // Coordinates are in PDF points, which jumpTo expects.
-            binding.pdfView.jumpTo(rect.left.toInt(), rect.top.toInt())
-            binding.pdfView.highlight(rect)
-            reportStatus(searchRects.size)
-        }
+        /** The query the results on screen belong to. */
+        var query = ""
 
         /** Move through the matches, wrapping at both ends. */
         fun stepMatch(delta: Int) {
-            if (searchRects.isEmpty()) return
-            currentMatch = (currentMatch + delta + searchRects.size) % searchRects.size
-            showMatch()
+            if (hits.isEmpty()) return
+            currentHit = (currentHit + delta + hits.size) % hits.size
+            val page = hits[currentHit]
+            jumpToPage(page)
+            dialogBinding.searchStatus.text = getString(
+                R.string.reader_search_result_with_page,
+                currentHit + 1,
+                hits.size,
+                page + 1
+            )
+            dialogBinding.searchSnippet.text = textSearch?.snippet(page, query).orEmpty()
         }
 
-        // Re-runs on every keystroke; the library debounces its own text-layer
-        // work, so this stays responsive on long books.
+        /** Re-run the query against the index and land on the first hit. */
+        fun runSearch(text: String) {
+            val index = textSearch
+            if (index == null) {
+                dialogBinding.searchStatus.text = getString(R.string.reader_search_indexing)
+                return
+            }
+            query = text
+            hits = index.findPages(text, dialogBinding.searchWholeWords.isChecked)
+            currentHit = 0
+            viewModel.setSearchCount(hits.size)
+
+            if (hits.isEmpty()) {
+                dialogBinding.searchStatus.text = getString(R.string.reader_search_no_results)
+                dialogBinding.searchSnippet.text = ""
+                return
+            }
+            // Land on the first hit straight away so the reader does not have to
+            // press "next" before seeing anything.
+            stepMatch(0)
+        }
+
+        // Build the index the first time search is opened, so the parse cost is
+        // paid once rather than on the first keystroke.
+        if (textSearch == null) {
+            dialogBinding.searchStatus.text = getString(R.string.reader_search_indexing)
+            searchBuildJob = lifecycleScope.launch {
+                val built = withContext(Dispatchers.IO) {
+                    runCatching {
+                        PdfTextSearch.build(this@PdfReaderActivity) {
+                            PdfTextSearch.streamFor(this@PdfReaderActivity, documentUri).invoke()
+                        }
+                    }.getOrNull()
+                }
+                textSearch = built
+                if (built == null) {
+                    // A book with no readable text layer is a scan: a property
+                    // of the file, not a failure of the search.
+                    dialogBinding.searchStatus.text =
+                        getString(R.string.reader_error_no_text_layer)
+                } else {
+                    runSearch(dialogBinding.searchInput.text?.toString().orEmpty().trim())
+                }
+            }
+        }
+
         dialogBinding.searchInput.doAfterTextChanged { text ->
-            val query = text?.toString().orEmpty().trim()
-            currentMatch = 0
-            if (query.isEmpty()) {
-                searchRects = emptyList()
-                binding.pdfView.clearHighlight()
-                reportStatus(0)
+            val typed = text?.toString().orEmpty().trim()
+            if (typed.isEmpty()) {
+                hits = emptyList()
+                currentHit = 0
+                dialogBinding.searchStatus.text = getString(R.string.reader_search_hint_empty)
+                dialogBinding.searchSnippet.text = ""
                 return@doAfterTextChanged
             }
-            binding.pdfView.clearHighlight()
-            binding.pdfView.findAllAsync(query)
+            runSearch(typed)
+        }
+
+        dialogBinding.searchWholeWords.setOnCheckedChangeListener { _, _ ->
+            val typed = dialogBinding.searchInput.text?.toString().orEmpty().trim()
+            if (typed.isNotEmpty()) runSearch(typed)
         }
 
         dialogBinding.btnSearchNext.setOnClickListener { stepMatch(1) }
@@ -630,16 +725,10 @@ class PdfReaderActivity : AppCompatActivity() {
             .setPositiveButton(R.string.reader_cancel, null)
             .create()
 
-        dialog.setOnShowListener {
-            reportStatus(0)
-            dialogBinding.searchInput.requestFocus()
-        }
         dialog.setOnDismissListener {
-            // The listener holds this dialog's views, so it has to go when the
-            // dialog does, or every reopen leaks the previous one.
-            binding.pdfView.removeOnFindAllCompleteListener(findListener)
-            binding.pdfView.clearHighlight()
-            searchRects = emptyList()
+            // The callbacks above close over this dialog's views, so the parse
+            // has to stop when it does, or every reopen leaks the previous one.
+            searchBuildJob?.cancel()
         }
         dialog.show()
     }
@@ -649,10 +738,10 @@ class PdfReaderActivity : AppCompatActivity() {
     /**
      * Save the clipboard text as a highlight on the current page.
      *
-     * AndroidPdfViewer does not expose the live selection through a public API,
-     * so a highlight is created from the clipboard — the same text the reader
-     * just copied. That keeps highlighting dependent on an explicit action
-     * rather than firing on every text selection.
+     * PDFView does not expose the live selection through a public API, so a
+     * highlight is created from the clipboard, which is the text the reader just
+     * copied. That keeps highlighting dependent on an explicit action rather
+     * than firing on every selection the library happens to make.
      */
     private fun createHighlightFromClipboard() {
         val text = currentClipboardText()
@@ -663,7 +752,7 @@ class PdfReaderActivity : AppCompatActivity() {
         viewModel.addHighlight(
             binding.pdfView.currentPage,
             text,
-            androidx.core.content.ContextCompat.getColor(this, R.color.reader_highlight_yellow)
+            ContextCompat.getColor(this, R.color.reader_highlight_yellow)
         )
         Snackbar.make(binding.root, R.string.reader_highlight_saved, Snackbar.LENGTH_SHORT).show()
     }
@@ -677,45 +766,18 @@ class PdfReaderActivity : AppCompatActivity() {
             ?.toString()
     }
 
-    /**
-     * Re-apply saved highlights to a page that has just become visible.
-     *
-     * Highlights are stored as text snippets, not rectangles, because selection
-     * rectangles depend on zoom and rotation. Re-finding the snippet keeps them
-     * in the right place at any zoom level.
-     */
-    private fun applyHighlightsOnPage(page: Int) {
-        if (!highlightedPages.contains(page)) return
-        lifecycleScope.launch {
-            val pageHighlights = withContext(Dispatchers.IO) {
-                viewModel.highlightsOnPage(page)
-            }
-            pageHighlights.forEach { highlight ->
-                binding.pdfView.findAllAsync(highlight.snippet)
-            }
-        }
-    }
-
     // ---- Table of contents -------------------------------------------------
 
     /**
-     * Outline / contents sheet.
+     * Outline / contents sheet, read from the PDF's own outline.
      *
-     * Only tagged (bookmarked) PDFs carry an outline; a scan has none, in which
-     * case the numeric jump is offered on its own instead of an empty list.
+     * Only a tagged (bookmarked) PDF carries one; a scan has none, in which case
+     * the numeric jump is offered on its own instead of an empty list.
      */
     private fun showTocDialog() {
-        val dialogBinding = DialogTableOfContentsBinding.inflate(layoutInflater)
-        val tocAdapter = TocAdapter(onEntryClick = { page -> jumpToPage(page) })
-        dialogBinding.tocRecycler.layoutManager = LinearLayoutManager(this)
-        dialogBinding.tocRecycler.adapter = tocAdapter
+        val entries = binding.pdfView.tableOfContents.flatten()
 
-        // The library exposes titles through each page's `title` field, which is
-        // null for pages that are not section starts.
-        val pages = binding.pdfView.pages
-        val titledPages = pages?.filter { !it.title.isNullOrBlank() }.orEmpty()
-
-        if (titledPages.isEmpty()) {
+        if (entries.isEmpty()) {
             MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.reader_table_of_contents)
                 .setMessage(R.string.reader_toc_unavailable)
@@ -723,6 +785,22 @@ class PdfReaderActivity : AppCompatActivity() {
                 .setNegativeButton(R.string.reader_cancel, null)
                 .show()
             return
+        }
+
+        val dialogBinding = DialogTableOfContentsBinding.inflate(layoutInflater)
+        val tocAdapter = TocAdapter(onEntryClick = { page -> jumpToPage(page) })
+        dialogBinding.tocRecycler.layoutManager = LinearLayoutManager(this)
+        dialogBinding.tocRecycler.adapter = tocAdapter
+        tocAdapter.submitList(entries)
+
+        // A long outline is worse than none, so the page field filters it down as
+        // the reader types instead of making them scroll to the section.
+        dialogBinding.tocPageInput.doAfterTextChanged { text ->
+            val query = text?.toString()?.trim().orEmpty()
+            tocAdapter.submitList(
+                if (query.isEmpty()) entries
+                else entries.filter { it.title.contains(query, ignoreCase = true) }
+            )
         }
 
         MaterialAlertDialogBuilder(this)
@@ -744,7 +822,7 @@ class PdfReaderActivity : AppCompatActivity() {
         val checked = booleanArrayOf(
             viewModel.prefs.nightMode,
             viewModel.prefs.continuousScroll,
-            viewModel.prefs.orientationLock != com.fiqh.app.pdf.prefs.PdfPrefs.ORIENTATION_UNSET
+            viewModel.prefs.orientationLock != PdfPrefs.ORIENTATION_UNSET
         )
 
         MaterialAlertDialogBuilder(this)
@@ -760,7 +838,7 @@ class PdfReaderActivity : AppCompatActivity() {
                     1 -> viewModel.prefs.continuousScroll = isChecked
                     2 -> viewModel.prefs.orientationLock =
                         if (isChecked) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
-                        else com.fiqh.app.pdf.prefs.PdfPrefs.ORIENTATION_UNSET
+                        else PdfPrefs.ORIENTATION_UNSET
                 }
             }
             .setPositiveButton(R.string.reader_cancel, null)
@@ -772,11 +850,12 @@ class PdfReaderActivity : AppCompatActivity() {
     /**
      * Apply or remove the dark reading surface.
      *
-     * PDFView paints an opaque bitmap, so it cannot be recoloured from the
-     * outside. A translucent black overlay over the page is the only reliable
-     * way to dim it — the same approach the web reader uses with a CSS overlay.
+     * pdfium inverts its own rendering when night mode is on, which is set here
+     * on the view; the translucent overlay on top dims the page further and
+     * keeps the paper feel of the web reader.
      */
     private fun applyNightMode(enabled: Boolean) {
+        binding.pdfView.setNightMode(enabled)
         binding.nightOverlay.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
@@ -806,14 +885,25 @@ class PdfReaderActivity : AppCompatActivity() {
     }
 
     /** Send the reader back to the WebView with the page it was left on. */
+    @Suppress("DEPRECATION")
     override fun onBackPressed() {
         // Close the inline page field before leaving the reader.
         if (binding.pageInputLayout.visibility == View.VISIBLE) {
             hidePageInput()
             return
         }
-        setResult(RESULT_OK, Intent().putExtra(PdfReaderContract.EXTRA_PAGE, binding.pdfView.currentPage))
-        @Suppress("DEPRECATION")
+setResult(
+                RESULT_OK,
+                Intent().putExtra(PdfReaderContract.EXTRA_PAGE, binding.pdfView.currentPage)
+            )
         super.onBackPressed()
+    }
+
+    private companion object {
+        /** How the web bridge addresses a file bundled inside the APK. */
+        const val ASSET_URI_PREFIX = "file:///android_asset/"
+
+        /** Gap between pages in paged mode, so the page edge is readable. */
+        const val PAGE_SPACING_DP = 8
     }
 }

@@ -72,8 +72,10 @@ dependencies {
     implementation "androidx.room:room-runtime:2.6.1"
     implementation "androidx.room:room-ktx:2.6.1"
     ksp "androidx.room:room-compiler:2.6.1"
-    // AndroidPdfViewer exposes a real text layer, which search/selection/copy need.
+    // AndroidPdfViewer renders the pages. It has no text-search API, so the
+    // search itself runs on PDFBox, which does expose a real text layer.
     implementation "com.github.mhiew:android-pdf-viewer:3.2.0-beta.3"
+    implementation "com.tom-roush:pdfbox-android:2.0.27.0"
 }
 
 kotlin {
