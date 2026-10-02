@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Main reader surface.
+
+    Layout notes:
+      - The PdfView fills the window and the bars are overlays so the page is
+        never letterboxed by chrome; top/bottom insets are padded in code.
+      - The night-mode surface is a sibling View rather than a background on the
+        root, because PdfView draws its own bitmap and would ignore a tint.
+      - The page scrubber lives inside the top bar to keep the reading area clear.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/readerRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/reader_background">
+
+    <!-- The PDF surface itself. -->
+    <com.github.barteksc.pdfviewer.PDFView
+        android:id="@+id/pdfView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Night-mode surface: painted over the page to invert perceived brightness. -->
+    <View
+        android:id="@+id/nightOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/reader_night_overlay"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <!-- ---- Top bar: navigation, title, TOC, search ---- -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/reader_surface"
+        app:title="@string/pdf_reader_title"
+        app:titleTextColor="@color/reader_on_surface"
+        app:navigationIcon="@drawable/ic_pdf_back"
+        app:navigationIconTint="@color/reader_on_surface" />
+
+    <!-- Position scrubber: drag to jump anywhere in the book. -->
+    <com.google.android.material.slider.Slider
+        android:id="@+id/pageSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginStart="@dimen/reader_gutter"
+        android:layout_marginEnd="@dimen/reader_gutter"
+        android:layout_marginTop="64dp"
+        android:stepSize="1"
+        app:labelBehavior="gone"
+        app:thumbColor="@color/reader_accent"
+        app:trackColorActive="@color/reader_accent"
+        app:trackColorInactive="@color/reader_divider" />
+
+    <!-- ---- Bottom bar: page indicator and reader tools ---- -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/reader_surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/reader_gutter"
+        android:paddingEnd="@dimen/reader_gutter">
+
+        <!-- "12 / 340": current page and total. -->
+        <TextView
+            android:id="@+id/pageIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textColor="@color/reader_on_surface"
+            android:textSize="14sp"
+            tools:text="12 / 340" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Previous page. -->
+        <ImageButton
+            android:id="@+id/btnPrevious"
+            android:layout_width="@dimen/reader_touch_target"
+            android:layout_height="@dimen/reader_touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reader_previous_page"
+            android:src="@drawable/ic_pdf_previous"
+            app:tint="@color/reader_on_surface" />
+
+        <!-- Next page. -->
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:layout_width="@dimen/reader_touch_target"
+            android:layout_height="@dimen/reader_touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reader_next_page"
+            android:src="@drawable/ic_pdf_next"
+            app:tint="@color/reader_on_surface" />
+
+        <!-- Reader settings / mode toggles. -->
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="@dimen/reader_touch_target"
+            android:layout_height="@dimen/reader_touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reader_settings"
+            android:src="@drawable/ic_pdf_settings"
+            app:tint="@color/reader_on_surface" />
+    </LinearLayout>
+
+    <!-- ---- Floating page-number entry (like the web reader) ---- -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/pageInputLayout"
+        style="@style/Widget.Fiqh.PageInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="-48dp"
+        android:visibility="gone"
+        app:hintEnabled="false"
+        tools:visibility="visible">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pageInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionGo"
+            android:inputType="number"
+            android:maxLength="4"
+            android:minWidth="96dp"
+            android:textAlignment="center"
+            android:textColor="@color/reader_on_surface"
+            android:textSize="18sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Indeterminate progress shown while the PDF is loading. -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/reader_accent"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</FrameLayout>

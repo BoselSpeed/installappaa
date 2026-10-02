@@ -19,4 +19,29 @@
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
     </style>
+
+    <!--
+        Native PDF reader theme. Extends DayNight so the reader_colors.xml
+        night overrides apply without any code branching, and disables the
+        action bar because activity_pdf_reader supplies its own MaterialToolbar.
+    -->
+    <style name="Theme.Fiqh.PdfReader" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:colorBackground">@color/reader_background</item>
+        <item name="colorPrimary">@color/reader_accent</item>
+        <item name="colorSurface">@color/reader_surface</item>
+        <item name="colorOnSurface">@color/reader_on_surface</item>
+        <!-- Pages must not dim behind the system bars: keep the reader edge to edge. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- Compact page-number field shown when the reader's bottom bar is tapped. -->
+    <style name="Widget.Fiqh.PageInput" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">@color/reader_surface</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+    </style>
 </resources>

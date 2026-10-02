@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Simple numeric page prompt, used by the bottom bar's page indicator.
+
+    Kept separate from the TOC dialog so the quick jump stays one tap away.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/reader_gutter">
+
+    <TextView
+        android:id="@+id/pageJumpCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:textColor="@color/reader_on_surface_variant"
+        android:textSize="13sp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/reader_go_to_page"
+        app:endIconMode="clear_text"
+        app:startIconDrawable="@drawable/ic_pdf_page">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pageJumpInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionGo"
+            android:inputType="number"
+            android:maxLength="4" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

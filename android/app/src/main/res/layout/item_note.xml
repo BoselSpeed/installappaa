@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    One saved note.
+
+    Both the body and the timestamp are editable in place; the timestamps are
+    formatted by the adapter, not here.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/reader_gutter"
+    android:paddingEnd="@dimen/reader_gutter"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Jump target; also serves as the tap target for the whole row. -->
+        <TextView
+            android:id="@+id/notePage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="4dp"
+            android:textColor="@color/reader_accent"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="page 24" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btnEditNote"
+            android:layout_width="@dimen/reader_touch_target"
+            android:layout_height="@dimen/reader_touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reader_edit"
+            android:src="@drawable/ic_pdf_edit"
+            app:tint="@color/reader_on_surface_variant" />
+
+        <ImageButton
+            android:id="@+id/btnDeleteNote"
+            android:layout_width="@dimen/reader_touch_target"
+            android:layout_height="@dimen/reader_touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reader_delete"
+            android:src="@drawable/ic_pdf_delete"
+            app:tint="@color/reader_on_surface_variant" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/noteBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/reader_on_surface"
+        android:textSize="15sp"
+        tools:text="The author's argument hinges on the distinction between the general and the specific." />
+
+    <TextView
+        android:id="@+id/noteTimestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/reader_on_surface_variant"
+        android:textSize="11sp"
+        tools:text="12 March, 14:05" />
+</LinearLayout>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One saved page: page number, optional label, and a delete affordance. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="56dp"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/reader_gutter"
+    android:paddingEnd="@dimen/reader_gutter">
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:contentDescription="@string/reader_bookmarks"
+        android:src="@drawable/ic_pdf_bookmark"
+        app:tint="@color/reader_accent" />
+
+    <!-- Label falls back to the page number when the user saved no text. -->
+    <TextView
+        android:id="@+id/bookmarkLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/reader_gutter"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@color/reader_on_surface"
+        android:textSize="15sp"
+        tools:text="page 24" />
+
+    <ImageButton
+        android:id="@+id/btnDeleteBookmark"
+        android:layout_width="@dimen/reader_touch_target"
+        android:layout_height="@dimen/reader_touch_target"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/reader_delete"
+        android:src="@drawable/ic_pdf_delete"
+        app:tint="@color/reader_on_surface_variant" />
+</LinearLayout>
