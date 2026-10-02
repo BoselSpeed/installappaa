@@ -15,12 +15,11 @@ npm run dev        # dev server on http://localhost:3000
 
 | Script | What it does |
 |---|---|
-| `npm run dev` | Vite dev server (includes the download proxy) |
+| `npm run dev` | Vite dev server |
 | `npm run build` | Production build into `تطبيق الفقه/` |
-| `npm run preview` | Preview the build (Vite — proxy available) |
-| `npm run serve` | **Serve the build in production** (static files + download proxy) |
+| `npm run preview` | Preview the production build locally |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run lint` | ESLint over app, server and scripts |
+| `npm run lint` | ESLint over the app and scripts |
 | `npm run verify:content` | Validate `src/data/books.js` against `public/` |
 | `npm run verify` | typecheck + lint + content check |
 | `npm run android:apk` | Build the web app and assemble a debug APK |
@@ -38,13 +37,11 @@ src/
     Navigation/        nav bar, sidebar, footer
     ErrorBoundary.jsx  render-error containment
   services/
-    zipRangeReader.js  pulls one PDF out of a remote ZIP via HTTP Range
-    volumeStorage.js   IndexedDB store for downloaded volumes
-    supabaseStorage.js volume URL resolution
-  firebase/            Firestore/Auth wrappers + a localStorage demo service
+    appService.js      the data layer every page imports
+    localService.js    the on-device store behind it (localStorage)
+    volumeStorage.js   volume URL resolution + IndexedDB downloads
   hooks/               context providers and data hooks
   i18n/                ar.json / en.json
-server/serve.mjs       zero-dependency static server + /__drive-proxy
 scripts/verify-content.mjs
 android/               Capacitor Android project
 docs/                  content management and deployment guides
@@ -54,7 +51,7 @@ docs/                  content management and deployment guides
 
 Everything lives in `src/data/books.js` — no code changes needed. See
 [`docs/books-management.md`](docs/books-management.md) (Arabic and English) for
-the field reference and the three ways to supply a volume PDF.
+the field reference and the ways to supply a volume PDF.
 
 After editing, run `npm run verify:content`: it checks that every bundled PDF and
 cover actually exists in `public/`, that every volume has a reachable source,
@@ -62,25 +59,26 @@ that ids are unique, and that every category is reachable from `/sections`.
 
 ## Deployment
 
-The web build needs one server-side endpoint beyond static hosting — see
-[`docs/deployment.md`](docs/deployment.md). Without it, bundled volumes work
-offline but downloading the rest of the library fails in the browser (the app
-tells the reader so and offers the original file). The Android build does not
-need it: it downloads through the native HTTP client.
+The build is entirely static — `تطبيق الفقه/` is the whole app, so any static
+host or CDN works, and no server-side code is required. See
+[`docs/deployment.md`](docs/deployment.md).
 
-Quickest path:
+Only PDFs bundled under `public/books/` are readable inside the app, on the web
+and in the Android build. Volumes hosted elsewhere are opened at their original
+location, because a static site cannot fetch another origin.
+
+Preview locally with:
 
 ```bash
 npm run build
-npm run serve        # http://localhost:4173
+npm run preview      # http://localhost:4173
 ```
 
 ## Data and accounts
 
-The app runs in demo mode out of the box: content and progress live in
-`localStorage` and downloaded volumes in IndexedDB. It switches to real
-Firebase and Supabase once you fill in `src/firebase/config.js` and
-`src/supabase/config.js` — both are placeholders in this repository.
+There is no backend and no account. Content and progress live in
+`localStorage`, and downloaded volumes in IndexedDB, so the app works offline
+and there are no credentials to configure.
 
 ## License
 

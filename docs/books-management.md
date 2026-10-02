@@ -38,7 +38,7 @@ src/data/books.js
   language_en: 'Arabic',
   category_ar: 'التصنيف',
   category_en: 'Category',
-  madhab_ar: 'المذهب',       // عند الحاجة فقط
+  madhab_ar: '',             // عند الحاجة فقط
   madhab_en: '',
   description_ar: 'نبذة عن الكتاب',
   description_en: 'Book description',
@@ -51,18 +51,18 @@ src/data/books.js
       number: 1,
       title_ar: 'المجلد الأول',
       title_en: 'Volume 1',
-      bundled: true,                       // مهم: true للمجلد الأول
+      bundled: true,                       // مهم: true للمجلد المدمج
       pdfUrl: '/books/اسم-الملف.pdf',      // ضع ملف PDF في public/books/
       downloadUrl: null,
-      sizeMb: 3.1                          // حجم الملف التقريبي
+      sizeMb: 3.1                          // الحجم التقريبي
     },
-    // المجلد الثاني — يُنزَّل من الإنترنت عند الطلب
+    // المجلد الثاني — يُقرأ من موقعه الأصلي خارج التطبيق
     {
       id: 'v2',
       number: 2,
       title_ar: 'المجلد الثاني',
       title_en: 'Volume 2',
-      bundled: false,                      // مهم: false للمجلدات الإضافية
+      bundled: false,                      // مهم: false للمجلدات غير المدمجة
       pdfUrl: null,
       downloadUrl: 'https://.../vol2.pdf', // رابط مباشر لملف PDF
       sizeMb: 150
@@ -71,49 +71,39 @@ src/data/books.js
 }
 ```
 
+### مدمج أم غير مدمج؟ أهم نقطة في الملف
+
+- **مجلد مدمج** (`bundled: true` مع `pdfUrl` يشير إلى ملف داخل `public/books/`)
+  يُقرأ **داخل التطبيق**، وفي نسخة أندرويد عبر القارئ الأصلي، ويعمل دون
+  إنترنت.
+- **مجلد غير مدمج** (`bundled: false`) يُقرأ من موقعه الأصلي في المتصفح، ولا
+  يُنزَّل إلى داخل التطبيق.
+
+السبب أن المتصفح يمنع التطبيق من جلب ملفات من نطاق آخر (CORS)، وهذه النسخة من
+التطبيق لا تحتوي على خادم وسيط يمكنه تجاوز ذلك. عرض زر «تنزيل» لمجلد لا يمكن
+تنزيله كان سيعطي المستخدم زرًا لا ينجح أبدًا، لذا تعرض بطاقة المجلد بدلًا منه
+شارة «يُفتح خارج التطبيق» وزر «فتح في المتصفح».
+
+**لجعل مجلد يُقرأ داخل التطبيق:** ضع ملفه في `public/books/` واجعله
+`bundled: true`.
+
 ### قواعد مهمة
 
-1. **المجلد الأول** دائماً `bundled: true` مع `pdfUrl` يشير إلى ملف داخل
-   `public/books/` حتى يكون متوفرًا مع التطبيق دون إنترنت.
-2. **المجلدات الأخرى** تكون `bundled: false` مع `downloadUrl` أو `storagePath`
-   (انظر «الاستضافة على Supabase Storage» أدناه). عند الضغط على «تنزيل»
-   يُحفظ الملف محليًا على الجهاز، ويمكن فتحه لاحقًا دون إنترنت.
+1. **المجلد الأول** `bundled: true` مع `pdfUrl` يشير إلى ملف داخل
+   `public/books/`.
+2. أي مجلد تريد قراءته داخل التطبيق يجب أن يكون مدمجًا.
 3. أي حقل تتركه فارغًا لن يظهر للمستخدم — لا شيء يُحذف ولا شيء ينكسر.
 4. لا تغيّر `id` كتاب موجود إلا إذا أردت إنشاء كتاب جديد.
 5. لا تحذف ملفات PDF الموجودة في `public/books/` ولا الملفات في `public/covers/`.
 6. التطبيق لا يضيف الكتب أو يعدّلها تلقائيًا — أنت من يتحكم بالمحتوى بالكامل
    من خلال هذا الملف.
-
-### الاستضافة على Supabase Storage (مقترح لاستضافة المجلدات الكبيرة)
-
-بدلاً من `downloadUrl` كامل يمكنك تخزين ملفات PDF على **Supabase Storage**
-وتستخدم التطبيق `storagePath`:
-
-```js
-{
-  bundled: false,
-  pdfUrl: null,
-  storagePath: 'books/كتاب-الاسم/vol2.pdf', // المسار داخل الجراب العام (bucket)
-  sizeMb: 150
-}
-```
-
-خطوات الإعداد مرة واحدة:
-
-1. أنشئ مشروعًا مجانيًا على https://supabase.com
-2. من **Storage** أنشئ جرابًا عامًا (public bucket) باسم `books`
-   (Project Settings → Storage → سياسة القراءة العامة).
-3. ارفع ملفات PDF إلى الجراب بنفس بنية `storagePath`.
-4. ضع رابط مشروعك في `src/supabase/config.js`:
-   `projectUrl: 'https://xxxxxxxx.supabase.co'` و `publicBucket: 'books'`.
-
-مزايا هذه الطريقة: روابط التحميل تعمل مع CORS مباشرة، فشريط التقدم يعمل
-داخل التطبيق، ولا يوجد حد 100MB كما في GitHub، والمجلدات الكبيرة مدعومة.
+7. بعد أي تعديل شغّل `npm run verify:content` للتأكد من وجود كل ملف مذكور.
 
 ### كتاب كامل داخل أرشيف ZIP واحد على Google Drive (لمجلدات كثيرة)
 
-إذا كان الكتاب الكبير مرقّمًا إلى عشرات المجلدات، أسهل طريقة هي رفع **ملف ZIP
-واحد** يحتوي كل المجلدات إلى Google Drive، ثم الإشارة إليه في الكتاب:
+رفع كل مجلدات الكتاب في ملف ZIP واحد على Google Drive يبقى وسيلة عملية للوصول
+إليها، لكن التطبيق لن يستخرج منها المجلدات. وجّه الكتاب إلى صفحة Drive
+مباشرة:
 
 ```js
 {
@@ -121,19 +111,17 @@ src/data/books.js
   // ...
   source: {
     type: 'zip',
-    // رابط التحميل المباشر (مهم جدًا: انسخه بهذا الشكل من معرّف الملف)
-    url: 'https://drive.usercontent.google.com/download?id=FILE_ID&export=download&confirm=t',
-    // رابط صفحة Drive (اختياري — يُستخدم كملاذ أخير احتياطي فقط)
+    // رابط صفحة Drive — يستخدمه التطبيق لفتح المجلد في المتصفح
     pageUrl: 'https://drive.google.com/file/d/FILE_ID/view'
   },
   volumes: [
     {
       id: 'v1',
       number: 1,
-      bundled: true,                    // المجلد الأول مدمج مع التطبيق
-      pdfUrl: '/books/اسم-الكتاب-v1.pdf', // استخرجت المجلد الأول ووضعته هنا
+      bundled: true,                       // المجلد الأول مدمج مع التطبيق
+      pdfUrl: '/books/اسم-الكتاب-v1.pdf', // ضعه في public/books/
       downloadUrl: null,
-      path: '0001-0343.pdf',            // اسم الملف داخل الـ ZIP بالضبط
+      path: '0001-0343.pdf',               // اسم الملف داخل الـ ZIP (توثيق فقط)
       sizeMb: 9.3
     },
     {
@@ -145,42 +133,33 @@ src/data/books.js
       path: '0344-0686.pdf',
       sizeMb: 8.5
     }
-    // ... بقية المجلدات بنفس `path` لكل ملف داخل الـ ZIP
+    // ... بقية المجلدات
   ]
 }
 ```
 
-كيف يعمل: المجلد الأول يُقرأ مباشرة من داخل التطبيق (مدمج). عند الضغط على
-«تنزيل» لأي مجلد آخر، يحاول التطبيق أولًا قراءة ذلك المجلد فقط من الـ ZIP عبر
-طلبات HTTP Range (دون تحميل الـ ZIP كاملًا). إذا منع الخادم (Google Drive أحيانًا)
-طلبات Range أو فشلت مصافحة CORS الخاصة بها، يلجأ التطبيق تلقائيًا إلى التنزيل
-الاحتياطي: ينزّل ملف الـ ZIP كاملًا داخل التطبيق ويفك ضغط المجلد المطلوب محليًا.
-في الحالتين يتم التنزيل **داخل التطبيق بالكامل** — لا يغادر المستخدم التطبيق ولا
-يُوجَّه إلى Google Drive.
+المجلد الأول يُقرأ داخل التطبيق لأنه مدمج. أما بقية المجلدات فتفتح في صفحة
+Drive عند الضغط عليها.
 
-الشروط المطلوبة حتى تعمل هذه الطريقة:
+لماذا لا يستخرج التطبيق المجلد من الـ ZIP؟ لأن الاستخراج يحتاج طلبات `Range`،
+والمتصفح يمنعها عبر CORS لأن `Range` ليس من الترويسات المسموح بها بلا خادم.
+التوجيه إلى صفحة Drive أوضح للمستخدم من زر تنزيل لا ينجح.
 
-1. **شارك ملف الـ ZIP بـ «أي شخص لديه الرابط»** (Viewer) — وإلا لن يستطيع
-   المستخدمون تحميله.
-2. **اضبط الرابط المباشر** بالشكل:
-   `https://drive.usercontent.google.com/download?id=FILE_ID&export=download&confirm=t`
-   حيث `FILE_ID` هو المعرّف الموجود في رابط المشاركة.
-   (`drive.google.com/download` العادي قد يعرض صفحة تحذير الفيروسات التي تعطّل
-   التنزيل داخل التطبيق — تأكد من استخدام `drive.usercontent.google.com` مع
-   `confirm=t` كما في المثال).
-3. انسخ اسم كل ملف داخل الـ ZIP **حرفًا بحرفًا** في حقل `path` (الحروف والمسافات
-   والرموز مهمة). الحرف «الجزء» في اسم الملف الفعلي داخل الـ ZIP لا تغيّره حتى
-   لو غيّرت عنوان العرض إلى «المجلد».
-4. `bundled: true` للمجلد الأول فقط مع نسخة منه داخل `public/books/`؛ أما بقية
-   المجلدات فتبقى `bundled: false` حتى لا يضخم حجم التطبيق.
+الشروط المطلوبة:
+
+1. **شارك ملف الـ ZIP بـ «أي شخص لديه الرابط»** (Viewer).
+2. انسخ `FILE_ID` من رابط المشاركة: `https://drive.google.com/file/d/FILE_ID/view`.
+3. انسخ اسم كل ملف داخل الـ ZIP **حرفًا بحرفًا** في حقل `path` (حقل توثيقي
+   فقط، ودقته لا تؤثر على عمل التطبيق لأن القراءة تتم من صفحة Drive).
+4. `bundled: true` للمجلد الأول فقط مع نسخة منه داخل `public/books/`؛ البقية
+   `bundled: false` حتى لا يضخم حجم التطبيق.
 
 ---
 
 ### إضافة كتاب متعدد المجلدات (أي عدد من المجلدات)
 
-أضف أي عدد تريده من الكائنات داخل مصفوفة `volumes` بالترتيب المطلوب
-(المجلد الأول، ثم الثاني، ثم الثالث...). التطبيق يعاملها كلها ككتاب واحد،
-ويعرضها داخل صفحة الكتاب الواحدة.
+أضف أي عدد تريده من الكائنات داخل مصفوفة `volumes` بالترتيب المطلوب. التطبيق
+يعاملها كلها ككتاب واحد، ويعرضها داخل صفحة الكتاب الواحدة.
 
 ---
 
@@ -212,54 +191,22 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
   `null` for a styled placeholder.
 - `order` — the book's position in the library.
 - `volumes` — the volumes of the book:
-  - **Volume 1** must be `bundled: true` with a `pdfUrl` pointing to a PDF
-    inside `public/books/`. It ships with the app and works offline.
-  - **Later volumes** must be `bundled: false` with a `downloadUrl` (a direct
-    link to the PDF) or a `storagePath` (a path inside your Supabase public
-    bucket — see below). They are downloaded on demand and stored locally on
-    the device, so they can be opened offline afterwards.
-  - **Whole book inside one ZIP on Google Drive** — set `source: { type:
-    'zip', url, pageUrl }` on the book and give each volume a `path` (the
-    exact member filename inside the ZIP). The app first fetches that single
-    volume from the ZIP via HTTP Range requests; if the server blocks Range
-    requests or their CORS preflight, it automatically falls back to
-    downloading the whole archive inside the app and extracting the volume
-    locally. Either way the download happens entirely in-app — the user is
-    never sent to Google Drive. See the Arabic section above for the recipe.
-
-### Hosting on Supabase Storage (recommended for large volumes)
-
-Instead of a full `downloadUrl`, you can store your PDFs on **Supabase
-Storage** and point volumes at them with `storagePath`:
-
-```js
-{
-  bundled: false,
-  pdfUrl: null,
-  storagePath: 'books/book-name/vol2.pdf', // path inside the public bucket
-  sizeMb: 150
-}
-```
-
-One-time setup:
-
-1. Create a free project at https://supabase.com
-2. In **Storage**, create a public bucket named `books` (Project Settings →
-   Storage → public read policy).
-3. Upload your PDFs into the bucket following the same `storagePath` structure.
-4. Put your project URL in `src/supabase/config.js`:
-   `projectUrl: 'https://xxxxxxxx.supabase.co'` and `publicBucket: 'books'`.
-
-Why: public storage URLs work with CORS out of the box, so the in-app
-download progress bar works, there is no 100MB GitHub limit, and large
-volumes are fully supported.
+  - **Bundled** (`bundled: true`) with a `pdfUrl` inside `public/books/` — opens
+    in the app, in the Android native reader, and offline.
+  - **Not bundled** (`bundled: false`) with a `downloadUrl` — opens at that URL
+    in the browser. Not downloaded into the app.
+  - **Whole book inside one ZIP on Google Drive** — set
+    `source: { type: 'zip', pageUrl }` on the book and give each volume a `path`
+    (the member filename inside the ZIP, for your own reference). Each
+    unbundled volume opens the archive's Drive page.
 
 ### Rules
 
 1. Keep volume 1 bundled with the app (offline-first).
-2. Volumes 2+ use `downloadUrl`; the app downloads and stores them locally.
+2. Bundle any volume that must be readable inside the app.
 3. Empty fields are hidden — nothing is deleted or broken.
 4. Never change the `id` of an existing book unless creating a new one.
 5. Never delete existing PDFs in `public/books/` or images in `public/covers/`.
 6. The app never adds or edits books automatically — you control the content
    entirely through this file.
+7. Run `npm run verify:content` after editing.
