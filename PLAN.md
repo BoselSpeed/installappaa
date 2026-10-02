@@ -52,9 +52,9 @@ Working features:
   (تطبيق الفقه), standalone display, RTL, icons (192/512/maskable); runtime
   `CacheFirst` for other `/books/*.pdf` with `rangeRequests` enabled
   - Build output goes to `تطبيق الفقه/`; verified functional offline
-- **Android APK** (`com.fiqh.app`) and an **iOS Xcode project** (`ايفون/`) built
-  from the same web bundle; native volume downloads go through `CapacitorHttp`,
-  bypassing Google Drive's CORS restrictions
+- **Android APK** (`com.fiqh.app`) built from the same web bundle; native volume
+  downloads go through `CapacitorHttp`, bypassing Google Drive's CORS
+  restrictions
 - `server/serve.mjs` — zero-dependency static server that also exposes the
   `/__drive-proxy` endpoint the web build needs for archive downloads
 - Tooling: `npm run verify` runs typecheck, ESLint and `npm run

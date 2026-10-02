@@ -4,7 +4,7 @@
 
 An offline-first library of Tawhid, Aqeedah, Tafsir, Hadith and Adab books,
 bilingual (Arabic / English, RTL default), shipping as an installable PWA and as
-native Android and iOS builds from the same codebase.
+an Android APK built from the same web bundle.
 
 ## Quick start
 
@@ -47,7 +47,6 @@ src/
 server/serve.mjs       zero-dependency static server + /__drive-proxy
 scripts/verify-content.mjs
 android/               Capacitor Android project
-ايفون/                  Capacitor iOS (Xcode) project
 docs/                  content management and deployment guides
 ```
 
@@ -66,8 +65,8 @@ that ids are unique, and that every category is reachable from `/sections`.
 The web build needs one server-side endpoint beyond static hosting — see
 [`docs/deployment.md`](docs/deployment.md). Without it, bundled volumes work
 offline but downloading the rest of the library fails in the browser (the app
-tells the reader so and offers the original file). The Android and iOS builds do
-not need it: they download through the native HTTP client.
+tells the reader so and offers the original file). The Android build does not
+need it: it downloads through the native HTTP client.
 
 Quickest path:
 

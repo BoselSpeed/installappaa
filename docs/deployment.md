@@ -20,7 +20,7 @@ Two things stop that from working in a browser:
 2. **Preflight.** `Range` is not a CORS-safelisted request header, so the browser
    sends an `OPTIONS` preflight first, which Drive does not answer.
 
-The Android and iOS builds avoid both because `CapacitorHttp` (enabled in
+The Android build avoids both because `CapacitorHttp` (enabled in
 `capacitor.config.json`) sends every request through the OS HTTP client, where
 there is no browser CORS at all.
 
@@ -192,17 +192,13 @@ which `zipRangeReader` recognises — and instead of a dead-end retry button the
 volume card explains the situation and offers the original archive link. Nothing
 crashes; bundled volumes keep working.
 
-## Building the native apps
+## Building the Android app
 
 ```bash
 npm run android:apk     # -> release/تطبيق-الفقه.apk
 ```
 
-For iOS, see `ايفون/README.md` — the platform folder is not named `ios`, so
-Capacitor CLI does not detect it and `npx cap sync ios` does not apply. Copy the
-build output into `ايفون/App/App/public/` instead.
-
-Both native builds embed the web bundle, so rebuild it before syncing.
+The APK embeds the web bundle, so rebuild the web app before syncing.
 
 ## Notes
 
