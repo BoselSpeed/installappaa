@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { sectionsService, lessonsService, booksService } from '../firebase/service';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
@@ -110,6 +110,15 @@ const SectionsPage = () => {
         <EmptyState icon="info" title={t('error_occurred')} />
       </PageShell>
     );
+  }
+
+  // /sections/:id is legacy for the per-book sections that used to exist.
+  // Every remaining section is a category, so send it to the filtered library.
+  if (sectionId && selectedSection) {
+    const target = sectionLink(selectedSection);
+    if (target !== `/sections/${sectionId}`) {
+      return <Navigate to={target} replace />;
+    }
   }
 
   return (

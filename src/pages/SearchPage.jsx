@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { lessonsService, sectionsService, lessonContentService } from '../firebase/service';
+import { lessonsService, sectionsService, lessonContentService, booksService } from '../firebase/service';
 import { SearchBar } from '../components/UI/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { lessonUrl, useLocalized, highlight } from '../utils/helpers';
@@ -34,15 +34,18 @@ const SearchPage = () => {
       setLoading(true);
       try {
         const q = query.trim().toLowerCase();
-        const [allLessons, allSections, allContent] = await Promise.all([
+        const [allLessons, allSections, allContent, allBooks] = await Promise.all([
           lessonsService.getAllLessons(),
           sectionsService.getAllSections(),
           lessonsService.getAllLessons().then((lessons) =>
             Promise.all(lessons.map((l) => lessonContentService.getLessonContent(l.id)))
-          )
+          ),
+          booksService.getAllBooks()
         ]);
 
-        const sectionById = Object.fromEntries(allSections.map((s) => [s.id, s]));
+        // A lesson's sectionId is its book id, so label lesson results with the
+        // book they belong to (sections are categories now).
+        const bookById = Object.fromEntries(allBooks.map((b) => [b.id, b]));
 
         const inText = (...values) =>
           values.some((v) => typeof v === 'string' && v.toLowerCase().includes(q));
@@ -58,7 +61,7 @@ const SearchPage = () => {
         setLessonResults(
           matchedLessons.map((lesson) => ({
             lesson,
-            section: sectionById[lesson.sectionId] || null
+            book: bookById[lesson.sectionId] || null
           }))
         );
 
@@ -98,7 +101,7 @@ const SearchPage = () => {
             <section>
               <SectionTitle className="mb-4">{t('lessons')}</SectionTitle>
               <div className="space-y-4">
-                {lessonResults.map(({ lesson, section }) => (
+                {lessonResults.map(({ lesson, book }) => (
                   <Card
                     key={lesson.id}
                     as={Link}
@@ -110,10 +113,10 @@ const SearchPage = () => {
                       <h3 className="min-w-0 text-lg font-bold text-ink sm:text-xl">
                         {highlight(pick(lesson, 'title'), query)}
                       </h3>
-                      {section && <Badge variant="outline">{pick(section, 'title')}</Badge>}
+                      {book && <Badge variant="outline">{pick(book, 'title')}</Badge>}
                     </div>
                     <p className="text-sm text-ink-muted">
-                      {section ? pick(section, 'description') : t('lessons')}
+                      {book ? pick(book, 'description') : t('lessons')}
                     </p>
                   </Card>
                 ))}

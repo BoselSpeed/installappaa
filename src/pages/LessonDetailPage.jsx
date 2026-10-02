@@ -5,7 +5,7 @@ import { useUserProgress } from '../hooks/useUserProgress';
 import { useNotes } from '../hooks/useNotes';
 import { useAppSettings } from '../hooks/useAppSettings';
 import { useTranslation } from 'react-i18next';
-import { useLocalized } from '../utils/helpers';
+import { sectionUrl, useLocalized } from '../utils/helpers';
 import { PageShell } from '../components/UI/PageShell';
 import { SectionTitle } from '../components/UI/PageHeader';
 import { BackLink } from '../components/UI/BackLink';
@@ -247,7 +247,7 @@ const LessonDetailPage = () => {
 
   return (
     <PageShell width="reading">
-      <BackLink to={`/sections/${sectionId}`} className="mb-4">
+      <BackLink to={sectionUrl(sectionId)} className="mb-4">
         {t('previous')} · {t('browse_sections')}
       </BackLink>
 
@@ -457,7 +457,7 @@ const LessonDetailPage = () => {
       </div>
 
       <p className="mt-8 text-center text-xs text-ink-muted">
-        <Link to={`/sections/${sectionId}`} className="underline underline-offset-4 hover:text-ink">
+        <Link to={sectionUrl(sectionId)} className="underline underline-offset-4 hover:text-ink">
           {t('browse_sections')}
         </Link>
       </p>

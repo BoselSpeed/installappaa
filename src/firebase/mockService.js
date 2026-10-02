@@ -23,140 +23,24 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'sections-v7';
+const SEED_VERSION = 'sections-v8';
 
 // ---------------------------------------------------------------------------
 // Seed data
 // ---------------------------------------------------------------------------
 
+// Sections are categories only: books are listed under /books, so seeding a
+// section per book made /sections duplicate the library. Lessons still carry
+// `sectionId: <bookId>`, which LessonDetailPage uses to link back to the book
+// page rather than to a section page.
 const seedSections = [
-  {
-    id: 'kitab-al-tawhid',
-    title_ar: 'كتاب التوحيد',
-    title_en: 'Kitab al-Tawhid',
-    description_ar: 'كتاب للإمام المجدد محمد بن عبد الوهاب في توحيد العبادة وما يناقضه من الشرك الأكبر والأصغر، مع أدلته من الكتاب والسنة وآثار السلف، وبيان ما يجب على العبد من توحيد الله وحده.',
-    description_en: 'A book by the Reviver Imam Muhammad ibn Abd al-Wahhab on the oneness of worship (Tawhid) and what negates it of major and minor shirk, with evidence from the Quran, Sunnah, and the Salaf, explaining what is incumbent upon the servant in singling out Allah alone.',
-    order: 1
-  },
-  {
-    id: 'thalatha-al-usul',
-    title_ar: 'متن ثلاثة الأصول وأدلتها',
-    title_en: 'Thalathat al-Usul',
-    description_ar: 'متن للإمام محمد بن عبد الوهاب في الأصول الثلاثة التي يجب على كل مسلم معرفتها والعمل بها: معرفة العبد ربه، ومعرفة دينه، ومعرفة نبيه ﷺ، مع أدلتها من الكتاب والسنة.',
-    description_en: 'A text by Imam Muhammad ibn Abd al-Wahhab on the three fundamentals every Muslim must know and act upon: knowing his Lord, his religion, and his Prophet, with their evidences from the Quran and Sunnah.',
-    order: 2
-  },
-  {
-    id: 'al-aqidah-al-wasitiyyah',
-    title_ar: 'العقيدة الواسطية',
-    title_en: 'Al-Aqidah al-Wasitiyyah',
-    description_ar: 'رسالة لشيخ الإسلام ابن تيمية في بيان عقيدة أهل السنة والجماعة في أسماء الله وصفاته والقدر والإيمان واليوم الآخر، بأسلوب يعتمد على نصوص الكتاب والسنة وإجماع السلف.',
-    description_en: 'A treatise by Shaykh al-Islam Ibn Taymiyyah expounding the creed of Ahl al-Sunnah wal-Jama\'ah regarding Allah\'s names and attributes, Qadar, faith, and the Hereafter, grounded in the Quran, Sunnah, and the consensus of the Salaf.',
-    order: 3
-  },
-  {
-    id: 'kashf-al-shubuhat',
-    title_ar: 'كتاب كشف الشبهات',
-    title_en: 'Kashf al-Shubuhat',
-    description_ar: 'رسالة للإمام محمد بن عبد الوهاب تكشف الشبهات التي يثيرها المخالفون حول التوحيد وعبادة الله وحده، مع الرد عليها بالأدلة من الكتاب والسنة.',
-    description_en: 'A treatise by Imam Muhammad ibn Abd al-Wahhab unveiling the ambiguities raised against Tawheed and the worship of Allah alone, responding to them with evidence from the Quran and Sunnah.',
-    order: 4
-  },
-  {
-    id: 'tafsir-al-baghawi',
-    title_ar: 'تفسير البغوي',
-    title_en: 'Tafsir al-Baghawi',
-    description_ar: 'تفسير جامع للإمام البغوي يجمع بين التفسير بالمأثور وعرض أقوال المفسرين بأسلوب متوسط، مع عناية بالقراءات وذكر أسباب النزول والأحكام المستنبطة.',
-    description_en: 'A comprehensive tafsir by Imam al-Baghawi combining transmitted interpretation with the views of early commentators in a moderate style.',
-    order: 5
-  },
-  {
-    id: 'musnad-abi-dawud',
-    title_ar: 'مسند أبي داود الطيالسي',
-    title_en: 'Musnad Abi Dawud al-Tayalisi',
-    description_ar: 'مسند الإمام الطيالسي أحد مسانيد الحديث المبكرة، جمع فيه أحاديث الصحابة مرفوعةً إلى النبي ﷺ، ويعد من أصول كتب السنة.',
-    description_en: "One of the early hadith musnads compiled by Imam al-Tayalisi, gathering the marfu' ahadith of the Companions.",
-    order: 6
-  },
-  {
-    id: 'sahih-al-bukhari',
-    title_ar: 'صحيح البخاري',
-    title_en: 'Sahih al-Bukhari',
-    description_ar: 'أصح كتاب بعد كتاب الله تعالى، جمع فيه الإمام البخاري أصح ما روي من أحاديث النبي ﷺ في العقائد والأحكام والآداب وغيرها، بعد تمحيص شديد واستيفاء لشروط الصحة.',
-    description_en: 'The most authentic book after the Book of Allah, compiling the soundest narrations of the Prophet in creed, rulings, and manners.',
-    order: 7
-  },
-  {
-    id: 'sahih-muslim',
-    title_ar: 'صحيح مسلم',
-    title_en: 'Sahih Muslim',
-    description_ar: 'أحد أصح كتب الحديث بعد صحيح البخاري، جمع الإمام مسلم فيه الحديث الصحيح مرتبًا على الأبواب، مع اهتمامه البالغ بالترتيب والجمع بين الطرق.',
-    description_en: 'One of the most authentic hadith collections, compiled by Imam Muslim arranged by chapters.',
-    order: 8
-  },
-  {
-    id: 'sunan-al-nasai',
-    title_ar: 'سنن النسائي',
-    title_en: "Sunan al-Nasa'i",
-    description_ar: 'من دواوين السنة الستة، صنفه الإمام النسائي في السنن والأحكام، ويتميز بمنهجه النقدي في علل الحديث.',
-    description_en: "One of the six canonical hadith collections, known for its critical method regarding hadith defects.",
-    order: 9
-  },
-  {
-    id: 'sunan-al-tirmidhi',
-    title_ar: 'سنن الترمذي',
-    title_en: 'Sunan al-Tirmidhi',
-    description_ar: 'جامع الترمذي من دواوين السنة، يتميز ببيانه لدرجة كل حديث من الصحة والحسن والضعف، وبعنايته بعلل الأحاديث ومعرفة الرجال.',
-    description_en: 'Jami\' al-Tirmidhi, one of the six canonical collections, distinguished by grading each hadith.',
-    order: 10
-  },
-  {
-    id: 'tafsir-al-qurtubi',
-    title_ar: 'تفسير القرطبي',
-    title_en: 'Tafsir al-Qurtubi',
-    description_ar: 'تفسير جامع لأحكام القرآن للعلامة القرطبي، يعنى بآيات الأحكام والاستنباطات الفقهية مع العناية باللغة والقراءات والناسخ والمنسوخ.',
-    description_en: "A comprehensive commentary on the rulings of the Quran by al-Qurtubi.",
-    order: 11
-  },
-  {
-    id: 'tafsir-al-tabari',
-    title_ar: 'تفسير الطبري',
-    title_en: 'Tafsir al-Tabari',
-    description_ar: 'أمّ التفاسير بالمأثور، روى فيه الإمام الطبري أقوال السلف بأسانيدها وعلّق عليها، فكان مرجعًا لكل من جاء بعده من المفسرين.',
-    description_en: 'The mother of transmitted tafsir, narrating the sayings of the Salaf with their chains.',
-    order: 12
-  },
-  {
-    id: 'tafsir-al-shawkani',
-    title_ar: 'تفسير الشوكاني',
-    title_en: 'Tafsir al-Shawkani',
-    description_ar: 'تفسير للإمام الشوكاني يجمع بين التفسير بالمأثور وبين الدراية والاستنباط، مع عناية بعلوم القرآن والبلاغة والترجيح بين الأقوال.',
-    description_en: 'A tafsir by Imam al-Shawkani combining transmitted interpretation with independent deduction.',
-    order: 13
-  },
-  {
-    id: 'tafsir-ibn-kathir',
-    title_ar: 'تفسير ابن كثير',
-    title_en: 'Tafsir Ibn Kathir',
-    description_ar: 'من أشهر كتب التفسير بالمأثور، فسّر فيه الحافظ ابن كثير القرآن بالقرآن ثم بالحديث وأقوال الصحابة والتابعين، بأسلوب متميز في الترجيح والنقد.',
-    description_en: 'One of the most famous transmitted tafsirs, interpreting the Quran by the Quran then by hadith.',
-    order: 14
-  },
-  {
-    id: 'qisas-min-sahih-al-bukhari',
-    title_ar: '50 من قصص صحيح البخاري',
-    title_en: '50 Stories from Sahih al-Bukhari',
-    description_ar: 'مجموعة من خمسين قصة منتقاة من صحيح البخاري بأسلوب مبسط مناسب للأطفال والناشئة، لترسيخ القيم والمعاني من السنة النبوية.',
-    description_en: 'A collection of fifty stories selected from Sahih al-Bukhari in a simple style suited for children and young readers.',
-    order: 15
-  },
   {
     id: 'adab',
     title_ar: 'أدب',
     title_en: 'Adab',
     description_ar: ' كتب الأدب والشعر والبلاغة العربية: دواوين الشعر الجاهلي، المعلقات، كتب البلاغة، وكتب الأدب الكلاسيكية.',
     description_en: 'Books of Arabic literature, poetry, and rhetoric: pre-Islamic poetry diwans, the Mu\'allaqat, rhetoric works, and classical literary texts.',
-    order: 16,
+    order: 1,
     booksCount: 14
   },
   // Category entries. A section whose id is not a book id is treated as a
@@ -169,7 +53,7 @@ const seedSections = [
     title_en: 'Tawhid and Aqeedah',
     description_ar: 'كتب العقيدة والتوحيد: العقيدة الواسطية، كتاب التوحيد، متن الأصول الثلاثة، وكشف الشبهات — مباني الدين وأصول الإيمان.',
     description_en: 'Works on Aqeedah and Tawhid: Al-Aqidah al-Wasitiyyah, Kitab al-Tawhid, Thalathat al-Usul, and Kashf al-Shubuhat — the foundations of the religion and of faith.',
-    order: 17,
+    order: 2,
     booksCount: 4
   },
   {
@@ -178,7 +62,7 @@ const seedSections = [
     title_en: 'Hadith',
     description_ar: 'دواوين السنة: صحيح البخاري، صحيح مسلم، سنن أبي داود، سنن الترمذي، وسنن النسائي.',
     description_en: 'The canonical hadith collections: Sahih al-Bukhari, Sahih Muslim, Sunan Abi Dawud, Jami’ al-Tirmidhi, and Sunan al-Nasa’i.',
-    order: 18,
+    order: 3,
     booksCount: 5
   },
   {
@@ -187,7 +71,7 @@ const seedSections = [
     title_en: 'Tafsir',
     description_ar: 'كتب تفسير القرآن الكريم: تفسير ابن كثير، والقرطبي، والطبري، والبغوي، والشوكاني.',
     description_en: 'Commentaries on the Quran: Ibn Kathir, al-Qurtubi, al-Tabari, al-Baghawi, and al-Shawkani.',
-    order: 19,
+    order: 4,
     booksCount: 5
   },
   {
@@ -196,7 +80,7 @@ const seedSections = [
     title_en: 'Stories',
     description_ar: 'قصص مختارة من صحيح البخاري بأسلوب مبسط مناسب للناشئة، ترسيخًا لقيم السنة ومعانيها.',
     description_en: 'Selected stories from Sahih al-Bukhari in a simple style suited for young readers, instilling the values and meanings of the Sunnah.',
-    order: 20,
+    order: 5,
     booksCount: 1
   }
 ];

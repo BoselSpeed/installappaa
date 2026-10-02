@@ -6,6 +6,12 @@ export const lessonUrl = (lesson) => {
   return `/section/${sectionId}/lesson/${lesson.id}`;
 };
 
+// A lesson's `sectionId` is the id of the book it belongs to (sections are
+// categories now), so "back" links from a lesson open the book page instead of
+// /sections/<bookId>, which no longer exists.
+export const sectionUrl = (sectionId) =>
+  sectionId ? `/books/${sectionId}` : '/sections';
+
 // Hook returning a pick() helper that returns the localized value of a field
 // (field_ar / field_en) based on the active i18n language.
 export const useLocalized = () => {
