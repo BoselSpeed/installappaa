@@ -301,6 +301,20 @@ const realUserProgressService = {
       await realUserProgressService.saveUserProgress({ ...progress, bookmarkedLessons });
     }
   },
+  addBookmarkedBook: async (userId, bookId) => {
+    const progress = await realUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const bookmarkedBooks = [...new Set([...(progress.bookmarkedBooks || []), bookId])];
+      await realUserProgressService.saveUserProgress({ ...progress, bookmarkedBooks });
+    }
+  },
+  removeBookmarkedBook: async (userId, bookId) => {
+    const progress = await realUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const bookmarkedBooks = (progress.bookmarkedBooks || []).filter((id) => id !== bookId);
+      await realUserProgressService.saveUserProgress({ ...progress, bookmarkedBooks });
+    }
+  },
   updateReadingStats: async (userId, minutesSpent) => {
     const progress = await realUserProgressService.getUserProgress(userId);
     if (progress) {

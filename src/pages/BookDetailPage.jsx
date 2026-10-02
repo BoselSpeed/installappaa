@@ -4,6 +4,7 @@ import { booksService } from '../firebase/service';
 import { useVolumeDownloads } from '../hooks/useVolumeDownloads';
 import { VolumeCard } from '../components/Content/VolumeCard';
 import { BookCover } from '../components/Content/BookCover';
+import { FavoriteBookButton } from '../components/Content/FavoriteBookButton';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
 import { PageShell } from '../components/UI/PageShell';
@@ -95,11 +96,14 @@ const BookDetailPage = () => {
             {pick(book, 'title')}
           </h1>
 
-          {isLoaded && (
-            <Badge variant="solid" className="mt-4" icon={<Icon name="check" size="xs" strokeWidth={2.5} />}>
-              {t('loaded_with_app')}
-            </Badge>
-          )}
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <FavoriteBookButton bookId={book.id} withLabel />
+            {isLoaded && (
+              <Badge variant="solid" icon={<Icon name="check" size="xs" strokeWidth={2.5} />}>
+                {t('loaded_with_app')}
+              </Badge>
+            )}
+          </div>
 
           <dl className="mt-6 divide-y divide-line border-y border-line">
             {fields.map((field) => (

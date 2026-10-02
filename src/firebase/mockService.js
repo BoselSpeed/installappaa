@@ -882,6 +882,7 @@ export const mockUserProgressService = {
       userId,
       completedLessons: [],
       bookmarkedLessons: [],
+      bookmarkedBooks: [],
       lastOpened: null,
       streaks: 0,
       readingTimeMinutes: 0,
@@ -932,6 +933,20 @@ export const mockUserProgressService = {
     if (progress) {
       const bookmarkedLessons = progress.bookmarkedLessons.filter((id) => id !== lessonId);
       await mockUserProgressService.saveUserProgress({ ...progress, bookmarkedLessons });
+    }
+  },
+  addBookmarkedBook: async (userId, bookId) => {
+    const progress = await mockUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const bookmarkedBooks = [...new Set([...(progress.bookmarkedBooks || []), bookId])];
+      await mockUserProgressService.saveUserProgress({ ...progress, bookmarkedBooks });
+    }
+  },
+  removeBookmarkedBook: async (userId, bookId) => {
+    const progress = await mockUserProgressService.getUserProgress(userId);
+    if (progress) {
+      const bookmarkedBooks = (progress.bookmarkedBooks || []).filter((id) => id !== bookId);
+      await mockUserProgressService.saveUserProgress({ ...progress, bookmarkedBooks });
     }
   },
   updateReadingStats: async (userId, minutesSpent) => {

@@ -26,7 +26,11 @@ export const UserProgressProvider = ({ children }) => {
       setLoading(true);
       try {
         const userProgress = await userProgressService.getUserProgress(userId);
-        setProgress(userProgress);
+        // Progress stored before books could be favorited has no
+        // bookmarkedBooks key; normalize it so callers can read it directly.
+        setProgress(
+          userProgress ? { ...userProgress, bookmarkedBooks: userProgress.bookmarkedBooks || [] } : null
+        );
       } catch (error) {
         console.error('Error fetching user progress:', error);
         setProgress(null);
@@ -103,6 +107,44 @@ export const UserProgressProvider = ({ children }) => {
       });
     } catch (error) {
       console.error('Error removing bookmark:', error);
+      throw error;
+    }
+  }, [userId]);
+
+  const addBookmarkedBook = useCallback(async (bookId) => {
+    if (!userId) return;
+
+    try {
+      await userProgressService.addBookmarkedBook(userId, bookId);
+      setProgress(prev => {
+        if (!prev) return prev;
+        const bookmarkedBooks = [...new Set([...(prev.bookmarkedBooks || []), bookId])];
+        return {
+          ...prev,
+          bookmarkedBooks
+        };
+      });
+    } catch (error) {
+      console.error('Error adding book bookmark:', error);
+      throw error;
+    }
+  }, [userId]);
+
+  const removeBookmarkedBook = useCallback(async (bookId) => {
+    if (!userId) return;
+
+    try {
+      await userProgressService.removeBookmarkedBook(userId, bookId);
+      setProgress(prev => {
+        if (!prev) return prev;
+        const bookmarkedBooks = (prev.bookmarkedBooks || []).filter((id) => id !== bookId);
+        return {
+          ...prev,
+          bookmarkedBooks
+        };
+      });
+    } catch (error) {
+      console.error('Error removing book bookmark:', error);
       throw error;
     }
   }, [userId]);
@@ -199,6 +241,8 @@ export const UserProgressProvider = ({ children }) => {
       markLessonCompleted, 
       addBookmark, 
       removeBookmark, 
+      addBookmarkedBook,
+      removeBookmarkedBook, 
       updateLastOpened,
       updateReadingStats,
       recordQuizResult,
