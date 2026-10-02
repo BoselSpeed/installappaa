@@ -182,5 +182,8 @@
   "no_questions": "No questions yet",
   "suggestions": "Suggestions",
   "recent_searches": "Recent Searches",
-  "voice_input": "Voice Input"
+  "voice_input": "Voice Input",
+  "open_native_reader": "Open in native reader",
+  "native_reader_unavailable": "This volume is not available in the native reader",
+  "native_reader_failed": "Could not open the native reader"
 }

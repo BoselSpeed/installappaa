@@ -186,5 +186,8 @@
   "no_questions": "لا توجد أسئلة بعد",
   "suggestions": "اقتراحات",
   "recent_searches": "عمليات البحث الأخيرة",
-  "voice_input": "إدخال صوتي"
+  "voice_input": "إدخال صوتي",
+  "open_native_reader": "فتح في القارئ الأصلي",
+  "native_reader_unavailable": "هذا المجلد غير متاح في القارئ الأصلي",
+  "native_reader_failed": "تعذّر فتح القارئ الأصلي"
 }
