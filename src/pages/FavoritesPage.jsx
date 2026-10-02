@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUserProgress } from '../hooks/useUserProgress';
-import { lessonsService, booksService } from '../firebase/service';
+import { lessonsService, booksService } from '../services/appService';
 import { useTranslation } from 'react-i18next';
 import { lessonUrl, useLocalized } from '../utils/helpers';
 import { PageShell } from '../components/UI/PageShell';

@@ -5,22 +5,22 @@
 //   1. Copy one of the entries below.
 //   2. Fill in the fields (any field you leave empty will simply be hidden
 //      in the UI — nothing is deleted or broken).
-//   3. For each volume, provide a PDF in one of three ways:
-//        - Volume 1 can be `bundled: true` with a `pdfUrl` pointing to a
-//          file inside /public/books/ so it ships with the app and works
-//          offline.
-//        - A volume can have a `downloadUrl` (a direct https link to the
-//          PDF). It is downloaded on demand and saved locally.
-//        - If the whole book is hosted as ONE remote ZIP archive (e.g. on
-//          Google Drive), set `source: { type: 'zip', url, pageUrl }` on the
-//          book and give each volume a `path` (the member filename inside the
-//          ZIP). The app downloads just that volume from the ZIP via HTTP
-//          Range requests — the user never leaves the app.
-//   4. Put any cover image in /public/covers/ and reference it with
+//   3. For each volume, provide a PDF in one of two ways:
+//        - `bundled: true` with a `pdfUrl` pointing to a file inside
+//          /public/books/ so it ships with the app, works offline, and opens
+//          in the native reader.
+//        - `downloadUrl` / `pdfUrl` pointing at a PDF hosted elsewhere. The app
+//          cannot fetch another origin (no proxy server, and Google Drive sends
+//          no CORS headers), so such a volume is opened at its original
+//          location instead of being downloaded.
+//   4. If a whole book is hosted as ONE remote ZIP archive, set
+//      `source: { type: 'zip', pageUrl }` on the book so every volume links to
+//      that archive's viewer page.
+//   5. Put any cover image in /public/covers/ and reference it with
 //      `coverImage` (or leave it null and a styled placeholder is shown).
 //
-// The demo (mock) service reads this file and merges it with any books added
-// through the books service API, so nothing that exists is ever replaced.
+// The local service reads this file and merges it with any books added through
+// the books service API, so nothing that exists is ever replaced.
 // ---------------------------------------------------------------------------
 
 const SEED_BOOKS = [

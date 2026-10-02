@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { notesService } from '../firebase/service';
+import { notesService } from '../services/appService';
 
 const NotesContext = createContext(null);
 

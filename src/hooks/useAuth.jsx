@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { authService } from '../firebase/service';
+import { authService } from '../services/appService';
 
 const AuthContext = createContext(null);
 

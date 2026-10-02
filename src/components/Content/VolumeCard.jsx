@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
+import { canReadInApp, resolveVolumeUrl } from '../../services/volumeStorage';
 import { Card } from '../UI/Card';
 import { Button } from '../UI/Button';
 import { ProgressBar } from '../UI/ProgressBar';
@@ -33,6 +34,10 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
 
   const title = pick(volume, 'title') || `${t('volume')} ${volume.number || ''}`.trim();
   const sizeMb = volume.sizeMb;
+  // Only a bundled PDF ships with the app, so only a bundled PDF can be opened
+  // in the reader. Anything else has to be opened where it is hosted.
+  const readableInApp = canReadInApp(volume);
+  const externalUrl = resolveVolumeUrl(volume, book);
   const statusRow = () => {
     if (state.bundled) {
       return <StatusMark tone="solid" icon="check" label={t('bundled_with_app')} />;
@@ -43,20 +48,37 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
     if (state.downloaded) {
       return <StatusMark tone="solid" icon="check" label={t('available_offline')} />;
     }
+    if (!readableInApp) {
+      return <StatusMark tone="muted" icon="arrowUpRight" label={t('opens_in_browser')} />;
+    }
     return <StatusMark tone="muted" icon="download" label={t('not_downloaded')} />;
   };
 
-  // A download can fail for a reason the user can act on: the browser cannot
-  // reach the host at all, so point them at the original file instead of
-  // leaving them with a dead-end retry button.
-  const blocked = state.error === 'proxy_unavailable' || state.error === 'download_blocked';
-  const externalUrl = book?.source?.pageUrl || (blocked ? book?.source?.url : null);
-
+  // A volume whose host sends no CORS headers can never be fetched by a static
+  // site, so the card offers its original location instead of a download button
+  // that could only ever fail.
   const errorBlock = () => {
+    if (!readableInApp && externalUrl) {
+      return (
+        <div className="space-y-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">
+          <p className="flex items-start gap-2">
+            <Icon name="info" size="sm" className="mt-0.5 shrink-0 text-ink-muted" />
+            <span>{t('external_volume_hint')}</span>
+          </p>
+          <div className="ps-7">
+            <Button href={externalUrl} target="_blank" rel="noopener noreferrer" size="sm" variant="secondary">
+              <Icon name="arrowUpRight" size="sm" />
+              {t('open_in_browser')}
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     if (!state.error) return null;
 
-    const message = blocked ? t('download_blocked') : state.error === 'download_error' ? t('download_error') : state.error;
-    const hint = blocked ? t('download_blocked_hint') : t('download_retry_hint');
+    const message = state.error === 'download_blocked' ? t('download_blocked') : state.error === 'download_error' ? t('download_error') : state.error;
+    const hint = state.error === 'download_blocked' ? t('download_blocked_hint') : t('download_retry_hint');
 
     return (
       <div className="space-y-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">

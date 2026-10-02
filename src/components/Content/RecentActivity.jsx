@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { lessonsService } from '../../firebase/service';
+import { lessonsService } from '../../services/appService';
 import { useTranslation } from 'react-i18next';
 import { lessonUrl, useLocalized } from '../../utils/helpers';
 import { Card } from '../UI/Card';

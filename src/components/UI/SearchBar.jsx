@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { searchHistoryService } from '../../firebase/service';
+import { searchHistoryService } from '../../services/appService';
 import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon';
 import { cn } from '../../utils/cn';

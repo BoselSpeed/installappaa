@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSectionsService } from '../../hooks/useSectionsService';
-import { booksService } from '../../firebase/service';
+import { booksService } from '../../services/appService';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { Icon } from '../UI/Icon';

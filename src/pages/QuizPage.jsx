@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { quizzesService, lessonsService } from '../firebase/service';
+import { quizzesService, lessonsService } from '../services/appService';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { useTranslation } from 'react-i18next';
 import { useLocalized, lessonUrl } from '../utils/helpers';

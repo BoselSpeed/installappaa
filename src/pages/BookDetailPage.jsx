@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { booksService } from '../firebase/service';
+import { booksService } from '../services/appService';
 import { useVolumeDownloads } from '../hooks/useVolumeDownloads';
 import { VolumeCard } from '../components/Content/VolumeCard';
 import { BookCover } from '../components/Content/BookCover';

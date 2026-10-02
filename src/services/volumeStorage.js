@@ -3,17 +3,41 @@
 // offline without re-downloading. Deleting a volume only removes the local
 // PDF blob — the book and its information are never touched.
 
-import { resolveVolumeUrl } from './supabaseStorage';
-import {
-  extractZipMember,
-  extractZipMemberWhole,
-  PROXY_UNAVAILABLE
-} from './zipRangeReader';
-
-// Error code for a cross-origin host that refuses to be fetched by the browser
-// (Google Drive sends no CORS headers). The UI turns this into an
-// "open in browser" link instead of a dead-end error.
+/**
+ * Error code for a cross-origin host that refuses to be fetched by the browser
+ * (Google Drive sends no CORS headers). The UI turns this into an
+ * "open in browser" link instead of a dead-end error.
+ */
 export const DOWNLOAD_BLOCKED = 'download_blocked';
+
+/**
+ * Where a volume's PDF can be read from, in order of preference:
+ *
+ *  1. `downloadUrl` — a direct link, when the host serves CORS headers.
+ *  2. `pdfUrl` — a PDF bundled with the app, which is the only kind that can
+ *     also open in the native reader.
+ *  3. `book.source.pageUrl` — the archive's own viewer page, offered as a
+ *     last resort for books whose volumes live in a remote ZIP.
+ *
+ * There is no storage backend to resolve against: a static site cannot fetch
+ * another origin's files, so anything not bundled has to be opened by the
+ * host's own viewer rather than downloaded into the app.
+ */
+export const resolveVolumeUrl = (volume, book) => {
+  if (!volume) return null;
+  if (volume.downloadUrl) return volume.downloadUrl;
+  if (volume.pdfUrl) return volume.pdfUrl;
+  if (book?.source?.pageUrl) return book.source.pageUrl;
+  return null;
+};
+
+/**
+ * Whether the app itself can display a volume. Only bundled PDFs can: they are
+ * served from the same origin as the app, so both the web reader and the
+ * native reader can open them. Everything else lives on another host, which a
+ * static deployment cannot fetch.
+ */
+export const canReadInApp = (volume) => Boolean(volume?.bundled || volume?.pdfUrl);
 
 const DB_NAME = 'fiqh-app';
 const DB_VERSION = 1;
@@ -90,41 +114,13 @@ export const removeStoredVolume = async (bookId, volumeId) => {
 };
 
 // Downloads a volume PDF and persists it locally. Reports progress (0-100)
-// through onProgress. Supports three sources, in order:
-//   1. book.source = { type: 'zip', ... } — the volume is a member of a remote
-//      ZIP archive, fetched per-volume via HTTP Range requests.
-//   2. resolveVolumeUrl(volume) — a direct downloadUrl, a Supabase storagePath,
-//      or a bundled pdfUrl.
+// through onProgress.
+//
+// Only a host that serves CORS headers can be fetched from a static site, so a
+// volume in a remote ZIP cannot be pulled out of the archive here — the archive
+// is opened through its own viewer instead.
 export const downloadVolume = async (book, volume, onProgress) => {
-  if (book?.source?.type === 'zip') {
-    const url = book.source.url;
-    const attempts = [
-      // Preferred: fetch just this volume from the archive via HTTP Range
-      // requests (does not download the whole ZIP).
-      () => extractZipMember(url, volume.path, onProgress),
-      // Fallback for servers that block Range requests / their CORS preflight:
-      // download the whole archive once and extract the volume locally. Either
-      // way the download happens inside the app.
-      () => extractZipMemberWhole(url, volume.path, onProgress)
-    ];
-    let lastError = null;
-    for (const attempt of attempts) {
-      try {
-        const blob = await attempt();
-        await storeVolume(book.id, volume.id, blob);
-        return blob;
-      } catch (error) {
-        console.warn('Volume download method failed, trying next:', error);
-        lastError = error;
-        // No proxy on this origin means the archive host is unreachable from the
-        // browser; the whole-archive attempt would fail for the same reason.
-        if (error?.code === PROXY_UNAVAILABLE) break;
-      }
-    }
-    throw lastError || new Error('download_error');
-  }
-
-  const url = resolveVolumeUrl(volume);
+  const url = resolveVolumeUrl(volume, book);
   if (!url) {
     throw new Error('No download URL available for this volume');
   }
@@ -192,5 +188,7 @@ export default {
   removeStoredVolume,
   downloadVolume,
   storedVolumeSizeMb,
+  resolveVolumeUrl,
+  canReadInApp,
   DOWNLOAD_BLOCKED
 };

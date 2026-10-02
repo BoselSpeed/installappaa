@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { quizzesService } from '../firebase/service';
+import { quizzesService } from '../services/appService';
 
 export const useQuizzesService = () => {
   const [quiz, setQuiz] = useState(null);

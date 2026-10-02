@@ -153,10 +153,10 @@ for (const book of books) {
   }
 }
 
-// Cross-check the sections in the demo service against the library, so books
+// Cross-check the sections in the local service against the library, so books
 // cannot silently become unreachable from /sections.
 try {
-  const mockPath = resolve(ROOT, 'src/firebase/mockService.js');
+  const mockPath = resolve(ROOT, 'src/services/localService.js');
   const mock = readFileSync(mockPath, 'utf8');
   const sStart = mock.indexOf('const seedSections = [');
   const sEnd = mock.indexOf('\n];', sStart) + 3;

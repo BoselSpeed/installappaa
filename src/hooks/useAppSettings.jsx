@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { appSettingsService } from '../firebase/service';
+import { appSettingsService } from '../services/appService';
 import { useTranslation } from 'react-i18next';
 
 const AppSettingsContext = createContext(null);

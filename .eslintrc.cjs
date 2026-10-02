@@ -28,12 +28,14 @@ module.exports = {
     'public',
     'ايفون/App/App/public',
     'android/app/src/main/assets/public',
+    // Android build intermediates (generated Capacitor copies of the bundle).
+    'android/app/build',
     'node_modules',
     '*.log'
   ],
   overrides: [
     {
-      // Node-side tooling: the production static server behind npm run serve.
+      // Node-side tooling (build scripts, content verification).
       files: ['**/*.cjs', '**/*.mjs'],
       env: { node: true, es2022: true },
       parserOptions: { sourceType: 'script' },

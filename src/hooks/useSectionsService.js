@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { sectionsService } from '../firebase/service';
+import { sectionsService } from '../services/appService';
 
 export const useSectionsService = () => {
   const [sections, setSections] = useState([]);

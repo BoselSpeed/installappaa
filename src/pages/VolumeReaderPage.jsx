@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { booksService } from '../firebase/service';
+import { booksService } from '../services/appService';
 import { getStoredVolumeBlobUrl } from '../services/volumeStorage';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';

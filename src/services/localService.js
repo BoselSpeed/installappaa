@@ -1,21 +1,27 @@
-// Mock (demo) service layer used when Firebase is not configured.
-// All data is persisted to localStorage and seeded with the uploaded books
-// (Kitab al-Tawhid, Thalathat al-Usul, Al-Aqidah al-Wasitiyyah, and
-// Kashf al-Shubuhat, read as PDFs inside the application).
+/**
+ * The on-device data store.
+ *
+ * Every read and write in the app goes through localStorage, seeded from
+ * `src/data/books.js` on first run. That is the whole backend: there is no
+ * remote API, so the app works offline and installing it needs no credentials.
+ *
+ * The service objects are re-exported under their plain names by
+ * `appService.js`, which is what the pages and hooks import.
+ */
 
 import { SEED_BOOKS } from '../data/books';
 
   const KEYS = {
-    seedVersion: 'fiqh_demo_seed_version',
-    sections: 'fiqh_demo_sections',
-    lessons: 'fiqh_demo_lessons',
-    content: 'fiqh_demo_lesson_content',
-    quizzes: 'fiqh_demo_quizzes',
-    books: 'fiqh_demo_books',
-    notes: 'fiqh_demo_notes',
-    searchHistory: 'fiqh_demo_search_history',
-    progress: (uid) => `fiqh_demo_progress_${uid}`,
-    settings: (uid) => `fiqh_demo_settings_${uid}`,
+    seedVersion: 'fiqh_seed_version',
+    sections: 'fiqh_sections',
+    lessons: 'fiqh_lessons',
+    content: 'fiqh_lesson_content',
+    quizzes: 'fiqh_quizzes',
+    books: 'fiqh_books',
+    notes: 'fiqh_notes',
+    searchHistory: 'fiqh_search_history',
+    progress: (uid) => `fiqh_progress_${uid}`,
+    settings: (uid) => `fiqh_settings_${uid}`,
     userId: 'userId'
   };
 

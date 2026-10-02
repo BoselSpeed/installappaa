@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { lessonsService, sectionsService, lessonContentService, booksService } from '../firebase/service';
+import { lessonsService, sectionsService, lessonContentService, booksService } from '../services/appService';
 import { SearchBar } from '../components/UI/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { lessonUrl, useLocalized, highlight } from '../utils/helpers';

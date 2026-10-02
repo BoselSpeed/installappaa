@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { booksService } from '../firebase/service';
+import { booksService } from '../services/appService';
 import { BookCard } from '../components/UI/BookCard';
 import { useTranslation } from 'react-i18next';
 import { PageShell } from '../components/UI/PageShell';

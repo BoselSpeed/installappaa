@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { lessonsService, lessonContentService, notesService } from '../firebase/service';
+import { lessonsService, lessonContentService, notesService } from '../services/appService';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { useNotes } from '../hooks/useNotes';
 import { useAppSettings } from '../hooks/useAppSettings';

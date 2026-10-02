@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { lessonContentService } from '../firebase/service';
+import { lessonContentService } from '../services/appService';
 
 export const useLessonContentService = () => {
   const [content, setContent] = useState(null);

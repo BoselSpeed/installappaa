@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { sectionsService, lessonsService, booksService } from '../firebase/service';
+import { sectionsService, lessonsService, booksService } from '../services/appService';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../utils/helpers';
 import { PageShell } from '../components/UI/PageShell';
