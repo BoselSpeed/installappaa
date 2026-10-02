@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useAppSettings } from '../hooks/useAppSettings';
-import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
-import { isDemoMode } from '../firebase/service';
 import { PageShell } from '../components/UI/PageShell';
 import { PageHeader, SectionTitle } from '../components/UI/PageHeader';
 import { Card } from '../components/UI/Card';
@@ -24,14 +22,8 @@ const FONT_SIZES = [
 
 const SettingsPage = () => {
   const { settings, updateLanguage, updateFontSize, loading } = useAppSettings();
-  const { user, logout } = useAuth();
   const { t } = useTranslation();
   const [status, setStatus] = useState('');
-
-  const handleLogout = async () => {
-    const result = await logout();
-    setStatus(result.success ? t('signed_out') : result.error);
-  };
 
   const handleClearCache = () => {
     try {
@@ -65,26 +57,6 @@ const SettingsPage = () => {
       )}
 
       <div className="space-y-4 sm:space-y-6">
-        <Card className="p-5 sm:p-6">
-          <SectionTitle className="mb-4 flex items-center gap-2 text-base sm:text-lg">
-            <Icon name="info" size="sm" className="text-ink-faint" />
-            {t('account')}
-          </SectionTitle>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="truncate text-sm text-ink-body">{user?.email || t('guest')}</p>
-              {isDemoMode && (
-                <p className="mt-1 text-xs text-ink-muted">{t('demo_mode')}</p>
-              )}
-            </div>
-            {user && (
-              <Button variant="secondary" size="sm" onClick={handleLogout}>
-                {t('sign_out')}
-              </Button>
-            )}
-          </div>
-        </Card>
-
         <Card className="p-5 sm:p-6">
           <SectionTitle className="mb-4 flex items-center gap-2 text-base sm:text-lg">
             <Icon name="language" size="sm" className="text-ink-faint" />
