@@ -20,10 +20,10 @@ android {
         }
     }
     compileOptions {
-        // Java 17 to match Kotlin's jvmTarget below. AGP requires the two to
-        // agree, and Capacitor leaves the Java level unset.
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        // Java 21, matching Kotlin below. Capacitor's own Android library
+        // compiles at 21, and AGP requires the app to be at least that level.
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     buildFeatures {
         // Generates the *Binding classes the reader uses to bind its layouts
@@ -78,9 +78,8 @@ dependencies {
 
 kotlin {
     compilerOptions {
-        // Must match compileOptions above, or javac/kotlinc disagree and the
-        // build fails with "invalid source release".
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        // Must match compileOptions above, or javac/kotlinc disagree.
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
     }
 }
 
