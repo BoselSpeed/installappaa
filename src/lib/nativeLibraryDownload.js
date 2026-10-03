@@ -113,8 +113,9 @@ export const downloadVolumeNatively = async ({ book, volume, onProgress }) => {
       bookId: book.id,
       // A standalone PDF is one file per volume, so it is named by volume: the
       // eleven volumes of Mawsuat al-Qabail share a book id and would otherwise
-      // overwrite each other. An archive is shared by the whole book.
-      artifactId: archive ? book.id : volumeKey(book.id, volume.id),
+      // overwrite each other. An archive is shared by the whole book, so it is
+      // stored under the book id and `volumeKey` stays absent.
+      ...(archive ? {} : { volumeKey: volumeKey(book.id, volume.id) }),
       extension: archive ? 'zip' : 'pdf'
     });
 
