@@ -8,12 +8,15 @@ import { PageShell } from '../components/UI/PageShell';
 import { BackLink } from '../components/UI/BackLink';
 import { ProgressBar } from '../components/UI/ProgressBar';
 import { Card } from '../components/UI/Card';
+import { Button } from '../components/UI/Button';
+import { Icon } from '../components/UI/Icon';
 import { Spinner } from '../components/UI/Spinner';
 import {
   canOpenInNativeReader,
   isNativeReaderAvailable,
   openInNativeReader
 } from '../lib/nativePdfReader';
+import { isNativeDownloadAvailable, nativeVolumeUri } from '../lib/nativeLibraryDownload';
 
 const PDFReader = lazy(() =>
   import('../components/Content/PDFReader').then((m) => ({ default: m.PDFReader }))
@@ -31,6 +34,9 @@ const VolumeReaderPage = () => {
   const [book, setBook] = useState(null);
   const [volume, setVolume] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+  // Volumes downloaded by the native downloader are real files on disk rather
+  // than blob: URLs, so only the native reader can open them.
+  const [nativeUri, setNativeUri] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
   const [readingProgress, setReadingProgress] = useState(0);
@@ -62,13 +68,20 @@ const VolumeReaderPage = () => {
         setVolume(foundVolume);
 
         let resolvedUrl = null;
+        let resolvedNative = null;
         if (foundVolume.bundled && foundVolume.pdfUrl) {
           resolvedUrl = foundVolume.pdfUrl;
         } else {
           objectUrl = await getStoredVolumeBlobUrl(bookId, volumeId);
           if (objectUrl) {
             resolvedUrl = objectUrl;
-          } else {
+          } else if (isNativeDownloadAvailable()) {
+            // Downloaded natively: the file exists, but the WebView has no way
+            // to read it, so the native reader takes it from here.
+            resolvedNative = await nativeVolumeUri(bookId, volumeId);
+          }
+
+          if (!resolvedUrl && !resolvedNative) {
             // Not bundled and not on the device — the details page should
             // have prevented reaching here.
             if (!cancelled) setNotFound(true);
@@ -77,12 +90,15 @@ const VolumeReaderPage = () => {
         }
 
         if (!cancelled) setPdfUrl(resolvedUrl);
+        if (!cancelled) setNativeUri(resolvedNative);
 
-        if (!cancelled) {
+        if (!cancelled && resolvedUrl) {
           // Asked after the URL resolves, because a blob: URL is exactly the
           // case the native reader cannot serve.
           const verdict = await canOpenInNativeReader(resolvedUrl);
           if (!cancelled) setNativeSupported(Boolean(verdict?.supported));
+        } else if (!cancelled) {
+          setNativeSupported(Boolean(resolvedNative));
         }
       } catch (error) {
         console.error('Error loading volume:', error);
@@ -112,18 +128,21 @@ const VolumeReaderPage = () => {
    * readers track position independently per book.
    */
   const handleOpenNative = useCallback(async () => {
-    if (!pdfUrl || !book) return;
+    // A natively downloaded volume is a file on disk; the web reader's
+    // blob:/asset URL is only meaningful to the WebView.
+    const url = nativeUri || pdfUrl;
+    if (!url || !book) return;
     const opened = await openInNativeReader({
       // Stable slug: the native side keys all persisted data on this string.
       bookKey: `${bookId}--${volumeId}`,
       title: pick(volume, 'title') || pick(book, 'title') || t('volume'),
-      url: pdfUrl
+      url
     });
     if (!opened) {
       // Only reachable if the plugin vanished between the probe and the tap.
       setNativeSupported(false);
     }
-  }, [book, bookId, pdfUrl, t, volume, volumeId, pick]);
+  }, [book, bookId, nativeUri, pdfUrl, t, volume, volumeId, pick]);
 
   if (notFound) {
     return <Navigate to={`/books/${bookId}`} replace />;
@@ -166,17 +185,26 @@ const VolumeReaderPage = () => {
 
       {loading ? (
         <PDFSkeleton label={t('pdf_loading')} />
-      ) : (
+      ) : pdfUrl ? (
         <Suspense fallback={<PDFSkeleton label={t('pdf_loading')} />}>
-          {pdfUrl && (
-            <PDFReader
-              pdfUrl={pdfUrl}
-              fileName={`${bookId}-${volumeId}.pdf`}
-              onPageChange={handlePdfPageChange}
-            />
-          )}
+          <PDFReader
+            pdfUrl={pdfUrl}
+            fileName={`${bookId}-${volumeId}.pdf`}
+            onPageChange={handlePdfPageChange}
+          />
         </Suspense>
-      )}
+      ) : nativeUri ? (
+        // Downloaded natively: the file is on the device but the WebView cannot
+        // read it, so the native reader above is the way in.
+        <Card className="flex flex-col items-center justify-center gap-4 px-5 py-16 text-center">
+          <Icon name="file" size="lg" className="text-ink-muted" />
+          <p className="text-sm text-ink-muted">{t('open_native_reader_hint')}</p>
+          <Button size="sm" onClick={handleOpenNative}>
+            <Icon name="file" size="sm" />
+            {t('open_native_reader')}
+          </Button>
+        </Card>
+      ) : null}
     </PageShell>
   );
 };

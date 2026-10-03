@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
-import { canReadInApp, resolveVolumeUrl } from '../../services/volumeStorage';
+import { canDownloadVolume, canReadInApp, resolveVolumeUrl } from '../../services/volumeStorage';
 import { Card } from '../UI/Card';
 import { Button } from '../UI/Button';
 import { ProgressBar } from '../UI/ProgressBar';
@@ -37,6 +37,9 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
   // Only a bundled PDF ships with the app, so only a bundled PDF can be opened
   // in the reader. Anything else has to be opened where it is hosted.
   const readableInApp = canReadInApp(volume);
+  // Downloading needs the native transfer: a browser cannot fetch these files
+  // because their host sends no CORS headers.
+  const downloadable = canDownloadVolume(volume);
   const externalUrl = resolveVolumeUrl(volume, book);
   const statusRow = () => {
     if (state.bundled) {
@@ -54,11 +57,41 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
     return <StatusMark tone="muted" icon="download" label={t('not_downloaded')} />;
   };
 
-  // A volume whose host sends no CORS headers can never be fetched by a static
-  // site, so the card offers its original location instead of a download button
-  // that could only ever fail.
+  // A real error is always shown, so a tap that fails says why instead of
+  // leaving the card looking untouched. The "open in browser" note is only for
+  // volumes that genuinely cannot be fetched on this platform.
   const errorBlock = () => {
-    if (!readableInApp && externalUrl) {
+    if (state.error) {
+      const message =
+        state.error === 'download_blocked'
+          ? t('download_blocked')
+          : state.error === 'download_failed'
+            ? t('download_failed')
+            : state.error === 'download_error'
+              ? t('download_error')
+              : state.error;
+      const hint = state.error === 'download_blocked' ? t('download_blocked_hint') : t('download_retry_hint');
+
+      return (
+        <div className="space-y-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">
+          <p className="flex items-start gap-2">
+            <Icon name="info" size="sm" className="mt-0.5 shrink-0 text-ink-muted" />
+            <span>{message}</span>
+          </p>
+          <p className="ps-7 text-xs text-ink-muted">{hint}</p>
+          {externalUrl && (
+            <div className="ps-7">
+              <Button href={externalUrl} target="_blank" rel="noopener noreferrer" size="sm" variant="secondary">
+                <Icon name="arrowUpRight" size="sm" />
+                {t('open_in_browser')}
+              </Button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (!downloadable && !readableInApp && externalUrl) {
       return (
         <div className="space-y-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">
           <p className="flex items-start gap-2">
@@ -75,28 +108,7 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       );
     }
 
-    if (!state.error) return null;
-
-    const message = state.error === 'download_blocked' ? t('download_blocked') : state.error === 'download_error' ? t('download_error') : state.error;
-    const hint = state.error === 'download_blocked' ? t('download_blocked_hint') : t('download_retry_hint');
-
-    return (
-      <div className="space-y-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink-soft">
-        <p className="flex items-start gap-2">
-          <Icon name="info" size="sm" className="mt-0.5 shrink-0 text-ink-muted" />
-          <span>{message}</span>
-        </p>
-        <p className="ps-7 text-xs text-ink-muted">{hint}</p>
-        {externalUrl && (
-          <div className="ps-7">
-            <Button href={externalUrl} target="_blank" rel="noopener noreferrer" size="sm" variant="secondary">
-              <Icon name="arrowUpRight" size="sm" />
-              {t('open_in_browser')}
-            </Button>
-          </div>
-        )}
-      </div>
-    );
+    return null;
   };
 
   const renderActions = () => {
@@ -146,12 +158,27 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       );
     }
 
-    return (
-      <Button size="sm" variant="secondary" onClick={() => onDownload?.(volume)}>
-        <Icon name="download" size="sm" />
-        {t('download')}
-      </Button>
-    );
+    if (downloadable) {
+      return (
+        <Button size="sm" variant="secondary" onClick={() => onDownload?.(volume)}>
+          <Icon name="download" size="sm" />
+          {t('download')}
+        </Button>
+      );
+    }
+
+    // Nothing to download into (the web build): send the reader to the file's
+    // own page rather than offering a button that cannot work.
+    if (externalUrl) {
+      return (
+        <Button href={externalUrl} target="_blank" rel="noopener noreferrer" size="sm" variant="secondary">
+          <Icon name="arrowUpRight" size="sm" />
+          {t('open_in_browser')}
+        </Button>
+      );
+    }
+
+    return null;
   };
 
   return (

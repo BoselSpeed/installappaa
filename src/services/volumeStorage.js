@@ -2,6 +2,19 @@
 // Downloaded PDFs are stored in IndexedDB so they can be opened again
 // offline without re-downloading. Deleting a volume only removes the local
 // PDF blob — the book and its information are never touched.
+//
+// On Android the transfer is handed to the native downloader instead
+// (see src/lib/nativeLibraryDownload.js). That matters because every remote
+// PDF here is hosted on Google Drive, which sends no CORS headers, so a
+// WebView fetch() can never succeed for them.
+
+import {
+  downloadVolumeNatively,
+  hasLocalVolume,
+  isNativeDownloadAvailable,
+  removeNativeVolume,
+  resolveDownloadUrl
+} from '../lib/nativeLibraryDownload';
 
 /**
  * Error code for a cross-origin host that refuses to be fetched by the browser
@@ -9,6 +22,13 @@
  * "open in browser" link instead of a dead-end error.
  */
 export const DOWNLOAD_BLOCKED = 'download_blocked';
+
+/**
+ * Error code for a transfer that reached the network but failed (host refused,
+ * connection lost, archive entry missing). Distinct from DOWNLOAD_BLOCKED,
+ * which means the browser forbade the request before it started.
+ */
+export const DOWNLOAD_FAILED = 'download_failed';
 
 /**
  * Where a volume's PDF can be read from, in order of preference:
@@ -38,6 +58,17 @@ export const resolveVolumeUrl = (volume, book) => {
  * static deployment cannot fetch.
  */
 export const canReadInApp = (volume) => Boolean(volume?.bundled || volume?.pdfUrl);
+
+/**
+ * Whether the app can download a volume onto the device.
+ *
+ * Bundled volumes ship with the app, so there is nothing to fetch. Everything
+ * else needs the native downloader: on Android that works for both plain Drive
+ * PDFs and volumes inside a Drive archive, while on the web the same files are
+ * unreachable and the volume has to be opened at its source instead.
+ */
+export const canDownloadVolume = (volume) =>
+  Boolean(volume && !volume.bundled && !volume.pdfUrl && isNativeDownloadAvailable());
 
 const DB_NAME = 'fiqh-app';
 const DB_VERSION = 1;
@@ -84,8 +115,12 @@ export const getStoredVolumeBlobUrl = async (bookId, volumeId) => {
   return blob ? URL.createObjectURL(blob) : null;
 };
 
-export const isVolumeStored = async (bookId, volumeId) =>
-  (await getStoredVolumeBlob(bookId, volumeId)) !== null;
+export const isVolumeStored = async (bookId, volumeId) => {
+  // The native store and the IndexedDB store are alternatives, never both: a
+  // volume downloaded in the app never also lands in IndexedDB.
+  if (await hasLocalVolume(bookId, volumeId)) return true;
+  return (await getStoredVolumeBlob(bookId, volumeId)) !== null;
+};
 
 export const storeVolume = async (bookId, volumeId, blob) => {
   const db = await openDB();
@@ -104,6 +139,9 @@ export const storeVolume = async (bookId, volumeId, blob) => {
 };
 
 export const removeStoredVolume = async (bookId, volumeId) => {
+  // Clear both stores: a volume may have been fetched natively on Android and
+  // left behind in IndexedDB by an earlier build.
+  await removeNativeVolume(bookId, volumeId).catch(() => undefined);
   const db = await openDB();
   return await new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
@@ -120,6 +158,22 @@ export const removeStoredVolume = async (bookId, volumeId) => {
 // volume in a remote ZIP cannot be pulled out of the archive here — the archive
 // is opened through its own viewer instead.
 export const downloadVolume = async (book, volume, onProgress) => {
+  // On Android the native downloader owns the transfer: it has no CORS
+  // restriction, so Drive-hosted files actually arrive.
+  if (isNativeDownloadAvailable() && !volume?.pdfUrl) {
+    const url = resolveDownloadUrl(volume, book);
+    if (!url) throw new Error('No download URL available for this volume');
+    try {
+      return await downloadVolumeNatively({ book, volume, onProgress });
+    } catch (error) {
+      // Surface something the UI can translate, rather than a raw platform
+      // message that would only ever show as an English string in an Arabic
+      // interface.
+      console.error('Native download failed:', error);
+      throw new Error(DOWNLOAD_FAILED);
+    }
+  }
+
   const url = resolveVolumeUrl(volume, book);
   if (!url) {
     throw new Error('No download URL available for this volume');
@@ -190,5 +244,7 @@ export default {
   storedVolumeSizeMb,
   resolveVolumeUrl,
   canReadInApp,
-  DOWNLOAD_BLOCKED
+  canDownloadVolume,
+  DOWNLOAD_BLOCKED,
+  DOWNLOAD_FAILED
 };

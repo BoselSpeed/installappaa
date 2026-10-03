@@ -128,6 +128,7 @@
   "download_retry_hint": "Downloads happen inside the app — tap Download to try again.",
   "download_blocked": "The browser cannot download this file directly because the host does not allow cross-origin access.",
   "download_blocked_hint": "This build has no proxy server, so files on other sites cannot be downloaded. Open the volume from its original location.",
+  "download_failed": "The download started but did not finish. Check your connection and try again.",
   "open_in_browser": "Open in Browser",
   "opens_in_browser": "Opens in browser",
   "external_volume_hint": "This volume is not bundled with the app, so it is read from its original location in the browser.",
@@ -181,6 +182,7 @@
   "recent_searches": "Recent Searches",
   "voice_input": "Voice Input",
   "open_native_reader": "Open in native reader",
+  "open_native_reader_hint": "This volume is on your device, so it opens in the native reader.",
   "native_reader_unavailable": "This volume is not available in the native reader",
   "native_reader_failed": "Could not open the native reader"
 }
