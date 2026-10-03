@@ -361,7 +361,7 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className={`overflow-hidden rounded-2xl border border-line bg-paper shadow-card ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''}`}
+      className={`overflow-hidden rounded-2xl border border-line bg-paper shadow-card ${isFullscreen ? 'fixed inset-0 z-50 flex flex-col rounded-none' : ''}`}
     >
       {/* Fullscreen shows only the reader, so the exit control sits alone in
           one corner instead of a toolbar over the pages. */}
@@ -471,7 +471,7 @@ const PDFReader = ({ pdfUrl, fileName, onPageChange }) => {
       {/* Pages */}
       <div
         ref={scrollerRef}
-        className={`pdf-reader-scroll overflow-y-auto ${isFullscreen ? 'h-screen' : ''}`}
+        className={`pdf-reader-scroll overflow-y-auto ${isFullscreen ? 'min-h-0 flex-1' : ''}`}
       >
         {loading && (
           <div className="flex flex-col items-center justify-center gap-4 py-24">
