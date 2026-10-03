@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,7 +41,9 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener
 import com.github.barteksc.pdfviewer.listener.OnRenderListener
+import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.github.barteksc.pdfviewer.source.AssetSource
+import com.github.barteksc.pdfviewer.util.FitPolicy
 import com.github.barteksc.pdfviewer.source.UriSource
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
@@ -145,8 +148,26 @@ class PdfReaderActivity : AppCompatActivity() {
         setUpNavigation()
         setUpSlider()
         setUpPageIndicator()
+        applyChromeInsets()
         observeData()
         openDocument(contract)
+    }
+
+    /**
+     * Keep the scrolling page strip clear of the bottom bar.
+     *
+     * The bars are overlays on the PDF surface rather than siblings above it,
+     * which is what lets a page fill the width edge to edge. With vertical
+     * scrolling that means the strip runs under the bottom bar, so the bar's
+     * measured height becomes bottom padding on the surface's container.
+     */
+    private fun applyChromeInsets() {
+        binding.bottomBar.doOnLayout {
+            val inset = binding.bottomBar.height
+            if (inset > 0 && binding.pdfContainer.paddingBottom != inset) {
+                binding.pdfContainer.setPadding(0, 0, 0, inset)
+            }
+        }
     }
 
     // ---- Intent plumbing ---------------------------------------------------
@@ -205,13 +226,22 @@ class PdfReaderActivity : AppCompatActivity() {
         val continuous = viewModel.prefs.continuousScroll
 
         configurator
-            .swipeHorizontal(true)
+            // Pages run top to bottom. This library reads the flag as
+            // "setSwipeVertical(!swipeHorizontal)", so `false` is what selects a
+            // vertical strip — the default `true` would page sideways.
+            .swipeHorizontal(false)
+            // A fixed height fits a whole page regardless of how wide it is,
+            // which keeps a tall page from shrinking to an unreadable width.
+            .pageFitPolicy(FitPolicy.BOTH)
             // Turning snapping off is the whole difference between paged and
             // continuous reading: one page then flows into the next.
             .pageSnap(!continuous)
             .spacing(if (continuous) 0 else PAGE_SPACING_DP)
             .nightMode(viewModel.prefs.nightMode)
             .enableSwipe(true)
+            // Tapping a page jumps along the strip. The handle ships with the
+            // library and is what makes this work; without it a tap is ignored.
+            .scrollHandle(DefaultScrollHandle(this))
             .onLoad(object : OnLoadCompleteListener {
                 override fun loadComplete(nPages: Int) {
                     pageCount = nPages

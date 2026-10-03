@@ -4,7 +4,9 @@
 
     Layout notes:
       - The PdfView fills the window and the bars are overlays so the page is
-        never letterboxed by chrome; top/bottom insets are padded in code.
+        never letterboxed by chrome. Pages scroll vertically, so the surface is
+        wrapped in a container whose bottom padding clears the bottom bar;
+        otherwise the last page would sit underneath it.
       - The night-mode surface is a sibling View rather than a background on the
         root, because PdfView draws its own bitmap and would ignore a tint.
       - The page scrubber lives inside the top bar to keep the reading area clear.
@@ -17,11 +19,24 @@
     android:layout_height="match_parent"
     android:background="@color/reader_background">
 
-    <!-- The PDF surface itself. -->
-    <com.github.barteksc.pdfviewer.PDFView
-        android:id="@+id/pdfView"
+    <!--
+        The page surface, inset from the bottom bar.
+
+        Pages scroll vertically, so the strip runs the full height of the strip
+        and the last page would otherwise end up underneath the bottom bar. A
+        padded wrapper is used rather than padding on PDFView itself: the view
+        sizes itself from its own bounds and ignores padding.
+    -->
+    <FrameLayout
+        android:id="@+id/pdfContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/pdfView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
     <!-- Night-mode surface: painted over the page to invert perceived brightness. -->
     <View
