@@ -1,6 +1,6 @@
 {
   "name": "islamic-fiqh-learning-app",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "description": "Islamic Fiqh Learning Application with black/white design, bilingual support, and offline capabilities",
   "private": true,
   "scripts": {

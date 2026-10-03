@@ -8,6 +8,7 @@ import { Button } from '../components/UI/Button';
 import { LoadingState } from '../components/UI/Spinner';
 import { Icon } from '../components/UI/Icon';
 import { cn } from '../utils/cn';
+import pkg from '../../package.json';
 
 const LANGUAGES = [
   { code: 'ar', label: 'العربية' },
@@ -131,7 +132,7 @@ const SettingsPage = () => {
           <div className="space-y-2 text-sm text-ink-muted">
             <p className="font-semibold text-ink">{t('app_name')}</p>
             <p>
-              {t('version')}: 0.1.0
+              {t('version')}: {pkg.version}
             </p>
           </div>
         </Card>
