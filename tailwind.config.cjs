@@ -4,6 +4,9 @@ module.exports = {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  // Class-based, not media-based: the theme is a user setting that has to
+  // override the operating system, in both directions.
+  darkMode: 'class',
   theme: {
     screens: {
       xs: '480px',
@@ -14,19 +17,22 @@ module.exports = {
       '2xl': '1536px',
     },
     extend: {
+      // Every colour is a CSS variable so that dark mode can re-point the
+      // palette in one place (index.css) instead of needing a `dark:` variant
+      // on every component. The light values live in :root.
       colors: {
         // Surfaces
-        paper: '#FFFFFF',
-        surface: '#F5F5F5',
-        'surface-quiet': '#FAFAFA',
-        line: '#E0E0E0',
+        paper: 'var(--color-paper)',
+        surface: 'var(--color-surface)',
+        'surface-quiet': 'var(--color-surface-quiet)',
+        line: 'var(--color-line)',
         // Ink scale — text, borders and icons
-        ink: '#000000',
-        'ink-soft': '#1A1A1A',
-        'ink-body': '#333333',
-        'ink-muted': '#666666',
-        'ink-faint': '#808080',
-        'ink-ghost': '#A9A9A9',
+        ink: 'var(--color-ink)',
+        'ink-soft': 'var(--color-ink-soft)',
+        'ink-body': 'var(--color-ink-body)',
+        'ink-muted': 'var(--color-ink-muted)',
+        'ink-faint': 'var(--color-ink-faint)',
+        'ink-ghost': 'var(--color-ink-ghost)',
       },
       fontSize: {
         xs: ['0.75rem', { lineHeight: '1.6' }],

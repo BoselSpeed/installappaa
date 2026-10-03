@@ -18,7 +18,11 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '.',
         scope: '.',
-        theme_color: '#000000',
+        // Matched to the light theme's paper and ink tokens in index.css. The
+        // splash screen is drawn before the app can read the saved theme, so
+        // this is the light appearance; the theme itself only applies once the
+        // document is live.
+        theme_color: '#ffffff',
         background_color: '#ffffff',
         icons: [
           {

@@ -4,6 +4,18 @@ import { useTranslation } from 'react-i18next';
 
 const AppSettingsContext = createContext(null);
 
+/**
+ * Put the theme on <html> so the CSS token block for the theme applies.
+ *
+ * Kept next to the setting that owns it rather than in AppProviders: the
+ * class has to be correct before the first paint of a reloaded app, and this
+ * component is what resolves the stored value.
+ */
+const applyTheme = (theme) => {
+  if (typeof document === 'undefined') return;
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+};
+
 export const AppSettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,6 +47,7 @@ export const AppSettingsProvider = ({ children }) => {
       try {
         const userSettings = await appSettingsService.getAppSettings(userId);
         setSettings(userSettings);
+        applyTheme(userSettings.theme);
         if (userSettings.language !== i18n.language) {
           i18n.changeLanguage(userSettings.language);
         }
@@ -89,6 +102,9 @@ export const AppSettingsProvider = ({ children }) => {
 
   const updateTheme = useCallback(async (theme) => {
     try {
+      // Applied before the write so the UI responds at once; the stored value
+      // only matters on the next launch.
+      applyTheme(theme);
       await appSettingsService.saveAppSettings({
         ...settings,
         theme

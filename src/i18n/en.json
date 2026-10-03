@@ -18,6 +18,10 @@
   "settings": "Settings",
   "language": "Language",
   "display": "Display",
+  "theme": "Theme",
+  "theme_mode": "Dark mode",
+  "light": "Light",
+  "dark": "Dark",
   "font_size": "Font Size",
   "small": "Small",
   "medium": "Medium",
@@ -182,7 +186,6 @@
   "recent_searches": "Recent Searches",
   "voice_input": "Voice Input",
   "open_native_reader": "Open in native reader",
-  "open_native_reader_hint": "This volume is on your device, so it opens in the native reader.",
   "native_reader_unavailable": "This volume is not available in the native reader",
   "native_reader_failed": "Could not open the native reader"
 }

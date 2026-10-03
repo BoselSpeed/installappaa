@@ -18,6 +18,10 @@
   "settings": "الإعدادات",
   "language": "اللغة",
   "display": "العرض",
+  "theme": "المظهر",
+  "theme_mode": "الوضع الليلي",
+  "light": "فاتح",
+  "dark": "داكن",
   "font_size": "حجم الخط",
   "small": "صغير",
   "medium": "متوسط",
@@ -186,7 +190,6 @@
   "recent_searches": "عمليات البحث الأخيرة",
   "voice_input": "إدخال صوتي",
   "open_native_reader": "فتح في القارئ الأصلي",
-  "open_native_reader_hint": "هذا المجلد مُنزَّل على الجهاز، لذلك يُفتح في القارئ الأصلي.",
   "native_reader_unavailable": "هذا المجلد غير متاح في القارئ الأصلي",
   "native_reader_failed": "تعذّر فتح القارئ الأصلي"
 }

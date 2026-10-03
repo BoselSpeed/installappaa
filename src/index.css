@@ -2,6 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Theme tokens.
+
+  These are the single source of truth for colour: tailwind.config.cjs points
+  every `paper` / `surface` / `ink-*` colour at them, so switching themes means
+  re-pointing these variables and nothing else. A component written once works in
+  both themes without a single `dark:` variant.
+*/
+:root {
+  color-scheme: light;
+
+  /* Surfaces, lightest to darkest */
+  --color-paper: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-surface-quiet: #fafafa;
+  --color-line: #e0e0e0;
+
+  /* Ink scale — text, borders and icons, strongest to faintest */
+  --color-ink: #000000;
+  --color-ink-soft: #1a1a1a;
+  --color-ink-body: #333333;
+  --color-ink-muted: #666666;
+  --color-ink-faint: #808080;
+  --color-ink-ghost: #a9a9a9;
+
+  /* Chrome that is not part of the palette above */
+  --color-on-accent: #ffffff;
+  --color-reader-canvas: #f5f5f5;
+  --color-scrollbar-track: #f5f5f5;
+  --color-scrollbar-thumb: #a9a9a9;
+  --color-scrollbar-thumb-hover: #808080;
+}
+
+/*
+  Applied by AppProviders from the saved theme setting, so it can be forced
+  either way rather than following the operating system.
+
+  The ink scale inverts (light text on dark surfaces) and the surfaces step down
+  by the same amount, which keeps the contrast between adjacent shades the same
+  as in light mode.
+*/
+.dark {
+  color-scheme: dark;
+
+  --color-paper: #0d0d0f;
+  --color-surface: #17171a;
+  --color-surface-quiet: #121215;
+  --color-line: #2e2e34;
+
+  --color-ink: #f5f5f7;
+  --color-ink-soft: #e4e4e7;
+  --color-ink-body: #c9c9cf;
+  --color-ink-muted: #a1a1aa;
+  --color-ink-faint: #7c7c85;
+  --color-ink-ghost: #5c5c64;
+
+  --color-on-accent: #0d0d0f;
+  --color-reader-canvas: #17171a;
+  --color-scrollbar-track: #17171a;
+  --color-scrollbar-thumb: #3d3d45;
+  --color-scrollbar-thumb-hover: #55555f;
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -17,13 +80,15 @@
   }
 
   body {
-    background-color: #ffffff;
-    color: #333333;
+    background-color: var(--color-paper);
+    color: var(--color-ink-body);
     line-height: 1.6;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* The palette swap should not read as a flash while the class changes. */
+    transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Mobile-first baseline; scales up on tablet and desktop */
@@ -31,7 +96,7 @@
   h2,
   h3,
   h4 {
-    color: #000000;
+    color: var(--color-ink);
     font-weight: 700;
     letter-spacing: -0.01em;
     line-height: 1.3;
@@ -44,19 +109,19 @@
 
   /* Visible, high-contrast keyboard focus on every interactive element */
   :focus-visible {
-    outline: 2px solid #000000;
+    outline: 2px solid var(--color-ink);
     outline-offset: 2px;
     border-radius: 2px;
   }
 
   ::selection {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--color-ink);
+    color: var(--color-on-accent);
   }
 
   mark {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--color-ink);
+    color: var(--color-on-accent);
     padding: 0 0.2em;
     border-radius: 2px;
   }
@@ -71,7 +136,7 @@
 
   input::placeholder,
   textarea::placeholder {
-    color: #666666;
+    color: var(--color-ink-muted);
     opacity: 1;
   }
 
@@ -101,7 +166,7 @@
      Lives in @layer components so that Tailwind utilities (a later layer) can
      override the default height — the fullscreen toggle relies on that. */
   .pdf-reader-scroll {
-    background-color: #f5f5f5;
+    background-color: var(--color-reader-canvas);
     height: 70vh;
   }
 
@@ -119,17 +184,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: var(--color-scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #a9a9a9;
-  border: 2px solid #f5f5f5;
+  background: var(--color-scrollbar-thumb);
+  border: 2px solid var(--color-scrollbar-track);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #808080;
+  background: var(--color-scrollbar-thumb-hover);
 }
 
 /* Respect users who prefer reduced motion */
