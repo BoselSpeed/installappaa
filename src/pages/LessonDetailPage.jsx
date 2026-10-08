@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { lessonsService, lessonContentService, notesService } from '../services/appService';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { useNotes } from '../hooks/useNotes';
@@ -48,6 +48,15 @@ const LessonDetailPage = () => {
   const contentRef = useRef(null);
   const readingStartRef = useRef(null);
 
+  const [searchParams] = useSearchParams();
+  // Table-of-contents links arrive as ?page=N; otherwise the reader resumes.
+  const requestedPage = Number(searchParams.get('page'));
+  const initialPage =
+    Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : undefined;
+  // The reader hides its own chrome while reading; the page follows it so only
+  // the document stays on screen.
+  const [controlsHidden, setControlsHidden] = useState(false);
+
   useEffect(() => {
     const loadLesson = async () => {
       setLoading(true);
@@ -75,6 +84,7 @@ const LessonDetailPage = () => {
 
     loadLesson();
     setReadingProgress(0);
+    setControlsHidden(false);
   }, [lessonId, sectionId, progress]);
 
   useEffect(() => {
@@ -206,6 +216,8 @@ const LessonDetailPage = () => {
   const currentIndex = siblings.findIndex((l) => l.id === lessonId);
   const prevLesson = currentIndex > 0 ? siblings[currentIndex - 1] : null;
   const nextLesson = currentIndex >= 0 && currentIndex < siblings.length - 1 ? siblings[currentIndex + 1] : null;
+  // Only the PDF reader requests chrome hiding; text lessons keep their header.
+  const chromeHidden = Boolean(lesson.pdfUrl) && controlsHidden;
 
   const renderBlock = (block, index) => {
     switch (block.type) {
@@ -247,11 +259,19 @@ const LessonDetailPage = () => {
 
   return (
     <PageShell width="reading">
-      <BackLink to={sectionUrl(sectionId)} className="mb-4">
+      <BackLink
+        to={sectionUrl(sectionId)}
+        className={cn('mb-4 transition-opacity duration-300', chromeHidden && 'pointer-events-none opacity-0')}
+      >
         {t('previous')} · {t('browse_sections')}
       </BackLink>
 
-      <header className="mb-6 mt-4 sm:mb-8">
+      <header
+        className={cn(
+          'mb-6 mt-4 transition-opacity duration-300 sm:mb-8',
+          chromeHidden && 'pointer-events-none opacity-0'
+        )}
+      >
         <h1 className="text-[1.5rem] font-bold leading-tight text-ink sm:text-3xl lg:text-4xl">
           {pick(lesson, 'title')}
         </h1>
@@ -260,7 +280,14 @@ const LessonDetailPage = () => {
         </div>
       </header>
 
-      <div className="sticky top-[7.625rem] z-30 lg:top-16 mb-6 rounded-xl border border-line bg-paper/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-paper/80">
+      <div
+        className={cn(
+          'mb-6 rounded-xl border border-line bg-paper/95 px-4 py-3 backdrop-blur transition-opacity duration-300 supports-[backdrop-filter]:bg-paper/80',
+          !lesson.pdfUrl &&
+            'sticky top-[7.625rem] z-30 lg:top-16',
+          chromeHidden && 'pointer-events-none opacity-0'
+        )}
+      >
         <div className="mb-2 flex items-center justify-between text-xs text-ink-muted">
           <span>{t('reading_progress')}</span>
           <span className="tabular-nums font-medium text-ink">{readingProgress}%</span>
@@ -281,7 +308,10 @@ const LessonDetailPage = () => {
             <PDFReader
               pdfUrl={lesson.pdfUrl}
               fileName={`${lesson.id}.pdf`}
+              storageKey={`lesson:${lessonId}`}
+              initialPage={initialPage}
               onPageChange={handlePdfPageChange}
+              onControlsChange={setControlsHidden}
             />
           </Suspense>
           {lesson.pages > 0 && (

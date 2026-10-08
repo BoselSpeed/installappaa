@@ -12,6 +12,8 @@ import {
   downloadVolumeNatively,
   hasLocalVolume,
   isNativeDownloadAvailable,
+  nativeVolumeUri,
+  nativeVolumeUrl,
   removeNativeVolume,
   resolveDownloadUrl
 } from '../lib/nativeLibraryDownload';
@@ -113,6 +115,40 @@ export const getStoredVolumeBlob = async (bookId, volumeId) => {
 export const getStoredVolumeBlobUrl = async (bookId, volumeId) => {
   const blob = await getStoredVolumeBlob(bookId, volumeId);
   return blob ? URL.createObjectURL(blob) : null;
+};
+
+/**
+ * Resolve where a volume the app can actually read is served from.
+ *
+ * Shared by the reader page and the table-of-contents preview so both follow
+ * the same order: a bundled file first, then a copy held in IndexedDB, then a
+ * file the native downloader put on the device.
+ *
+ * @param {string} bookId
+ * @param {string} volumeId
+ * @param {{bundled?:boolean, pdfUrl?:string}} volume
+ * @returns {Promise<{url:string, nativeUri:string|null, revoke:string|null}|null>}
+ *   `revoke` is the object URL to release once the PDF has been read into
+ *   memory; null when the URL does not belong to the caller to revoke.
+ */
+export const resolveReadableVolumeUrl = async (bookId, volumeId, volume) => {
+  if (volume?.bundled && volume.pdfUrl) {
+    return { url: volume.pdfUrl, nativeUri: null, revoke: null };
+  }
+
+  const blobUrl = await getStoredVolumeBlobUrl(bookId, volumeId);
+  if (blobUrl) {
+    return { url: blobUrl, nativeUri: null, revoke: blobUrl };
+  }
+
+  if (isNativeDownloadAvailable()) {
+    const url = await nativeVolumeUrl(bookId, volumeId);
+    if (url) {
+      return { url, nativeUri: await nativeVolumeUri(bookId, volumeId), revoke: null };
+    }
+  }
+
+  return null;
 };
 
 export const isVolumeStored = async (bookId, volumeId) => {
@@ -237,6 +273,7 @@ export const storedVolumeSizeMb = async (bookId, volumeId) => {
 export default {
   getStoredVolumeBlob,
   getStoredVolumeBlobUrl,
+  resolveReadableVolumeUrl,
   isVolumeStored,
   storeVolume,
   removeStoredVolume,
