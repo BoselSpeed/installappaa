@@ -61,6 +61,11 @@ Working features:
   `PDFView` reader: TOC from the PDF outline, page navigation, jump-to-page,
   night mode, bookmarks, notes, reading progress, and text search through
   PDFBox
+  - **Immersive parity (2026-10-08):** the toolbar, scrubber and bottom bar
+    fade away while reading and a tap brings them back (one-time hint first
+    time); free zoom 50–500% in 25% steps, double-tap to 250%, pinch bounds and
+    the last used zoom remembered per device and restored on open — mirroring
+    the web reader
 - Tooling: `npm run verify` runs typecheck, ESLint and `npm run
   verify:content`, which validates `books.js` against the files in `public/`
   (missing bundled PDFs or covers, unusable volumes, duplicate ids, unpaired
