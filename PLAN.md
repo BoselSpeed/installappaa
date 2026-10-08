@@ -9,7 +9,7 @@
 > issue list at the end of this file for what is genuinely outstanding.
 
 ## Implementation Status
-**Last updated:** 2026-10-02
+**Last updated:** 2026-10-08
 
 The application is functional end-to-end and has **no backend at all**: content
 and progress live on the device, and every page reads them through
@@ -35,6 +35,15 @@ Working features:
 - In-app PDF reader (pdf.js) with page navigation, zoom, jump-to-page and
   per-page reading progress; covers fall back to a styled placeholder rather
   than showing a broken image
+- **Web reader parity upgrade (2026-10-08):** the in-app reader now matches the
+  native one — it remembers the last page, zoom and fit mode per book (same
+  composite slug as the native reader) and resumes there; it extracts the PDF's
+  own outline into a searchable table of contents (cached, available both as a
+  drawer inside the reader and as a Table of contents button on volume cards);
+  the toolbar and page indicator fade away while reading and a tap brings them
+  back (double-tap zooms, pinch zooms around the fingers); long jumps land
+  instantly because every page box is sized up front; and canvas backings are
+  capped and off-screen bitmaps released so long books stop exhausting memory
 - Search across lesson and section titles with highlighting, plus voice search
 - Quiz player: progress, scoring, results, review mode with explanations, retake.
   Five questions per lesson are seeded for each of the four PDF lessons

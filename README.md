@@ -67,6 +67,10 @@ Only PDFs bundled under `public/books/` are readable inside the app, on the web
 and in the Android build. Volumes hosted elsewhere are opened at their original
 location, because a static site cannot fetch another origin.
 
+The web reader resumes where you stopped (page, zoom and fit, per volume), has a
+searchable table of contents read from each PDF's outline, and hides its toolbar
+while you read — tap to bring it back, double-tap or pinch to zoom.
+
 Preview locally with:
 
 ```bash
