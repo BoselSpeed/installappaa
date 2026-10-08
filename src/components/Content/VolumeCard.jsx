@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocalized } from '../../utils/helpers';
 import { canDownloadVolume, canReadInApp, resolveVolumeUrl } from '../../services/volumeStorage';
+import { getReadingPosition } from '../../services/readerCache';
 import { Card } from '../UI/Card';
 import { Button } from '../UI/Button';
 import { ProgressBar } from '../UI/ProgressBar';
 import { Icon } from '../UI/Icon';
+import { Spinner } from '../UI/Spinner';
 import { cn } from '../../utils/cn';
+
+const VolumeTocModal = lazy(() =>
+  import('./VolumeTocModal').then((m) => ({ default: m.VolumeTocModal }))
+);
 
 const StatusMark = ({ tone, icon, label }) => (
   <span
@@ -31,6 +37,19 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
   const { t } = useTranslation();
   const { pick } = useLocalized();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [tocOpen, setTocOpen] = useState(false);
+  // Last page the reader stopped at for this volume, read once on mount so the
+  // card can offer to resume instead of starting over.
+  const [savedPage, setSavedPage] = useState(null);
+
+  const storageKey = `${book.id}--${volume.id}`;
+  const localVolume = state.bundled || state.downloaded;
+
+  useEffect(() => {
+    if (!localVolume) return;
+    const saved = getReadingPosition(storageKey);
+    setSavedPage(saved && saved.page > 1 ? saved.page : null);
+  }, [localVolume, storageKey]);
 
   const title = pick(volume, 'title') || `${t('volume')} ${volume.number || ''}`.trim();
   const sizeMb = volume.sizeMb;
@@ -111,13 +130,21 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
     return null;
   };
 
+  const readerPath = savedPage
+    ? `/books/${book.id}/volume/${volume.id}?page=${savedPage}`
+    : `/books/${book.id}/volume/${volume.id}`;
+
   const renderActions = () => {
     if (state.bundled || state.downloaded) {
       return (
         <div className="flex flex-wrap items-center gap-2">
-          <Button to={`/books/${book.id}/volume/${volume.id}`} size="sm">
+          <Button to={readerPath} size="sm">
             <Icon name="file" size="sm" />
             {t('open_pdf')}
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => setTocOpen(true)}>
+            <Icon name="list" size="sm" />
+            {t('toc')}
           </Button>
           {!state.bundled &&
             (confirmDelete ? (
@@ -193,6 +220,11 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
             <p className="mt-0.5 text-xs text-ink-muted">
               {sizeMb != null && sizeMb > 0 ? `PDF • ${sizeMb} MB` : 'PDF'}
             </p>
+            {savedPage && (
+              <p className="mt-0.5 text-xs font-medium text-ink-muted">
+                {t('continue_from_page', { page: savedPage })}
+              </p>
+            )}
           </div>
         </div>
         <div className="shrink-0">{statusRow()}</div>
@@ -201,6 +233,18 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       {errorBlock()}
 
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">{renderActions()}</div>
+
+      {tocOpen && (
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40">
+              <Spinner size="lg" />
+            </div>
+          }
+        >
+          <VolumeTocModal bookId={book.id} volume={volume} onClose={() => setTocOpen(false)} />
+        </Suspense>
+      )}
     </Card>
   );
 };

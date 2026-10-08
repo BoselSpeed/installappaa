@@ -164,15 +164,18 @@
 
   /* PDF reader scroll container.
      Lives in @layer components so that Tailwind utilities (a later layer) can
-     override the default height — the fullscreen toggle relies on that. */
+     override the default height — the fullscreen toggle relies on that.
+     Leaves room for the page header above, then fills the rest of the viewport
+     so the book reads edge to edge instead of inside a short card. */
   .pdf-reader-scroll {
     background-color: var(--color-reader-canvas);
-    height: 70vh;
+    height: calc(100dvh - 11rem);
+    min-height: 260px;
   }
 
   @media (min-width: 768px) {
     .pdf-reader-scroll {
-      height: 75vh;
+      height: calc(100dvh - 11rem);
     }
   }
 }
