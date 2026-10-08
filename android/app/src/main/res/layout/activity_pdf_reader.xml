@@ -102,6 +102,26 @@
             android:layout_height="1dp"
             android:layout_weight="1" />
 
+        <!-- Zoom out (steps of 25%, 50–500% like the web reader). -->
+        <ImageButton
+            android:id="@+id/btnZoomOut"
+            android:layout_width="@dimen/reader_touch_target"
+            android:layout_height="@dimen/reader_touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reader_zoom_out"
+            android:src="@drawable/ic_pdf_zoom_out"
+            app:tint="@color/reader_on_surface" />
+
+        <!-- Zoom in. -->
+        <ImageButton
+            android:id="@+id/btnZoomIn"
+            android:layout_width="@dimen/reader_touch_target"
+            android:layout_height="@dimen/reader_touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reader_zoom_in"
+            android:src="@drawable/ic_pdf_zoom_in"
+            app:tint="@color/reader_on_surface" />
+
         <!-- Previous page. -->
         <ImageButton
             android:id="@+id/btnPrevious"

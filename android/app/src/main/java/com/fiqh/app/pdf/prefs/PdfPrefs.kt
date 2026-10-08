@@ -19,10 +19,15 @@ class PdfPrefs private constructor(context: Context) {
     private val prefs: SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
 
-    /** Last zoom the reader used, as a PdfViewer zoom level (0..3). */
+    /** Last zoom the reader used, as a percentage of the fitted page (50..500). */
     var zoomLevel: Int
         get() = prefs.getInt(KEY_ZOOM, DEFAULT_ZOOM)
         set(value) = prefs.edit().putInt(KEY_ZOOM, value).apply()
+
+    /** True once the one-time "tap to show the reading tools" hint has been shown. */
+    var controlsHintSeen: Boolean
+        get() = prefs.getBoolean(KEY_CONTROLS_HINT, false)
+        set(value) = prefs.edit().putBoolean(KEY_CONTROLS_HINT, value).apply()
 
     /** True when the dark reading surface is on. */
     var nightMode: Boolean
@@ -45,9 +50,10 @@ class PdfPrefs private constructor(context: Context) {
         private const val KEY_NIGHT_MODE = "night_mode"
         private const val KEY_CONTINUOUS = "continuous_scroll"
         private const val KEY_ORIENTATION = "orientation_lock"
+        private const val KEY_CONTROLS_HINT = "controls_hint_seen"
 
-        /** PdfViewer's own default zoom step. */
-        const val DEFAULT_ZOOM = 1
+        /** Fit-to-page zoom, i.e. 100%. */
+        const val DEFAULT_ZOOM = 100
         const val ORIENTATION_UNSET = -1
 
         @Volatile

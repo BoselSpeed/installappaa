@@ -73,6 +73,9 @@
     <string name="reader_zoom_level">مستوى التكبير %1$d</string>
     <string name="reader_lock_rotation">قفل الاتجاه</string>
 
+    <!-- Immersive reading: the tools fade away until the page is tapped. -->
+    <string name="reader_controls_hint">اضغط في أي مكان لإظهار أدوات القراءة</string>
+
     <!-- Loading and errors -->
     <string name="reader_loading">جارٍ تحميل الكتاب…</string>
     <string name="reader_error_missing_file">تعذّر العثور على ملف الكتاب</string>

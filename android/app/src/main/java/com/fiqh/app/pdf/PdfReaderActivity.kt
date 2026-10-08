@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import java.io.File
 import java.io.IOException
 import java.net.URL
@@ -121,6 +123,27 @@ class PdfReaderActivity : AppCompatActivity() {
     /** Cancelled when the search dialog closes, so a slow parse stops early. */
     private var searchBuildJob: Job? = null
 
+    /** True while the document is loading; disables paging and auto-hide. */
+    private var loading = true
+
+    // ---- Immersive chrome -------------------------------------------------
+    //
+    // The toolbar, scrubber and bottom bar hover over the page and, like the
+    // web reader, fade away while reading. A tap anywhere brings them back;
+    // interacting with a control restarts the countdown.
+
+    /** Main-thread dispatcher for the auto-hide countdown. */
+    private val chromeHandler = Handler(Looper.getMainLooper())
+
+    /** Fade the chrome out once the reader has been quiet for a while. */
+    private val hideChromeRunnable = Runnable { hideChrome() }
+
+    /** Whether the toolbar/scrubber/bottom bar are on screen right now. */
+    private var chromeVisible = true
+
+    /** Current zoom as a percentage of the fitted page (50..500). */
+    private var zoomPercent = PdfPrefs.DEFAULT_ZOOM
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPdfReaderBinding.inflate(layoutInflater)
@@ -166,6 +189,116 @@ class PdfReaderActivity : AppCompatActivity() {
             val inset = binding.bottomBar.height
             if (inset > 0 && binding.pdfContainer.paddingBottom != inset) {
                 binding.pdfContainer.setPadding(0, 0, 0, inset)
+            }
+        }
+    }
+
+    // ---- Immersive chrome -------------------------------------------------
+
+    /**
+     * Fade the chrome in or out.
+     *
+     * The bars stay in the layout as `INVISIBLE` rather than `GONE`, so their
+     * measured heights survive the fade and re-showing never reflows the page.
+     * The bottom inset on [binding.pdfContainer] is only useful while the bars
+     * are on screen, so it is released when they go away, letting the last page
+     * run all the way to the bottom edge.
+     */
+    private fun setChromeVisible(visible: Boolean) {
+        if (chromeVisible == visible) {
+            if (visible) applyChromeInsets()
+            return
+        }
+        chromeVisible = visible
+        val alpha = if (visible) 1f else 0f
+
+        // Plumb the toolbar's alpha through the scrubber too; the scrubber is
+        // mounted inside the top bar region but is a separate overlay view.
+        val duration = 200L
+        binding.toolbar.isClickable = visible
+        binding.pageSlider.isClickable = visible
+        binding.bottomBar.isClickable = visible
+        listOf(binding.toolbar, binding.pageSlider, binding.bottomBar).forEach { view ->
+            view.visibility = View.VISIBLE
+            view.animate().alpha(alpha).setDuration(duration)
+                .withEndAction {
+                    if (!visible) {
+                        binding.toolbar.visibility = View.INVISIBLE
+                        binding.pageSlider.visibility = View.INVISIBLE
+                        binding.bottomBar.visibility = View.INVISIBLE
+                        binding.pdfContainer.setPadding(0, 0, 0, 0)
+                    }
+                }
+                .start()
+        }
+        if (visible) applyChromeInsets()
+    }
+
+    /** Bring the chrome back and (re)start the auto-hide countdown. */
+    private fun showChrome() {
+        chromeHandler.removeCallbacks(hideChromeRunnable)
+        setChromeVisible(true)
+        scheduleChromeHide()
+    }
+
+    /**
+     * Let the chrome fade out.
+     *
+     * The one-time hint is shown the first time this happens, because that is
+     * the exact moment a reader realises the tools have disappeared.
+     */
+    private fun hideChrome() {
+        if (!chromeVisible) return
+        // Never hide under an open page-entry field; a reader typing a page has
+        // not stopped reading yet.
+        if (binding.pageInputLayout.visibility == View.VISIBLE) {
+            scheduleChromeHide()
+            return
+        }
+        setChromeVisible(false)
+        if (!viewModel.prefs.controlsHintSeen) {
+            viewModel.prefs.controlsHintSeen = true
+            Toast.makeText(this, R.string.reader_controls_hint, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /** Hide the chrome after the idle timeout, unless something is busy. */
+    private fun scheduleChromeHide() {
+        chromeHandler.removeCallbacks(hideChromeRunnable)
+        if (loading) return
+        chromeHandler.postDelayed(hideChromeRunnable, CHROME_IDLE_MS)
+    }
+
+    /** Tap anywhere on the page: the tools hide if up, come back if hidden. */
+    private fun toggleChrome() {
+        if (chromeVisible) hideChrome() else showChrome()
+    }
+
+    // ---- Free zoom ---------------------------------------------------------
+
+    /**
+     * Step the zoom by ±25% of the fitted page (50–500%), and remember it so
+     * the next book opens already zoomed, like the web reader.
+     */
+    private fun changeZoomBy(delta: Int) {
+        if (pageCount <= 0) return
+        zoomPercent = (zoomPercent + delta).coerceIn(MIN_ZOOM_PERCENT, MAX_ZOOM_PERCENT)
+        binding.pdfView.zoomWithAnimation(zoomPercent / 100f)
+        viewModel.prefs.zoomLevel = zoomPercent
+    }
+
+    /**
+     * Apply the saved zoom once the page is laid out.
+     *
+     * A freshly opened document must finish its fit before a custom zoom can
+     * take over, so this is run after the next frame rather than inline.
+     */
+    private fun restoreZoom() {
+        zoomPercent = viewModel.prefs.zoomLevel.coerceIn(MIN_ZOOM_PERCENT, MAX_ZOOM_PERCENT)
+        if (zoomPercent == 100) return
+        binding.pdfView.post {
+            if (pageCount > 0 && zoomPercent != 100) {
+                binding.pdfView.zoomWithAnimation(zoomPercent / 100f)
             }
         }
     }
@@ -239,6 +372,10 @@ class PdfReaderActivity : AppCompatActivity() {
             .spacing(if (continuous) 0 else PAGE_SPACING_DP)
             .nightMode(viewModel.prefs.nightMode)
             .enableSwipe(true)
+            // Double-tap zooms to 250% and taps toggle the chrome, both of
+            // which the reader only has meaningfully when it stays enabled.
+            .enableDoubletap(true)
+            .onTap { toggleChrome(); true }
             // Tapping a page jumps along the strip. The handle ships with the
             // library and is what makes this work; without it a tap is ignored.
             .scrollHandle(DefaultScrollHandle(this))
@@ -253,12 +390,17 @@ class PdfReaderActivity : AppCompatActivity() {
                     val requested = contract.page
                     if (requested != null) {
                         jumpToPage(requested)
+                        restoreZoom()
                     } else {
                         lifecycleScope.launch {
                             val saved = viewModel.loadProgress()
-                            if (saved != null) jumpToPage(saved.pageIndex)
+                            if (saved != null) {
+                                jumpToPage(saved.pageIndex)
+                                restoreZoom()
+                            }
                         }
                     }
+                    showChrome()
                 }
             })
             .onError(object : OnErrorListener {
@@ -297,6 +439,14 @@ class PdfReaderActivity : AppCompatActivity() {
                     setLoading(false)
                 }
             })
+            // Free zoom between 50% and 500%, with a double-tap landing on 250% —
+            // the same envelope the web reader offers. Set on the view before the
+            // document loads so the first pinch obeys these bounds.
+            .also {
+                binding.pdfView.setMinZoom(MIN_ZOOM)
+                binding.pdfView.setMidZoom(DOUBLE_TAP_ZOOM)
+                binding.pdfView.setMaxZoom(MAX_ZOOM)
+            }
             .load()
     }
 
@@ -372,6 +522,7 @@ class PdfReaderActivity : AppCompatActivity() {
                 R.id.action_bookmark_toggle -> toggleCurrentBookmark()
                 else -> return@setOnMenuItemClickListener false
             }
+            showChrome()
             true
         }
     }
@@ -379,18 +530,26 @@ class PdfReaderActivity : AppCompatActivity() {
     // ---- Navigation --------------------------------------------------------
 
     private fun setUpNavigation() {
-        binding.btnNext.setOnClickListener { jumpToPage(binding.pdfView.currentPage + 1) }
-        binding.btnPrevious.setOnClickListener { jumpToPage(binding.pdfView.currentPage - 1) }
+        binding.btnNext.setOnClickListener {
+            showChrome()
+            jumpToPage(binding.pdfView.currentPage + 1)
+        }
+        binding.btnPrevious.setOnClickListener {
+            showChrome()
+            jumpToPage(binding.pdfView.currentPage - 1)
+        }
+        binding.btnZoomIn.setOnClickListener { showChrome(); changeZoomBy(ZOOM_STEP) }
+        binding.btnZoomOut.setOnClickListener { showChrome(); changeZoomBy(-ZOOM_STEP) }
 
         // Volume keys turn pages, as in most e-readers.
         binding.root.setOnKeyListener { _, keyCode, event ->
             if (event.action != KeyEvent.ACTION_DOWN) return@setOnKeyListener false
             when (keyCode) {
                 KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                    jumpToPage(binding.pdfView.currentPage + 1); true
+                    showChrome(); jumpToPage(binding.pdfView.currentPage + 1); true
                 }
                 KeyEvent.KEYCODE_VOLUME_UP -> {
-                    jumpToPage(binding.pdfView.currentPage - 1); true
+                    showChrome(); jumpToPage(binding.pdfView.currentPage - 1); true
                 }
                 else -> false
             }
@@ -430,6 +589,7 @@ class PdfReaderActivity : AppCompatActivity() {
      */
     private fun setUpPageIndicator() {
         binding.pageIndicator.setOnClickListener {
+            showChrome()
             if (binding.pageInputLayout.visibility == View.VISIBLE) {
                 hidePageInput()
             } else {
@@ -463,6 +623,8 @@ class PdfReaderActivity : AppCompatActivity() {
     private fun hidePageInput() {
         binding.pageInputLayout.visibility = View.GONE
         binding.pageInput.clearFocus()
+        // The field is gone; an idle reader can get back to reading dark.
+        scheduleChromeHide()
     }
 
     /** Full page-jump dialog, offered from the table of contents. */
@@ -504,10 +666,14 @@ class PdfReaderActivity : AppCompatActivity() {
             }
         }
         binding.pageSlider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: Slider) = Unit
+            override fun onStartTrackingTouch(slider: Slider) {
+                // Scrubbing is active reading; stop the countdown while it runs.
+                showChrome()
+            }
             override fun onStopTrackingTouch(slider: Slider) {
                 // The slider is 1-based to match the indicator; pages are 0-based.
                 jumpToPage(slider.value.toInt() - 1)
+                scheduleChromeHide()
             }
         })
     }
@@ -893,25 +1059,44 @@ class PdfReaderActivity : AppCompatActivity() {
 
     /** Show the spinner and block paging while there is no document to page. */
     private fun setLoading(loading: Boolean) {
+        this.loading = loading
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         binding.btnNext.isEnabled = !loading
         binding.btnPrevious.isEnabled = !loading
+        binding.btnZoomIn.isEnabled = !loading
+        binding.btnZoomOut.isEnabled = !loading
+        if (loading) {
+            // Keep the chrome legible (and tappable) while nothing is rendered.
+            chromeHandler.removeCallbacks(hideChromeRunnable)
+            setChromeVisible(true)
+        } else {
+            showChrome()
+        }
     }
 
     // ---- Lifecycle ---------------------------------------------------------
 
-    /**
-     * Persist the visible position before the activity goes away.
-     *
-     * Called on every stop rather than only on destroy: the reader is usually
-     * backgrounded (home button, or the reader returning to the WebView), and
-     * that is the moment the position has to be reliable.
-     */
-    override fun onStop() {
-        super.onStop()
+    /** Persist the visible position before the activity goes away. */
+    private fun flushPosition() {
         if (pageCount > 0) {
             viewModel.saveProgress(binding.pdfView.currentPage, 0f)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Coming back from the background is a natural moment to offer the
+        // chrome again, exactly like the web reader.
+        showChrome()
+    }
+
+    override fun onStop() {
+        chromeHandler.removeCallbacks(hideChromeRunnable)
+        super.onStop()
+        // Called on every stop rather than only on destroy: the reader is
+        // usually backgrounded (home button, or the reader returning to the
+        // WebView), and that is the moment the position has to be reliable.
+        flushPosition()
     }
 
     /** Send the reader back to the WebView with the page it was left on. */
@@ -935,5 +1120,16 @@ setResult(
 
         /** Gap between pages in paged mode, so the page edge is readable. */
         const val PAGE_SPACING_DP = 8
+
+        // Chrome auto-hide envelope, mirroring the web reader.
+        const val CHROME_IDLE_MS = 3500L
+
+        // Free zoom envelope: 50–500% in 25% steps, double-tap on 250%.
+        const val MIN_ZOOM_PERCENT = 50
+        const val MAX_ZOOM_PERCENT = 500
+        const val ZOOM_STEP = 25
+        const val MIN_ZOOM = 0.5f
+        const val DOUBLE_TAP_ZOOM = 2.5f
+        const val MAX_ZOOM = 5f
     }
 }
