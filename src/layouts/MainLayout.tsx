@@ -1,4 +1,5 @@
 import { NavBar } from '../components/Navigation/NavBar'
+import { BottomNav } from '../components/Navigation/BottomNav'
 import { Footer } from '../components/Navigation/Footer'
 import { Sidebar } from '../components/Navigation/Sidebar'
 import { Outlet } from 'react-router-dom'
@@ -26,6 +27,10 @@ export const MainLayout = () => {
         </main>
       </div>
       <Footer />
+      <BottomNav />
+      {/* The fixed tab bar floats over the page; on mobile reserve its height
+          so the footer is never hidden behind it. */}
+      <div className="h-14 lg:hidden" aria-hidden="true" />
     </div>
   )
 }

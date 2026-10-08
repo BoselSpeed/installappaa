@@ -53,9 +53,6 @@ const LessonDetailPage = () => {
   const requestedPage = Number(searchParams.get('page'));
   const initialPage =
     Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : undefined;
-  // The reader hides its own chrome while reading; the page follows it so only
-  // the document stays on screen.
-  const [controlsHidden, setControlsHidden] = useState(false);
 
   useEffect(() => {
     const loadLesson = async () => {
@@ -84,7 +81,6 @@ const LessonDetailPage = () => {
 
     loadLesson();
     setReadingProgress(0);
-    setControlsHidden(false);
   }, [lessonId, sectionId, progress]);
 
   useEffect(() => {
@@ -216,8 +212,6 @@ const LessonDetailPage = () => {
   const currentIndex = siblings.findIndex((l) => l.id === lessonId);
   const prevLesson = currentIndex > 0 ? siblings[currentIndex - 1] : null;
   const nextLesson = currentIndex >= 0 && currentIndex < siblings.length - 1 ? siblings[currentIndex + 1] : null;
-  // Only the PDF reader requests chrome hiding; text lessons keep their header.
-  const chromeHidden = Boolean(lesson.pdfUrl) && controlsHidden;
 
   const renderBlock = (block, index) => {
     switch (block.type) {
@@ -259,19 +253,11 @@ const LessonDetailPage = () => {
 
   return (
     <PageShell width="reading">
-      <BackLink
-        to={sectionUrl(sectionId)}
-        className={cn('mb-4 transition-opacity duration-300', chromeHidden && 'pointer-events-none opacity-0')}
-      >
+      <BackLink to={sectionUrl(sectionId)} className="mb-4">
         {t('previous')} · {t('browse_sections')}
       </BackLink>
 
-      <header
-        className={cn(
-          'mb-6 mt-4 transition-opacity duration-300 sm:mb-8',
-          chromeHidden && 'pointer-events-none opacity-0'
-        )}
-      >
+      <header className="mb-6 mt-4 sm:mb-8">
         <h1 className="text-[1.5rem] font-bold leading-tight text-ink sm:text-3xl lg:text-4xl">
           {pick(lesson, 'title')}
         </h1>
@@ -283,9 +269,7 @@ const LessonDetailPage = () => {
       <div
         className={cn(
           'mb-6 rounded-xl border border-line bg-paper/95 px-4 py-3 backdrop-blur transition-opacity duration-300 supports-[backdrop-filter]:bg-paper/80',
-          !lesson.pdfUrl &&
-            'sticky top-[7.625rem] z-30 lg:top-16',
-          chromeHidden && 'pointer-events-none opacity-0'
+          !lesson.pdfUrl && 'sticky top-[7.625rem] z-30 lg:top-16'
         )}
       >
         <div className="mb-2 flex items-center justify-between text-xs text-ink-muted">
@@ -311,7 +295,6 @@ const LessonDetailPage = () => {
               storageKey={`lesson:${lessonId}`}
               initialPage={initialPage}
               onPageChange={handlePdfPageChange}
-              onControlsChange={setControlsHidden}
             />
           </Suspense>
           {lesson.pages > 0 && (

@@ -8,7 +8,6 @@ import { PageShell } from '../components/UI/PageShell';
 import { BackLink } from '../components/UI/BackLink';
 import { Card } from '../components/UI/Card';
 import { Spinner } from '../components/UI/Spinner';
-import { cn } from '../utils/cn';
 import {
   canOpenInNativeReader,
   isNativeReaderAvailable,
@@ -41,9 +40,6 @@ const VolumeReaderPage = () => {
   // Whether the native reader can open this volume. Asked separately from the
   // in-app reader because the two accept different kinds of source.
   const [nativeSupported, setNativeSupported] = useState(false);
-  // The reader fades its chrome away while a page is being read; the page
-  // header follows it so nothing but the book stays on screen.
-  const [controlsHidden, setControlsHidden] = useState(false);
   const { t } = useTranslation();
   const { pick } = useLocalized();
 
@@ -142,12 +138,7 @@ const VolumeReaderPage = () => {
 
   return (
     <PageShell width="reading">
-      <div
-        className={cn(
-          'mb-4 flex flex-wrap items-center justify-between gap-2 transition-opacity duration-300',
-          controlsHidden && 'pointer-events-none opacity-0'
-        )}
-      >
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <BackLink to={`/books/${bookId}`}>
           {pick(book, 'title') || t('books')}
         </BackLink>
@@ -180,7 +171,6 @@ const VolumeReaderPage = () => {
             // per volume.
             storageKey={`${bookId}--${volumeId}`}
             initialPage={initialPage}
-            onControlsChange={setControlsHidden}
           />
         </Suspense>
       ) : null}

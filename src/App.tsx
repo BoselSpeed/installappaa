@@ -15,11 +15,13 @@ import { StatisticsPage } from './pages/StatisticsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { AppProviders } from './components/AppProviders'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { ScrollManager } from './components/ScrollManager'
 
 function App() {
   return (
     <ErrorBoundary>
       <AppProviders>
+        <ScrollManager />
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />

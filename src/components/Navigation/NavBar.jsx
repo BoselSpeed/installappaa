@@ -10,7 +10,6 @@ const NAV_ITEMS = [
   { to: '/favorites', key: 'favorites', icon: 'bookmark' },
   { to: '/statistics', key: 'stats', icon: 'chart' },
   { to: '/achievements', key: 'achievements', icon: 'trophy' },
-  { to: '/settings', key: 'settings', icon: 'settings' },
 ];
 
 const NavBar = () => {
@@ -45,31 +44,19 @@ const NavBar = () => {
             ))}
           </nav>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-1">
+            <Link
+              to="/settings"
+              aria-label={t('settings')}
+              title={t('settings')}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-ink-muted transition-colors duration-200 hover:bg-surface hover:text-ink"
+            >
+              <Icon name="settings" size="md" />
+            </Link>
             <LanguageToggle />
           </div>
         </div>
       </div>
-
-      {/* Mobile / tablet navigation rail */}
-      <nav
-        className="border-t border-line lg:hidden"
-        aria-label={t('sections')}
-      >
-        <div className="mx-auto flex w-full max-w-7xl items-stretch gap-1 overflow-x-auto px-2 py-1.5 sm:justify-start sm:px-4">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              aria-label={t(item.key)}
-              className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors duration-200 hover:bg-surface hover:text-ink"
-            >
-              <Icon name={item.icon} size="sm" />
-              <span className="hidden min-[400px]:inline">{t(item.key)}</span>
-            </Link>
-          ))}
-        </div>
-      </nav>
     </header>
   );
 };
