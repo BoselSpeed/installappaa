@@ -5,6 +5,7 @@ import { Button } from '../UI/Button';
 import { Spinner } from '../UI/Spinner';
 import { cn } from '../../utils/cn';
 import { loadPdfDocument, extractOutline } from '../../lib/pdfOutline';
+import { getBookIndex } from '../../lib/bookIndexes';
 import {
   getReadingPosition,
   saveReadingPosition,
@@ -482,6 +483,11 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
 
   const loadToc = useCallback(async () => {
     if (tocEntries) return;
+    const curated = storageKey ? getBookIndex(storageKey) : null;
+    if (curated) {
+      setTocEntries(curated);
+      return;
+    }
     const cached = storageKey ? getTocCache(storageKey) : null;
     if (cached) {
       setTocEntries(cached);

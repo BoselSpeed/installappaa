@@ -5,6 +5,7 @@ import { useLocalized } from '../../utils/helpers';
 import { resolveReadableVolumeUrl } from '../../services/volumeStorage';
 import { getTocCache, saveTocCache } from '../../services/readerCache';
 import { loadPdfDocument, extractOutline } from '../../lib/pdfOutline';
+import { getBookIndex } from '../../lib/bookIndexes';
 import { Spinner } from '../UI/Spinner';
 import { Icon } from '../UI/Icon';
 import { cn } from '../../utils/cn';
@@ -33,6 +34,13 @@ const VolumeTocModal = ({ bookId, volume, onClose }) => {
     const load = async () => {
       setLoading(true);
       setEntries(null);
+
+      const curated = getBookIndex(storageKey);
+      if (curated) {
+        setEntries(curated);
+        setLoading(false);
+        return;
+      }
 
       const cached = getTocCache(storageKey);
       if (cached) {
