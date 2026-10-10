@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { booksService } from '../services/appService';
 import { resolveReadableVolumeUrl } from '../services/volumeStorage';
@@ -8,12 +8,6 @@ import { PageShell } from '../components/UI/PageShell';
 import { BackLink } from '../components/UI/BackLink';
 import { Card } from '../components/UI/Card';
 import { Spinner } from '../components/UI/Spinner';
-import {
-  canOpenInNativeReader,
-  getNativeProgress,
-  isNativeReaderAvailable,
-  openInNativeReader
-} from '../lib/nativePdfReader';
 
 const PDFReader = lazy(() =>
   import('../components/Content/PDFReader').then((m) => ({ default: m.PDFReader }))
@@ -32,17 +26,8 @@ const VolumeReaderPage = () => {
   const [book, setBook] = useState(null);
   const [volume, setVolume] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
-  // Set when a downloaded volume has no blob: URL but does exist on disk. It is
-  // then readable in-app through the Capacitor file scheme, and also by the
-  // native reader.
-  const [nativeUri, setNativeUri] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
-  // Whether the native reader can open this volume. Asked separately from the
-  // in-app reader because the two accept different kinds of source.
-  const [nativeSupported, setNativeSupported] = useState(false);
-  // Saved reading position from the native reader (zero-based page index)
-  const [nativePageIndex, setNativePageIndex] = useState(null);
   const { t } = useTranslation();
   const { pick } = useLocalized();
 
@@ -81,26 +66,6 @@ const VolumeReaderPage = () => {
         objectUrl = resolved.revoke;
 
         if (!cancelled) setPdfUrl(resolved.url);
-        if (!cancelled) setNativeUri(resolved.nativeUri);
-
-        if (!cancelled) {
-          // The native reader is offered the file path when there is one,
-          // otherwise the in-app URL: a blob: URL means nothing to the native
-          // side, while a file on disk is exactly what it reads best.
-          const verdict = resolved.nativeUri
-            ? { supported: true }
-            : await canOpenInNativeReader(resolved.url);
-          if (!cancelled) setNativeSupported(Boolean(verdict?.supported));
-        }
-
-        // Fetch native reader progress for this volume to resume on open.
-        if (!cancelled && isNativeReaderAvailable()) {
-          const bookKey = `${bookId}--${volumeId}`;
-          const progress = await getNativeProgress(bookKey);
-          if (!cancelled && progress) {
-            setNativePageIndex(progress.pageIndex);
-          }
-        }
       } catch (error) {
         console.error('Error loading volume:', error);
         if (!cancelled) setNotFound(true);
@@ -115,33 +80,6 @@ const VolumeReaderPage = () => {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [bookId, volumeId]);
-
-  /**
-   * Hand the volume to the native Android reader.
-   *
-   * The reader stores its own progress, bookmarks, notes and highlights, so
-   * this deliberately does not pass the web reader's percentage across: the two
-   * readers track position independently per book.
-   */
-  const handleOpenNative = useCallback(async () => {
-    // A natively downloaded volume is a file on disk; the web reader's
-    // blob:/asset URL is only meaningful to the WebView.
-    const url = nativeUri || pdfUrl;
-    if (!url || !book) return;
-    const bookKey = `${bookId}--${volumeId}`;
-    const opened = await openInNativeReader({
-      // Stable slug: the native side keys all persisted data on this string.
-      bookKey,
-      title: pick(volume, 'title') || pick(book, 'title') || t('volume'),
-      url,
-      // Resume from the native reader's saved position (zero-based index)
-      page: nativePageIndex ?? (initialPage ? initialPage - 1 : 0)
-    });
-    if (!opened) {
-      // Only reachable if the plugin vanished between the probe and the tap.
-      setNativeSupported(false);
-    }
-  }, [book, bookId, nativeUri, pdfUrl, t, volume, volumeId, pick, nativePageIndex, initialPage]);
 
   if (notFound) {
     return <Navigate to={`/books/${bookId}`} replace />;
@@ -161,17 +99,6 @@ const VolumeReaderPage = () => {
           <h1 className="truncate text-lg font-bold text-ink sm:text-xl lg:text-2xl">
             {volumeTitle}
           </h1>
-          {/* Shown only when the native reader can actually open this volume. */}
-          {isNativeReaderAvailable() && (
-            <button
-              type="button"
-              onClick={handleOpenNative}
-              disabled={!nativeSupported}
-              className="shrink-0 rounded-lg border border-line bg-paper px-3 py-1.5 text-xs font-medium text-ink transition hover:bg-ink/5 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
-            >
-              {nativeSupported ? t('open_native_reader') : t('native_reader_unavailable')}
-            </button>
-          )}
         </div>
       </div>
 
@@ -182,8 +109,6 @@ const VolumeReaderPage = () => {
           <PDFReader
             pdfUrl={pdfUrl}
             fileName={`${bookId}-${volumeId}.pdf`}
-            // Same slug as the native reader, so both remember one position
-            // per volume.
             storageKey={`${bookId}--${volumeId}`}
             initialPage={initialPage}
           />

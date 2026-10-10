@@ -161,6 +161,16 @@ const PATHS = {
       <path d="m15 5-7 7 7 7" />
     </>
   ),
+  chevronUp: (
+    <>
+      <path d="m5 15 7-7 7 7" />
+    </>
+  ),
+  chevronDown: (
+    <>
+      <path d="m5 9 7 7 7-7" />
+    </>
+  ),
   clockSmall: (
     <>
       <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" />
@@ -233,6 +243,13 @@ sun: (
     <>
       <path d="M4 13h4l1.5 3h5L16 13h4" />
       <path d="M5.5 5h13l2.5 8v4.5A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5V13l2.5-8z" />
+    </>
+  ),
+  highlighter: (
+    <>
+      <path d="M12 3v12l-4-4h-4l4-4z" />
+      <path d="M8 11h8" />
+      <path d="M8 15h8" />
     </>
   ),
   language: (

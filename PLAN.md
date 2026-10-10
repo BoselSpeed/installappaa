@@ -44,6 +44,12 @@ Working features:
   back (double-tap zooms, pinch zooms around the fingers); long jumps land
   instantly because every page box is sized up front; and canvas backings are
   capped and off-screen bitmaps released so long books stop exhausting memory
+- **Web reader study tools (2026-10-10):** the in-app reader now carries the
+  native reader's study features — page bookmarks, per-page notes with edit and
+  delete, highlights saved from selected (or copied) text, full-text search over
+  a lazily built PDF index, and a night-mode toggle wired to the app theme.
+  With full parity reached, the volume page no longer offers the separate
+  native reader entry point
 - Search across lesson and section titles with highlighting, plus voice search
 - Quiz player: progress, scoring, results, review mode with explanations, retake.
   Five questions per lesson are seeded for each of the four PDF lessons

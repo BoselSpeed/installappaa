@@ -4,15 +4,26 @@ import { Icon } from '../UI/Icon';
 import { Button } from '../UI/Button';
 import { Spinner } from '../UI/Spinner';
 import { cn } from '../../utils/cn';
+import { useAppSettings } from '../../hooks/useAppSettings';
 import { loadPdfDocument, extractOutline } from '../../lib/pdfOutline';
 import { getBookIndex } from '../../lib/bookIndexes';
+import { buildSearchIndex } from '../../lib/pdfTextSearch';
 import {
   getReadingPosition,
   saveReadingPosition,
   getTocCache,
   saveTocCache,
   getControlsHintSeen,
-  markControlsHintSeen
+  markControlsHintSeen,
+  getBookmarks,
+  toggleBookmark,
+  isBookmarked,
+  getNotes,
+  saveNote,
+  deleteNote,
+  getHighlights,
+  addHighlight,
+  deleteHighlight
 } from '../../services/readerCache';
 
 const MAX_DPR = 2;
@@ -53,6 +64,8 @@ const clampZoom = (value) => Math.min(Math.max(value, MIN_ZOOM), MAX_ZOOM);
 
 const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, onControlsChange }) => {
   const { t } = useTranslation();
+  const { settings, updateTheme } = useAppSettings();
+  const nightMode = settings?.theme === 'dark';
 
   const [doc, setDoc] = useState(null);
   const [numPages, setNumPages] = useState(0);
@@ -68,6 +81,34 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
   const [tocEntries, setTocEntries] = useState(null);
   const [tocLoading, setTocLoading] = useState(false);
   const [tocQuery, setTocQuery] = useState('');
+
+  // Bookmarks
+  const [bookmarksOpen, setBookmarksOpen] = useState(false);
+  const [bookmarks, setBookmarks] = useState([]);
+
+  // Notes
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [notes, setNotes] = useState([]);
+  const [noteInput, setNoteInput] = useState('');
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [notePage, setNotePage] = useState(1);
+
+  // Highlights
+  const [highlightsOpen, setHighlightsOpen] = useState(false);
+  const [highlights, setHighlights] = useState([]);
+
+  // Search
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchHits, setSearchHits] = useState([]);
+  const [searchCurrentHit, setSearchCurrentHit] = useState(0);
+  const [searchIndex, setSearchIndex] = useState(null);
+  const [searchBuilding, setSearchBuilding] = useState(false);
+  const [searchStatus, setSearchStatus] = useState('');
+
+  // Settings
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
   const [toast, setToast] = useState(null);
 
   const containerRef = useRef(null);
@@ -568,6 +609,252 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // ---- Bookmarks ------------------------------------------------------------
+
+  const loadBookmarks = useCallback(() => {
+    if (!storageKey) return;
+    setBookmarks(getBookmarks(storageKey));
+  }, [storageKey]);
+
+  const handleToggleBookmark = useCallback(() => {
+    if (!storageKey) return;
+    const added = toggleBookmark(storageKey, currentPageRef.current);
+    loadBookmarks();
+    showToast(t(added ? 'bookmark_added' : 'bookmark_removed'));
+    showControls();
+  }, [storageKey, loadBookmarks, showToast, showControls, t]);
+
+  const handleBookmarksOpen = useCallback(() => {
+    loadBookmarks();
+    setBookmarksOpen(true);
+    showControls(false);
+  }, [loadBookmarks, showControls]);
+
+  const handleBookmarksClose = useCallback(() => {
+    setBookmarksOpen(false);
+    showControls();
+  }, [showControls]);
+
+  const handleBookmarkJump = useCallback((page) => {
+    setBookmarksOpen(false);
+    showControls();
+    jumpToPage(page, { smooth: false });
+  }, [jumpToPage, showControls]);
+
+  const handleBookmarkDelete = useCallback((page) => {
+    toggleBookmark(storageKey, page);
+    loadBookmarks();
+  }, [storageKey, loadBookmarks]);
+
+  // ---- Notes ----------------------------------------------------------------
+
+  const loadNotes = useCallback(() => {
+    if (!storageKey) return;
+    setNotes(getNotes(storageKey));
+  }, [storageKey]);
+
+  const handleNotesOpen = useCallback(() => {
+    loadNotes();
+    setNotePage(currentPageRef.current);
+    setNoteInput('');
+    setEditingNoteId(null);
+    setNotesOpen(true);
+    showControls(false);
+  }, [loadNotes, showControls]);
+
+  const handleNotesClose = useCallback(() => {
+    setNotesOpen(false);
+    setNoteInput('');
+    setEditingNoteId(null);
+    showControls();
+  }, [showControls]);
+
+  const handleNoteSave = useCallback(() => {
+    const trimmed = noteInput.trim();
+    if (!trimmed) return;
+    saveNote(storageKey, notePage, trimmed, editingNoteId);
+    loadNotes();
+    setNoteInput('');
+    setEditingNoteId(null);
+    showToast(t('note_saved'));
+  }, [storageKey, notePage, noteInput, editingNoteId, loadNotes, showToast, t]);
+
+  const handleNoteEdit = useCallback((note) => {
+    setNoteInput(note.body);
+    setEditingNoteId(note.id);
+    setNotePage(note.page);
+  }, []);
+
+  const handleNoteDelete = useCallback((noteId) => {
+    deleteNote(storageKey, noteId);
+    loadNotes();
+    showToast(t('note_deleted'));
+  }, [storageKey, loadNotes, showToast, t]);
+
+  const handleNoteJump = useCallback((page) => {
+    setNotesOpen(false);
+    showControls();
+    jumpToPage(page, { smooth: false });
+  }, [jumpToPage, showControls]);
+
+  // ---- Highlights -----------------------------------------------------------
+
+  const loadHighlights = useCallback(() => {
+    if (!storageKey) return;
+    setHighlights(getHighlights(storageKey));
+  }, [storageKey]);
+
+  const handleHighlightsOpen = useCallback(() => {
+    loadHighlights();
+    setHighlightsOpen(true);
+    showControls(false);
+  }, [loadHighlights, showControls]);
+
+  const handleHighlightsClose = useCallback(() => {
+    setHighlightsOpen(false);
+    showControls();
+  }, [showControls]);
+
+  const handleHighlightCreate = useCallback(() => {
+    // Get selected text or clipboard
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim();
+    if (selectedText) {
+      addHighlight(storageKey, currentPageRef.current, selectedText);
+      loadHighlights();
+      showToast(t('highlight_saved'));
+      selection.removeAllRanges();
+    } else {
+      // Fallback to clipboard
+      navigator.clipboard?.readText().then((text) => {
+        const clipboardText = text?.trim();
+        if (clipboardText) {
+          addHighlight(storageKey, currentPageRef.current, clipboardText);
+          loadHighlights();
+          showToast(t('highlight_saved'));
+        } else {
+          showToast(t('highlight_copy_first'));
+        }
+      }).catch(() => {
+        showToast(t('highlight_copy_first'));
+      });
+    }
+    showControls();
+  }, [storageKey, loadHighlights, showToast, showControls, t]);
+
+  const handleHighlightDelete = useCallback((highlightId) => {
+    deleteHighlight(storageKey, highlightId);
+    loadHighlights();
+    showToast(t('highlight_deleted'));
+  }, [storageKey, loadHighlights, showToast, t]);
+
+  const handleHighlightJump = useCallback((page) => {
+    setHighlightsOpen(false);
+    showControls();
+    jumpToPage(page, { smooth: false });
+  }, [jumpToPage, showControls]);
+
+  // ---- Search ---------------------------------------------------------------
+
+  const runSearch = useCallback((query) => {
+    if (!searchIndex) return;
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setSearchHits([]);
+      setSearchCurrentHit(0);
+      setSearchStatus(t('search_hint_empty'));
+      return;
+    }
+    const hits = searchIndex.findPages(trimmed);
+    setSearchHits(hits);
+    setSearchCurrentHit(0);
+    if (hits.length === 0) {
+      setSearchStatus(t('search_no_results'));
+    } else {
+      setSearchStatus(t('search_results', { current: 1, total: hits.length, page: hits[0] }));
+      jumpToPage(hits[0], { smooth: false });
+    }
+  }, [searchIndex, jumpToPage, t]);
+
+  const buildSearch = useCallback(async () => {
+    if (!doc || !storageKey) return;
+    setSearchBuilding(true);
+    setSearchStatus(t('search_indexing'));
+    try {
+      const index = await buildSearchIndex(pdfUrl, storageKey);
+      setSearchIndex(index);
+      setSearchBuilding(false);
+      setSearchStatus('');
+      runSearch(searchQuery);
+    } catch (err) {
+      console.error('Search index build failed:', err);
+      setSearchBuilding(false);
+      setSearchStatus(t('search_error'));
+    }
+  }, [doc, storageKey, pdfUrl, searchQuery, runSearch, t]);
+
+  const handleSearchOpen = useCallback(() => {
+    setSearchOpen(true);
+    showControls(false);
+    if (!searchIndex && !searchBuilding) {
+      buildSearch();
+    }
+  }, [searchIndex, searchBuilding, buildSearch, showControls]);
+
+  const handleSearchClose = useCallback(() => {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchHits([]);
+    setSearchCurrentHit(0);
+    showControls();
+  }, [showControls]);
+
+  const handleSearchQueryChange = useCallback((e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    runSearch(value);
+  }, [runSearch]);
+
+  const handleSearchNext = useCallback(() => {
+    if (searchHits.length === 0) return;
+    const next = (searchCurrentHit + 1) % searchHits.length;
+    setSearchCurrentHit(next);
+    const page = searchHits[next];
+    jumpToPage(page, { smooth: false });
+    if (searchIndex) {
+      setSearchStatus(t('search_results', { current: next + 1, total: searchHits.length, page }));
+    }
+  }, [searchHits, searchCurrentHit, searchIndex, jumpToPage, t]);
+
+  const handleSearchPrevious = useCallback(() => {
+    if (searchHits.length === 0) return;
+    const prev = (searchCurrentHit - 1 + searchHits.length) % searchHits.length;
+    setSearchCurrentHit(prev);
+    const page = searchHits[prev];
+    jumpToPage(page, { smooth: false });
+    if (searchIndex) {
+      setSearchStatus(t('search_results', { current: prev + 1, total: searchHits.length, page }));
+    }
+  }, [searchHits, searchCurrentHit, searchIndex, jumpToPage, t]);
+
+  // ---- Settings -------------------------------------------------------------
+
+  const handleSettingsOpen = useCallback(() => {
+    setSettingsOpen(true);
+    showControls(false);
+  }, [showControls]);
+
+  const handleSettingsClose = useCallback(() => {
+    setSettingsOpen(false);
+    showControls();
+  }, [showControls]);
+
+  const toggleNightMode = useCallback(() => {
+    const next = !nightMode;
+    updateTheme(next ? 'dark' : 'light');
+    showToast(t(next ? 'night_mode_on' : 'night_mode_off'));
+  }, [nightMode, updateTheme, showToast, t]);
+
   // ---- Gestures -----------------------------------------------------------
 
   const handleTouchStart = (e) => {
@@ -1045,6 +1332,51 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
             </button>
 
             <button
+              onClick={handleBookmarksOpen}
+              className={cn(toolbarButton, bookmarksOpen && activeButton)}
+              aria-label={t('bookmarks')}
+              title={t('bookmarks')}
+            >
+              <Icon name="bookmark" size="md" />
+            </button>
+
+            <button
+              onClick={handleNotesOpen}
+              className={cn(toolbarButton, notesOpen && activeButton)}
+              aria-label={t('notes')}
+              title={t('notes')}
+            >
+              <Icon name="note" size="md" />
+            </button>
+
+            <button
+              onClick={handleHighlightsOpen}
+              className={cn(toolbarButton, highlightsOpen && activeButton)}
+              aria-label={t('highlights')}
+              title={t('highlights')}
+            >
+              <Icon name="highlighter" size="md" />
+            </button>
+
+            <button
+              onClick={handleSearchOpen}
+              className={cn(toolbarButton, searchOpen && activeButton)}
+              aria-label={t('search')}
+              title={t('search')}
+            >
+              <Icon name="search" size="md" />
+            </button>
+
+            <button
+              onClick={handleSettingsOpen}
+              className={cn(toolbarButton, settingsOpen && activeButton)}
+              aria-label={t('settings')}
+              title={t('settings')}
+            >
+              <Icon name="settings" size="md" />
+            </button>
+
+            <button
               onClick={() => {
                 toggleFullscreen();
                 showControls();
@@ -1158,6 +1490,401 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
                   {t('toc_unavailable')}
                 </div>
               )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Bookmarks drawer */}
+      {bookmarksOpen && (
+        <>
+          <button
+            type="button"
+            onClick={handleBookmarksClose}
+            className="absolute inset-0 z-30 bg-ink/30"
+            aria-label={t('close')}
+          />
+          <div className="absolute inset-y-0 end-0 z-40 flex w-[min(20rem,88%)] flex-col border-s border-line bg-paper shadow-card">
+            <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
+              <h3 className="text-sm font-bold text-ink">{t('bookmarks')}</h3>
+              <button
+                type="button"
+                onClick={handleBookmarksClose}
+                className={toolbarButton}
+                aria-label={t('close')}
+                title={t('close')}
+              >
+                <Icon name="close" size="md" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+              {bookmarks.length > 0 ? (
+                <ul className="space-y-0.5">
+                  {bookmarks.map((bookmark, index) => (
+                    <li
+                      key={`${bookmark.page}-${index}`}
+                      className="flex items-center gap-1 rounded-lg px-1 transition-colors hover:bg-surface"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleBookmarkJump(bookmark.page)}
+                        className="min-w-0 flex-1 truncate rounded-lg px-2 py-2 text-start text-sm text-ink-body"
+                      >
+                        {t('bookmark_page', { page: bookmark.page })}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleBookmarkDelete(bookmark.page)}
+                        className="shrink-0 rounded-lg p-2 text-ink-muted hover:text-ink"
+                        aria-label={t('delete_bookmark')}
+                        title={t('delete_bookmark')}
+                      >
+                        <Icon name="trash" size="sm" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-4 py-8 text-center text-sm text-ink-muted">
+                  {t('bookmarks_empty')}
+                </div>
+              )}
+            </div>
+            <div className="border-t border-line px-4 py-2">
+              <button
+                type="button"
+                onClick={handleToggleBookmark}
+                className={cn(toolbarTextButton, activeButton, 'w-full')}
+              >
+                {isBookmarked(storageKey, currentPage)
+                  ? t('bookmark_remove_current', { page: currentPage })
+                  : t('bookmark_add_current', { page: currentPage })}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Notes drawer */}
+      {notesOpen && (
+        <>
+          <button
+            type="button"
+            onClick={handleNotesClose}
+            className="absolute inset-0 z-30 bg-ink/30"
+            aria-label={t('close')}
+          />
+          <div className="absolute inset-y-0 end-0 z-40 flex w-[min(22rem,92%)] flex-col border-s border-line bg-paper shadow-card">
+            <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
+              <h3 className="text-sm font-bold text-ink">{t('notes')}</h3>
+              <button
+                type="button"
+                onClick={handleNotesClose}
+                className={toolbarButton}
+                aria-label={t('close')}
+                title={t('close')}
+              >
+                <Icon name="close" size="md" />
+              </button>
+            </div>
+            <div className="border-b border-line px-4 py-3">
+              <label className="block text-xs font-medium text-ink-muted mb-1">
+                {t('note_on_page', { page: notePage })}
+              </label>
+              <textarea
+                value={noteInput}
+                onChange={(e) => setNoteInput(e.target.value)}
+                placeholder={t('note_placeholder')}
+                rows={4}
+                className="w-full rounded-xl border border-line bg-surface-quiet px-3 py-2 text-sm text-ink transition-card duration-300 focus:border-ink resize-none"
+                aria-label={t('note_placeholder')}
+              />
+            </div>
+            <div className="flex items-center justify-end gap-2 px-4 py-2">
+              <button
+                type="button"
+                onClick={handleNoteSave}
+                className={cn(toolbarTextButton, activeButton)}
+              >
+                {editingNoteId ? t('note_update') : t('note_save')}
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+              {notes.length > 0 ? (
+                <ul className="space-y-2">
+                  {notes.map((note, index) => (
+                    <li key={`${note.id}-${index}`} className="rounded-lg border border-line bg-surface-quiet p-3">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <span className="text-xs font-medium text-ink-muted">
+                          {t('note_page_label', { page: note.page })}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleNoteEdit(note); }}
+                            className="text-ink-muted hover:text-ink p-1"
+                            aria-label={t('note_edit')}
+                          >
+                            <Icon name="edit" size="sm" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleNoteDelete(note.id); }}
+                            className="text-ink-muted hover:text-ink p-1"
+                            aria-label={t('note_delete')}
+                          >
+                            <Icon name="trash" size="sm" />
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-sm text-ink-body whitespace-pre-wrap">{note.body}</p>
+                      <button
+                        type="button"
+                        onClick={() => handleNoteJump(note.page)}
+                        className="mt-2 text-xs text-ink-muted hover:text-ink underline"
+                      >
+                        {t('go_to_page', { page: note.page })}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-4 py-8 text-center text-sm text-ink-muted">
+                  {t('notes_empty')}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Highlights drawer */}
+      {highlightsOpen && (
+        <>
+          <button
+            type="button"
+            onClick={handleHighlightsClose}
+            className="absolute inset-0 z-30 bg-ink/30"
+            aria-label={t('close')}
+          />
+          <div className="absolute inset-y-0 end-0 z-40 flex w-[min(20rem,88%)] flex-col border-s border-line bg-paper shadow-card">
+            <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
+              <h3 className="text-sm font-bold text-ink">{t('highlights')}</h3>
+              <button
+                type="button"
+                onClick={handleHighlightsClose}
+                className={toolbarButton}
+                aria-label={t('close')}
+                title={t('close')}
+              >
+                <Icon name="close" size="md" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+              {highlights.length > 0 ? (
+                <ul className="space-y-2">
+                  {highlights.map((highlight, index) => (
+                    <li key={`${highlight.id}-${index}`} className="rounded-lg border border-line bg-surface-quiet p-3">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <span className="text-xs font-medium text-ink-muted">
+                          {t('highlight_page_label', { page: highlight.page })}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleHighlightDelete(highlight.id); }}
+                          className="text-ink-muted hover:text-ink p-1"
+                          aria-label={t('highlight_delete')}
+                        >
+                          <Icon name="trash" size="sm" />
+                        </button>
+                      </div>
+                      <p className="text-sm text-ink-body" style={{ backgroundColor: `#${highlight.color.toString(16).padStart(6, '0')}` }}>
+                        {highlight.snippet}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleHighlightJump(highlight.page)}
+                        className="mt-2 text-xs text-ink-muted hover:text-ink underline"
+                      >
+                        {t('go_to_page', { page: highlight.page })}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-4 py-8 text-center text-sm text-ink-muted">
+                  {t('highlights_empty')}
+                  <p className="text-xs mt-1">{t('highlights_hint')}</p>
+                </div>
+              )}
+            </div>
+            <div className="border-t border-line px-4 py-2">
+              <button
+                type="button"
+                onClick={handleHighlightCreate}
+                className={cn(toolbarTextButton, activeButton, 'w-full')}
+              >
+                {t('highlight_create')}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Search drawer */}
+      {searchOpen && (
+        <>
+          <button
+            type="button"
+            onClick={handleSearchClose}
+            className="absolute inset-0 z-30 bg-ink/30"
+            aria-label={t('close')}
+          />
+          <div className="absolute inset-y-0 end-0 z-40 flex w-[min(20rem,88%)] flex-col border-s border-line bg-paper shadow-card">
+            <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
+              <h3 className="text-sm font-bold text-ink">{t('search')}</h3>
+              <button
+                type="button"
+                onClick={handleSearchClose}
+                className={toolbarButton}
+                aria-label={t('close')}
+                title={t('close')}
+              >
+                <Icon name="close" size="md" />
+              </button>
+            </div>
+            <div className="border-b border-line px-3 py-2">
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={handleSearchQueryChange}
+                placeholder={t('search_placeholder')}
+                className="w-full rounded-xl border border-line bg-surface-quiet px-3 py-2 text-sm text-ink transition-card duration-300 focus:border-ink"
+                aria-label={t('search_placeholder')}
+                autoFocus
+              />
+            </div>
+            {searchBuilding && (
+              <div className="flex flex-col items-center gap-3 py-6 px-4">
+                <Spinner size="md" />
+                <p className="text-center text-xs text-ink-muted">{searchStatus || t('search_indexing')}</p>
+              </div>
+            )}
+            {!searchBuilding && (
+              <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+                {searchHits.length > 0 ? (
+                  <div>
+                    <div className="px-2 py-1 text-xs text-ink-muted text-center">
+                      {searchStatus}
+                    </div>
+                    <ul className="space-y-1">
+                      {searchHits.map((page, index) => (
+                        <li key={`${page}-${index}`}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSearchCurrentHit(index);
+                              jumpToPage(page, { smooth: false });
+                              if (searchIndex) {
+                                setSearchStatus(t('search_results', { current: index + 1, total: searchHits.length, page }));
+                              }
+                            }}
+                            className={cn(
+                              'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-start text-sm transition-colors',
+                              index === searchCurrentHit
+                                ? 'bg-ink text-[var(--color-on-accent)]'
+                                : 'text-ink-body hover:bg-surface'
+                            )}
+                          >
+                            <span className="min-w-0 truncate">
+                              {searchIndex ? searchIndex.getSnippet(page, searchQuery) : t('page', { page })}
+                            </span>
+                            <span
+                              className={cn(
+                                'shrink-0 text-xs tabular-nums',
+                                index === searchCurrentHit ? 'opacity-80' : 'text-ink-muted'
+                              )}
+                            >
+                              {page}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex items-center justify-center gap-2 px-2 py-2">
+                      <button
+                        type="button"
+                        onClick={handleSearchPrevious}
+                        disabled={searchHits.length === 0}
+                        className={toolbarButton}
+                        aria-label={t('search_previous')}
+                      >
+                        <Icon name="chevronUp" size="md" />
+                      </button>
+                      <span className="text-xs text-ink-muted">
+                        {searchCurrentHit + 1} / {searchHits.length}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleSearchNext}
+                        disabled={searchHits.length === 0}
+                        className={toolbarButton}
+                        aria-label={t('search_next')}
+                      >
+                        <Icon name="chevronDown" size="md" />
+                      </button>
+                    </div>
+                  </div>
+                ) : searchQuery.trim() ? (
+                  <div className="px-4 py-8 text-center text-sm text-ink-muted">
+                    {t('search_no_results')}
+                  </div>
+                ) : (
+                  <div className="px-4 py-8 text-center text-sm text-ink-muted">
+                    {t('search_hint_empty')}
+                  </div>
+                )
+              }
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Settings drawer */}
+      {settingsOpen && (
+        <>
+          <button
+            type="button"
+            onClick={handleSettingsClose}
+            className="absolute inset-0 z-30 bg-ink/30"
+            aria-label={t('close')}
+          />
+          <div className="absolute inset-y-0 end-0 z-40 flex w-[min(20rem,88%)] flex-col border-s border-line bg-paper shadow-card">
+            <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
+              <h3 className="text-sm font-bold text-ink">{t('settings')}</h3>
+              <button
+                type="button"
+                onClick={handleSettingsClose}
+                className={toolbarButton}
+                aria-label={t('close')}
+                title={t('close')}
+              >
+                <Icon name="close" size="md" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={nightMode}
+                    onChange={toggleNightMode}
+                    className="h-4 w-4 rounded border-line bg-paper text-ink focus:ring-ink"
+                  />
+                  <span className="text-sm text-ink">{t('night_mode')}</span>
+                </label>
+              </div>
             </div>
           </div>
         </>

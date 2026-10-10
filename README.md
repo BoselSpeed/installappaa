@@ -69,7 +69,10 @@ location, because a static site cannot fetch another origin.
 
 The web reader resumes where you stopped (page, zoom and fit, per volume), has a
 searchable table of contents read from each PDF's outline, and hides its toolbar
-while you read — tap to bring it back, double-tap or pinch to zoom.
+while you read — tap to bring it back, double-tap or pinch to zoom. It also
+carries the native reader's study tools: page bookmarks, per-page notes,
+highlights saved from selected or copied text, a full-text search that indexes
+the PDF, and a night-mode toggle that switches the whole app theme.
 
 Preview locally with:
 
