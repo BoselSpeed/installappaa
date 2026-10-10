@@ -10,6 +10,7 @@ import { Card } from '../components/UI/Card';
 import { Spinner } from '../components/UI/Spinner';
 import {
   canOpenInNativeReader,
+  getNativeProgress,
   isNativeReaderAvailable,
   openInNativeReader
 } from '../lib/nativePdfReader';
@@ -40,6 +41,8 @@ const VolumeReaderPage = () => {
   // Whether the native reader can open this volume. Asked separately from the
   // in-app reader because the two accept different kinds of source.
   const [nativeSupported, setNativeSupported] = useState(false);
+  // Saved reading position from the native reader (zero-based page index)
+  const [nativePageIndex, setNativePageIndex] = useState(null);
   const { t } = useTranslation();
   const { pick } = useLocalized();
 
@@ -89,6 +92,15 @@ const VolumeReaderPage = () => {
             : await canOpenInNativeReader(resolved.url);
           if (!cancelled) setNativeSupported(Boolean(verdict?.supported));
         }
+
+        // Fetch native reader progress for this volume to resume on open.
+        if (!cancelled && isNativeReaderAvailable()) {
+          const bookKey = `${bookId}--${volumeId}`;
+          const progress = await getNativeProgress(bookKey);
+          if (!cancelled && progress) {
+            setNativePageIndex(progress.pageIndex);
+          }
+        }
       } catch (error) {
         console.error('Error loading volume:', error);
         if (!cancelled) setNotFound(true);
@@ -116,17 +128,20 @@ const VolumeReaderPage = () => {
     // blob:/asset URL is only meaningful to the WebView.
     const url = nativeUri || pdfUrl;
     if (!url || !book) return;
+    const bookKey = `${bookId}--${volumeId}`;
     const opened = await openInNativeReader({
       // Stable slug: the native side keys all persisted data on this string.
-      bookKey: `${bookId}--${volumeId}`,
+      bookKey,
       title: pick(volume, 'title') || pick(book, 'title') || t('volume'),
-      url
+      url,
+      // Resume from the native reader's saved position (zero-based index)
+      page: nativePageIndex ?? (initialPage ? initialPage - 1 : 0)
     });
     if (!opened) {
       // Only reachable if the plugin vanished between the probe and the tap.
       setNativeSupported(false);
     }
-  }, [book, bookId, nativeUri, pdfUrl, t, volume, volumeId, pick]);
+  }, [book, bookId, nativeUri, pdfUrl, t, volume, volumeId, pick, nativePageIndex, initialPage]);
 
   if (notFound) {
     return <Navigate to={`/books/${bookId}`} replace />;

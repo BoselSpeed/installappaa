@@ -11,14 +11,9 @@ const NAV_ITEMS = [
   { to: '/achievements', key: 'achievements', icon: 'trophy' },
 ];
 
-// Reading surfaces keep the whole book on screen: no bottom bar over them.
-const HIDDEN = [/^\/books\/[^/]+\/volume\//, /^\/section\/[^/]+\/lesson\//];
-
 const BottomNav = () => {
   const { t } = useAppSettings();
   const { pathname } = useLocation();
-
-  if (HIDDEN.some((re) => re.test(pathname))) return null;
 
   return (
     <nav
