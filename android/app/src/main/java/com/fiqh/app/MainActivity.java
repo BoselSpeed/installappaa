@@ -33,7 +33,17 @@ public class MainActivity extends BridgeActivity {
         // afterwards.
         registerPlugin(PdfReaderPlugin.class);
         registerPlugin(LibraryDownloadPlugin.class);
+
+        // Set up edge-to-edge BEFORE super.onCreate() so the WebView is laid
+        // out full-screen from the start.
+        Window window = getWindow();
+        if (window != null) {
+            WindowCompat.setDecorFitsSystemWindows(window, false);
+        }
+
         super.onCreate(savedInstanceState);
+
+        // Now hide the system bars and configure transient behavior.
         hideSystemBars();
     }
 
@@ -56,7 +66,6 @@ public class MainActivity extends BridgeActivity {
     private void hideSystemBars() {
         Window window = getWindow();
         if (window == null) return;
-        WindowCompat.setDecorFitsSystemWindows(window, false);
         WindowInsetsControllerCompat controller =
                 WindowCompat.getInsetsController(window, window.getDecorView());
         if (controller == null) return;
