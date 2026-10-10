@@ -360,10 +360,11 @@ class LibraryDownloadPlugin : Plugin() {
     }
 
     /**
-     * Absolute path a native reader should use for a volume.
+     * Absolute path of a downloaded volume on disk.
      *
      * Kept here so the web layer never has to know the on-disk layout; it just
-     * asks for the volume id and gets a `file://` URI back.
+     * asks for the volume id and gets a `file://` URI back, which it rewrites
+     * with `Capacitor.convertFileSrc` so the in-app reader can load it.
      */
     @PluginMethod
     fun volumePath(call: PluginCall) {

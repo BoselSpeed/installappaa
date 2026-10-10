@@ -8,7 +8,7 @@
 //   3. For each volume, provide a PDF in one of two ways:
 //        - `bundled: true` with a `pdfUrl` pointing to a file inside
 //          /public/books/ so it ships with the app, works offline, and opens
-//          in the native reader.
+//          in the in-app reader.
 //        - `downloadUrl` / `pdfUrl` pointing at a PDF hosted elsewhere. The app
 //          cannot fetch another origin (no proxy server, and Google Drive sends
 //          no CORS headers), so such a volume is opened at its original

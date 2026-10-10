@@ -9,7 +9,7 @@
 > issue list at the end of this file for what is genuinely outstanding.
 
 ## Implementation Status
-**Last updated:** 2026-10-08
+**Last updated:** 2026-10-10
 
 The application is functional end-to-end and has **no backend at all**: content
 and progress live on the device, and every page reads them through
@@ -35,21 +35,21 @@ Working features:
 - In-app PDF reader (pdf.js) with page navigation, zoom, jump-to-page and
   per-page reading progress; covers fall back to a styled placeholder rather
   than showing a broken image
-- **Web reader parity upgrade (2026-10-08):** the in-app reader now matches the
-  native one — it remembers the last page, zoom and fit mode per book (same
-  composite slug as the native reader) and resumes there; it extracts the PDF's
+- **Web reader upgrade (2026-10-08):** the in-app reader remembers the last
+  page, zoom and fit mode per book (keyed by the volume's composite slug) and
+  resumes there; it extracts the PDF's
   own outline into a searchable table of contents (cached, available both as a
   drawer inside the reader and as a Table of contents button on volume cards);
   the toolbar and page indicator fade away while reading and a tap brings them
   back (double-tap zooms, pinch zooms around the fingers); long jumps land
   instantly because every page box is sized up front; and canvas backings are
   capped and off-screen bitmaps released so long books stop exhausting memory
-- **Web reader study tools (2026-10-10):** the in-app reader now carries the
-  native reader's study features — page bookmarks, per-page notes with edit and
-  delete, highlights saved from selected (or copied) text, full-text search over
-  a lazily built PDF index, and a night-mode toggle wired to the app theme.
-  With full parity reached, the volume page no longer offers the separate
-  native reader entry point
+- **In-app reader study tools (2026-10-10):** the PDF reader — the single
+  reader for both lesson PDFs and book volumes — has page bookmarks, per-page
+  notes with edit and delete, highlights saved from selected (or copied) text,
+  full-text search over a lazily built PDF index, and a night-mode toggle wired
+  to the app theme. The separate native Android reader was removed; its toolset
+  now lives entirely in this reader
 - Search across lesson and section titles with highlighting, plus voice search
 - Quiz player: progress, scoring, results, review mode with explanations, retake.
   Five questions per lesson are seeded for each of the four PDF lessons
@@ -63,15 +63,15 @@ Working features:
   (تطبيق الفقه), standalone display, RTL, icons (192/512/maskable); runtime
   `CacheFirst` for other `/books/*.pdf` with `rangeRequests` enabled
   - Build output goes to `تطبيق الفقه/`; verified functional offline
-- **Android APK** (`com.fiqh.app`) built from the same web bundle, with a native
-  `PDFView` reader: TOC from the PDF outline, page navigation, jump-to-page,
-  night mode, bookmarks, notes, reading progress, and text search through
-  PDFBox
-  - **Immersive parity (2026-10-08):** the toolbar, scrubber and bottom bar
-    fade away while reading and a tap brings them back (one-time hint first
-    time); free zoom 50–500% in 25% steps, double-tap to 250%, pinch bounds and
-    the last used zoom remembered per device and restored on open — mirroring
-    the web reader
+- **Android APK** (`com.fiqh.app`) built from the same web bundle and running
+  the same in-app reader. A native Kotlin plugin downloads Google Drive volumes
+  (plain PDFs and ZIP archives) that the WebView cannot fetch itself, so books
+  become readable offline; the app opens immersive, with the system bars hidden
+  and a swipe bringing them back
+  - **Immersive reader (2026-10-08):** the toolbar and page indicator fade away
+    while reading and a tap brings them back (one-time hint first time); free
+    zoom 50–500% in 25% steps, double-tap to 250%, pinch bounds and the last
+    used zoom remembered per device and restored on open
 - Tooling: `npm run verify` runs typecheck, ESLint and `npm run
   verify:content`, which validates `books.js` against the files in `public/`
   (missing bundled PDFs or covers, unusable volumes, duplicate ids, unpaired
@@ -81,9 +81,8 @@ Known gaps:
 - Only eight of 146 volumes ship with the app; the rest open at their source
   rather than being readable in-app, because there is no server to fetch them
   through
-- The native reader cannot highlight or select text: `android-pdf-viewer`
-  exposes no text layer, so search is page-level and highlights are stored from
-  copied text
+- The reader works on a canvas, so text cannot be selected in place: highlights
+  are stored from copied text, and search is page-level
 - No test suite yet (Phase 6)
 - No route-level code splitting beyond the PDF reader chunk
 

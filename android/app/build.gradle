@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
-// Native PDF reader: Kotlin for the reader, KSP to run Room's processor.
+// Kotlin for the native book downloader plugin.
 apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'com.google.devtools.ksp'
 
 android {
     namespace = "com.fiqh.app"
@@ -25,22 +24,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
-    buildFeatures {
-        // Generates the *Binding classes the reader uses to bind its layouts
-        // without findViewById, which is what keeps the code null-safe.
-        viewBinding true
-    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
-
-// Export the generated Room schema so future migrations can be written against it.
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 repositories {
@@ -60,22 +49,8 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
 
-    // ---- Native PDF reader -------------------------------------------------
-    // Material for dialogs / bottom bar, matching the web paper + ink palette.
+    // Material supplies the edge-to-edge app theme (AppTheme.EdgeToEdge).
     implementation "com.google.android.material:material:1.12.0"
-    implementation "androidx.recyclerview:recyclerview:1.3.2"
-    implementation "androidx.constraintlayout:constraintlayout:2.2.0"
-    // ViewModel + LiveData keeps the reader across rotation without re-rendering.
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.7"
-    // Room stores reading position, bookmarks, notes and highlights.
-    implementation "androidx.room:room-runtime:2.6.1"
-    implementation "androidx.room:room-ktx:2.6.1"
-    ksp "androidx.room:room-compiler:2.6.1"
-    // AndroidPdfViewer renders the pages. It has no text-search API, so the
-    // search itself runs on PDFBox, which does expose a real text layer.
-    implementation "com.github.mhiew:android-pdf-viewer:3.2.0-beta.3"
-    implementation "com.tom-roush:pdfbox-android:2.0.27.0"
 }
 
 kotlin {

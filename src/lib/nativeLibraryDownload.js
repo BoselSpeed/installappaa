@@ -139,26 +139,10 @@ export const downloadVolumeNatively = async ({ book, volume, onProgress }) => {
 };
 
 /**
- * A `file://` URI the native reader can open, or null when the volume is not
- * on the device. Used when the user explicitly asks for the native reader,
- * which reads the file directly.
- */
-export const nativeVolumeUri = async (bookId, volumeId) => {
-  if (!isNativeDownloadAvailable()) return null;
-  try {
-    const result = await LibraryDownload.volumePath({ volumeId: volumeKey(bookId, volumeId) });
-    return result?.present ? result.uri : null;
-  } catch {
-    return null;
-  }
-};
-
-/**
  * A URL the in-app (pdfjs) reader can load a downloaded volume from, or null
  * when the volume is not on the device.
  *
- * A `file://` URL is not something the WebView is allowed to fetch, which is
- * why a natively downloaded volume used to require the native reader.
+ * A `file://` URL is not something the WebView is allowed to fetch.
  * `Capacitor.convertFileSrc` rewrites the path to the scheme the Capacitor
  * WebView serves app-local files from, so pdfjs can stream it like any other
  * document and the volume stays readable inside the app.

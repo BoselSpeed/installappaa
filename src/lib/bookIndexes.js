@@ -6,7 +6,7 @@
 // the TOC matches the book the user is holding.
 //
 // Entries are keyed by reader storage key (`${bookId}--${volumeId}`, the same
-// identity the native reader and reading-position cache use) and each entry is
+// identity the reading-position cache uses) and each entry is
 // `{ title, page, level }` where `page` is the 1-based PDF page to jump to.
 //
 // The titles are taken verbatim (or near-verbatim) from the printed فهرس;

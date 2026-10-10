@@ -8,21 +8,19 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.fiqh.app.library.LibraryDownloadPlugin;
-import com.fiqh.app.pdf.PdfReaderPlugin;
 import com.getcapacitor.BridgeActivity;
 
 /**
  * Capacitor entry point for the app.
  *
- * The native PDF reader and the book downloader are both launched from
- * JavaScript, so their plugins have to be registered here. Without this
- * registration the web layer's plugin proxies have no native counterpart and
- * every call to them silently fails.
+ * The book downloader is launched from JavaScript, so its plugin has to be
+ * registered here. Without this registration the web layer's plugin proxy has
+ * no native counterpart and every call to it silently fails.
  *
  * The window is also made immersive on entry: the status and navigation bars
- * are hidden so the whole app (web pages included) reads edge to edge, the
- * same way the native PDF reader does. A swipe still brings the bars back
- * briefly, and they stay gone once the app regains focus.
+ * are hidden so the whole app (web pages included) reads edge to edge. A swipe
+ * still brings the bars back briefly, and they stay gone once the app regains
+ * focus.
  */
 public class MainActivity extends BridgeActivity {
 
@@ -31,7 +29,6 @@ public class MainActivity extends BridgeActivity {
         // Registered before super.onCreate() returns, because the Bridge that
         // owns the plugin registry is created there and drops plugins added
         // afterwards.
-        registerPlugin(PdfReaderPlugin.class);
         registerPlugin(LibraryDownloadPlugin.class);
 
         // Set up edge-to-edge BEFORE super.onCreate() so the WebView is laid
@@ -50,8 +47,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        // Returning from the native reader or from a transient bar swipe must
-        // not leave the bars visible.
+        // Returning from a transient bar swipe must not leave the bars visible.
         if (hasFocus) hideSystemBars();
     }
 

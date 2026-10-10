@@ -34,7 +34,7 @@ npm run android:apk     # -> release/تطبيق-الفقه.apk
 ## Which volumes are readable in the app
 
 Only PDFs bundled under `public/books/` are served from the app's own origin.
-Those open in the web reader, in the Android reader, and offline.
+Those open in the in-app reader, on web and Android alike, and offline.
 
 Volumes hosted elsewhere are not downloadable, and this is a browser limit rather
 than a missing feature:

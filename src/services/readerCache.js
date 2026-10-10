@@ -4,8 +4,7 @@
 // one namespace, so it survives reloads, works offline and needs no server:
 //
 //   - reading position — the page (plus zoom and fit mode) each book was left
-//     on, keyed by the same composite slug the native reader uses, so a volume
-//     keeps one identity across both readers;
+//     on, keyed by the volume's composite slug so it resumes where it stopped;
 //   - extracted table of contents — headings pulled out of a PDF's own
 //     outline, cached so the index never has to be parsed twice;
 //   - bookmarks — pages the reader has marked, keyed by book;

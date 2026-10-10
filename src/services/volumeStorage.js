@@ -12,7 +12,6 @@ import {
   downloadVolumeNatively,
   hasLocalVolume,
   isNativeDownloadAvailable,
-  nativeVolumeUri,
   nativeVolumeUrl,
   removeNativeVolume,
   resolveDownloadUrl
@@ -36,8 +35,7 @@ export const DOWNLOAD_FAILED = 'download_failed';
  * Where a volume's PDF can be read from, in order of preference:
  *
  *  1. `downloadUrl` — a direct link, when the host serves CORS headers.
- *  2. `pdfUrl` — a PDF bundled with the app, which is the only kind that can
- *     also open in the native reader.
+ *  2. `pdfUrl` — a PDF bundled with the app.
  *  3. `book.source.pageUrl` — the archive's own viewer page, offered as a
  *     last resort for books whose volumes live in a remote ZIP.
  *
@@ -55,9 +53,9 @@ export const resolveVolumeUrl = (volume, book) => {
 
 /**
  * Whether the app itself can display a volume. Only bundled PDFs can: they are
- * served from the same origin as the app, so both the web reader and the
- * native reader can open them. Everything else lives on another host, which a
- * static deployment cannot fetch.
+ * served from the same origin as the app, so the web reader can open them.
+ * Everything else lives on another host, which a static deployment cannot
+ * fetch.
  */
 export const canReadInApp = (volume) => Boolean(volume?.bundled || volume?.pdfUrl);
 
@@ -127,24 +125,24 @@ export const getStoredVolumeBlobUrl = async (bookId, volumeId) => {
  * @param {string} bookId
  * @param {string} volumeId
  * @param {{bundled?:boolean, pdfUrl?:string}} volume
- * @returns {Promise<{url:string, nativeUri:string|null, revoke:string|null}|null>}
+ * @returns {Promise<{url:string, revoke:string|null}|null>}
  *   `revoke` is the object URL to release once the PDF has been read into
  *   memory; null when the URL does not belong to the caller to revoke.
  */
 export const resolveReadableVolumeUrl = async (bookId, volumeId, volume) => {
   if (volume?.bundled && volume.pdfUrl) {
-    return { url: volume.pdfUrl, nativeUri: null, revoke: null };
+    return { url: volume.pdfUrl, revoke: null };
   }
 
   const blobUrl = await getStoredVolumeBlobUrl(bookId, volumeId);
   if (blobUrl) {
-    return { url: blobUrl, nativeUri: null, revoke: blobUrl };
+    return { url: blobUrl, revoke: blobUrl };
   }
 
   if (isNativeDownloadAvailable()) {
     const url = await nativeVolumeUrl(bookId, volumeId);
     if (url) {
-      return { url, nativeUri: await nativeVolumeUri(bookId, volumeId), revoke: null };
+      return { url, revoke: null };
     }
   }
 

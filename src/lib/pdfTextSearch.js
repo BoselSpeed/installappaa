@@ -1,7 +1,7 @@
-// PDF text search for the web reader.
+// PDF text search for the in-app reader.
 //
 // Extracts the text layer from a PDF using pdf.js and builds an in-memory
-// index for fast searching. Mirrors the native reader's PdfTextSearch.
+// index for fast searching.
 
 import { loadPdfDocument } from './pdfOutline';
 

@@ -24,24 +24,6 @@
 
         </activity>
 
-        <!--
-            Native PDF reader. Not exported: it is only ever started by
-            PdfReaderPlugin inside this app's own WebView.
-            configChanges keeps the open page when the device is rotated.
-        -->
-        <activity
-            android:name=".pdf.PdfReaderActivity"
-            android:label="@string/pdf_reader_title"
-            android:theme="@style/Theme.Fiqh.PdfReader"
-            android:parentActivityName=".MainActivity"
-            android:exported="false"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|density|uiMode|smallestScreenSize|navigation"
-            android:windowSoftInputMode="adjustResize">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.fiqh.app.MainActivity" />
-        </activity>
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

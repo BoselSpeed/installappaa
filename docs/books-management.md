@@ -74,7 +74,7 @@ src/data/books.js
 ### مدمج أم غير مدمج؟ أهم نقطة في الملف
 
 - **مجلد مدمج** (`bundled: true` مع `pdfUrl` يشير إلى ملف داخل `public/books/`)
-  يُقرأ **داخل التطبيق**، وفي نسخة أندرويد عبر القارئ الأصلي، ويعمل دون
+  يُقرأ **داخل التطبيق** (في الويب وفي نسخة أندرويد بالقارئ نفسه)، ويعمل دون
   إنترنت.
 - **مجلد غير مدمج** (`bundled: false`) يُقرأ من موقعه الأصلي في المتصفح، ولا
   يُنزَّل إلى داخل التطبيق.
@@ -192,7 +192,7 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
 - `order` — the book's position in the library.
 - `volumes` — the volumes of the book:
   - **Bundled** (`bundled: true`) with a `pdfUrl` inside `public/books/` — opens
-    in the app, in the Android native reader, and offline.
+    in the in-app reader on both web and Android, and offline.
   - **Not bundled** (`bundled: false`) with a `downloadUrl` — opens at that URL
     in the browser. Not downloaded into the app.
   - **Whole book inside one ZIP on Google Drive** — set

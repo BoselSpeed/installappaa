@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Standard 48dp minimum touch target (accessibility guideline). -->
-    <dimen name="reader_touch_target">48dp</dimen>
-    <!-- Matches the 16px web gutter so the native reader lines up with the site. -->
-    <dimen name="reader_gutter">16dp</dimen>
-</resources>
