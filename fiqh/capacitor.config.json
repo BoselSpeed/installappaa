@@ -1,0 +1,16 @@
+{
+  "appId": "com.fiqh.app",
+  "appName": "fiqh",
+  "webDir": "fiqh-build",
+  "android": {
+    "allowMixedContent": true
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
