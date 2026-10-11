@@ -1286,6 +1286,42 @@ const SEED_BOOKS = [
       { id: 'v11', number: 11, title_ar: 'المجلد ١١', title_en: 'Volume 11', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1_fdtM7jkZOF9ffQa_QAcCBzREn2xzQvO&export=download&confirm=t', sizeMb: 13.2 },
       { id: 'v12', number: 12, title_ar: 'المجلد ١٢', title_en: 'Volume 12', bundled: false, pdfUrl: null, downloadUrl: 'https://drive.usercontent.google.com/download?id=1957uQeJAU4iOMk8y1xfYM8GjS3zFwpua&export=download&confirm=t', sizeMb: 5.3 }
     ]
+  },
+  {
+    id: 'diwan-imru-al-qays',
+    title_ar: 'ديوان امرئ القيس',
+    title_en: 'Diwan Imru al-Qays',
+    author_ar: 'امرؤ القيس بن حجر الكندي',
+    author_en: 'Imru al-Qays ibn Hujr al-Kindi',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'أدب',
+    category_en: 'Adab',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'ديوان الشاعر الجاهلي امرئ القيس بن حجر الكندي، رأس الشعراء وأحد أصحاب المعلقات، يجمع شعره في الغزل والفخر والوصف والرثاء.',
+    description_en:
+      "The diwan of the pre-Islamic poet Imru al-Qays ibn Hujr al-Kindi, foremost of the poets and one of the authors of the Mu'allaqat, gathering his poetry of love, pride, description, and elegy.",
+    coverImage: null,
+    order: 30,
+    source: {
+      type: 'archive',
+      identifier: 'ar107diwan41'
+    },
+    volumes: [
+      { id: 'v1', number: 1, title_ar: 'الكتاب كاملًا', title_en: 'Full Book', bundled: false, pdfUrl: null, downloadUrl: null, path: 'امرؤ القيس-ديوان امرئ القيس.pdf', sizeMb: 3.6 }
+    ]
   }
 ];
 
