@@ -28,7 +28,7 @@ For the Android app, no host is involved at all: the APK embeds the same bundle,
 so rebuild the web app before syncing Capacitor.
 
 ```bash
-npm run android:apk     # -> release/تطبيق-الفقه.apk
+npm run android:apk     # -> android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Which volumes are readable in the app
