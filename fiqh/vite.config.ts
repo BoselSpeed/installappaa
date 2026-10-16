@@ -61,6 +61,22 @@ export default defineConfig({
               },
               rangeRequests: true
             }
+          },
+          {
+            // Covers for the imported archive.org library are served straight
+            // from archive.org; cache them so the grid still renders offline.
+            urlPattern: /^https:\/\/archive\.org\/(services\/img|download)\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fiqh-archive-images',
+              expiration: {
+                maxEntries: 1000,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
           }
         ]
       },
