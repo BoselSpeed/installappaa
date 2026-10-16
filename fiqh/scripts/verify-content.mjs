@@ -88,9 +88,13 @@ for (const book of books) {
   else categories.set(book.category_ar, (categories.get(book.category_ar) || 0) + 1);
 
   if (book.coverImage) {
-    const file = publicFile(book.coverImage);
-    if (!file) error(`"${label}" coverImage is not a local path: ${book.coverImage}`);
-    else if (!existsSync(file)) error(`"${label}" cover not found: ${book.coverImage}`);
+    if (isHttp(book.coverImage)) {
+      // Remote cover (e.g. archive.org services/img) — nothing local to check.
+    } else {
+      const file = publicFile(book.coverImage);
+      if (!file) error(`"${label}" coverImage is not a local path: ${book.coverImage}`);
+      else if (!existsSync(file)) error(`"${label}" cover not found: ${book.coverImage}`);
+    }
   }
 
   if (!Array.isArray(book.volumes) || book.volumes.length === 0) {
