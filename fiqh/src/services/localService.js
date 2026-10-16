@@ -29,7 +29,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'sections-v9';
+const SEED_VERSION = 'sections-v10';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -90,16 +90,68 @@ const seedSections = [
     booksCount: 1
   },
   {
-    id: 'cat-archive-org',
-    title_ar: 'أرشيف الإنترنت',
-    title_en: 'Internet Archive',
-    description_ar:
-      'كتب من حساب freework على موقع أرشيف الإنترنت (archive.org): كتب عربية ممسوحة ضوئيًا تُنزَّل داخل التطبيق وتُقرأ بلا إنترنت.',
-    description_en:
-      'Books from the freework account on the Internet Archive (archive.org): scanned Arabic books that download inside the app and read offline.',
-    order: 6,
-    booksCount: 840
-  }
+    id: 'cat-fiqh',
+    title_ar: 'الفقه',
+    title_en: 'Fiqh',
+    description_ar: 'كتب الفقه على المذاهب المختلفة.',
+    description_en: 'Books on Islamic jurisprudence across different madhhabs.',
+    order: 7,
+    booksCount: 0
+  },
+  {
+    id: 'cat-usul',
+    title_ar: 'أصول الفقه',
+    title_en: 'Usul al-Fiqh',
+    description_ar: 'أصول الفقه وقواعد الاستنباط.',
+    description_en: 'Principles of Islamic jurisprudence (usul al-fiqh).',
+    order: 8,
+    booksCount: 0
+  },
+  {
+    id: 'cat-seerah',
+    title_ar: 'السيرة والتاريخ',
+    title_en: 'Seerah and History',
+    description_ar: 'السيرة النبوية والتاريخ الإسلامي.',
+    description_en: 'Prophetic biography and Islamic history.',
+    order: 9,
+    booksCount: 0
+  },
+  {
+    id: 'cat-tarajim',
+    title_ar: 'التراجم والطبقات',
+    title_en: 'Biographies',
+    description_ar: 'تراجم الرجال والطبقات.',
+    description_en: 'Biographies and scholarly ranks.',
+    order: 10,
+    booksCount: 0
+  },
+  {
+    id: 'cat-language',
+    title_ar: 'اللغة والنحو',
+    title_en: 'Language and Grammar',
+    description_ar: 'اللغة العربية والنحو والبلاغة.',
+    description_en: 'Arabic language, grammar, and rhetoric.',
+    order: 11,
+    booksCount: 0
+  },
+  {
+    id: 'cat-magazines',
+    title_ar: 'المجلات والدوريات',
+    title_en: 'Magazines',
+    description_ar: 'مجلات ودوريات علمية.',
+    description_en: 'Scholarly magazines and periodicals.',
+    order: 12,
+    booksCount: 0
+  },
+  {
+    id: 'cat-general',
+    title_ar: 'منوعات',
+    title_en: 'General',
+    description_ar: 'كتب متنوعة.',
+    description_en: 'Miscellaneous books.',
+    order: 13,
+    booksCount: 0
+  },
 ];
 
 const seedLessons = [
