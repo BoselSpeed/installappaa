@@ -29,7 +29,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'sections-v8';
+const SEED_VERSION = 'sections-v9';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -88,6 +88,17 @@ const seedSections = [
     description_en: 'Selected stories from Sahih al-Bukhari in a simple style suited for young readers, instilling the values and meanings of the Sunnah.',
     order: 5,
     booksCount: 1
+  },
+  {
+    id: 'cat-archive-org',
+    title_ar: 'أرشيف الإنترنت',
+    title_en: 'Internet Archive',
+    description_ar:
+      'كتب من حساب freework على موقع أرشيف الإنترنت (archive.org): كتب عربية ممسوحة ضوئيًا تُنزَّل داخل التطبيق وتُقرأ بلا إنترنت.',
+    description_en:
+      'Books from the freework account on the Internet Archive (archive.org): scanned Arabic books that download inside the app and read offline.',
+    order: 6,
+    booksCount: 840
   }
 ];
 

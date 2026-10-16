@@ -206,6 +206,24 @@ PDF (وغالبًا توجد مجلدات منفصلة لكل جزء)، اجعل
 4. تحقّق بالتنزيل مرة واحدة يدويًا: `curl -L
    "https://archive.org/download/<identifier>/<path>" -o test.pdf`.
 
+### استيراد حساب كامل على archive.org دفعة واحدة
+
+بدلاً من نسخ الإدخالات يدويًا، يجلب السكربت `scripts/import-archive-account.mjs`
+كل كتب حساب على archive.org: يقرأ وصف كل عنصر، يختار ملف الـ PDF المناسب
+(نسخة `_text.pdf` ذات الطبقة النصية القابلة للبحث إن وُجدت)، ينزّل غلاف العنصر
+إلى `public/covers/`، ثم يضيف إدخال كتاب لكل عنصر إلى `src/data/books.js`.
+
+```bash
+node scripts/import-archive-account.mjs --uploader freework
+```
+
+خياراته: `--limit 5` لتجربة على عناصر قليلة، `--dry-run` للمعاينة بلا كتابة،
+`--concurrency 12` لسرعة الطلبات، و`--category-ar` / `--category-en` لتغيير
+التصنيف الذي تُضاف إليه الكتب (يجب أن يوجد قسم مكافئ له في `seedSections` داخل
+`src/services/localService.js`، وإلا ترفض الأداة الكتابة). العناصر الموجودة
+في الملف (بنفس `identifier`) تُتخطّى، فيمكن إعادة التشغيل بعد إضافة كتب جديدة.
+في النهاية شغّل `npm run verify:content`.
+
 ---
 
 ### إضافة كتاب متعدد المجلدات (أي عدد من المجلدات)
@@ -257,6 +275,26 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
     `https://archive.org/download/<identifier>/<path>`: fetched natively on
     Android and through archive.org's CORS-enabled `/cors/` endpoint on the web,
     then stored on the device and opened in the in-app reader.
+
+### Importing a whole archive.org account
+
+Instead of copying entries by hand, `scripts/import-archive-account.mjs`
+imports every book of an archive.org account: it reads each item's metadata,
+picks its PDFs (preferring the searchable `_text.pdf` derivative), downloads
+the item cover into `public/covers/`, and appends one book entry per item to
+`src/data/books.js`.
+
+```bash
+node scripts/import-archive-account.mjs --uploader freework
+```
+
+Options: `--limit 5` for a trial run, `--dry-run` to preview without writing,
+`--concurrency 12` for request parallelism, and `--category-ar` /
+`--category-en` for the category the books are filed under (a matching seed
+section must already exist in `src/services/localService.js`, otherwise the
+tool refuses to write). Items already present in the file (same identifier)
+are skipped, so re-running after adding books by hand is safe. Finish with
+`npm run verify:content`.
 
 ### Rules
 
