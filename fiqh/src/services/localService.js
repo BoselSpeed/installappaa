@@ -47,7 +47,7 @@ const seedSections = [
     description_ar: ' كتب الأدب والشعر والبلاغة العربية: دواوين الشعر الجاهلي، المعلقات، كتب البلاغة، وكتب الأدب الكلاسيكية.',
     description_en: 'Books of Arabic literature, poetry, and rhetoric: pre-Islamic poetry diwans, the Mu\'allaqat, rhetoric works, and classical literary texts.',
     order: 1,
-    booksCount: 14
+    booksCount: 33
   },
   // Category entries. A section whose id is not a book id is treated as a
   // category browser: SectionsPage links it to /books?category=<title_ar>, so
@@ -60,7 +60,7 @@ const seedSections = [
     description_ar: 'كتب العقيدة والتوحيد: العقيدة الواسطية، كتاب التوحيد، متن الأصول الثلاثة، وكشف الشبهات — مباني الدين وأصول الإيمان.',
     description_en: 'Works on Aqeedah and Tawhid: Al-Aqidah al-Wasitiyyah, Kitab al-Tawhid, Thalathat al-Usul, and Kashf al-Shubuhat — the foundations of the religion and of faith.',
     order: 2,
-    booksCount: 4
+    booksCount: 66
   },
   {
     id: 'cat-hadith',
@@ -69,7 +69,7 @@ const seedSections = [
     description_ar: 'دواوين السنة: صحيح البخاري، صحيح مسلم، سنن أبي داود، سنن الترمذي، وسنن النسائي.',
     description_en: 'The canonical hadith collections: Sahih al-Bukhari, Sahih Muslim, Sunan Abi Dawud, Jami’ al-Tirmidhi, and Sunan al-Nasa’i.',
     order: 3,
-    booksCount: 5
+    booksCount: 130
   },
   {
     id: 'cat-tafsir',
@@ -78,7 +78,7 @@ const seedSections = [
     description_ar: 'كتب تفسير القرآن الكريم: تفسير ابن كثير، والقرطبي، والطبري، والبغوي، والشوكاني.',
     description_en: 'Commentaries on the Quran: Ibn Kathir, al-Qurtubi, al-Tabari, al-Baghawi, and al-Shawkani.',
     order: 4,
-    booksCount: 5
+    booksCount: 48
   },
   {
     id: 'cat-stories',
@@ -96,7 +96,7 @@ const seedSections = [
     description_ar: 'كتب الفقه على المذاهب المختلفة.',
     description_en: 'Books on Islamic jurisprudence across different madhhabs.',
     order: 7,
-    booksCount: 0
+    booksCount: 64
   },
   {
     id: 'cat-usul',
@@ -105,7 +105,7 @@ const seedSections = [
     description_ar: 'أصول الفقه وقواعد الاستنباط.',
     description_en: 'Principles of Islamic jurisprudence (usul al-fiqh).',
     order: 8,
-    booksCount: 0
+    booksCount: 18
   },
   {
     id: 'cat-seerah',
@@ -114,7 +114,7 @@ const seedSections = [
     description_ar: 'السيرة النبوية والتاريخ الإسلامي.',
     description_en: 'Prophetic biography and Islamic history.',
     order: 9,
-    booksCount: 0
+    booksCount: 48
   },
   {
     id: 'cat-tarajim',
@@ -123,7 +123,7 @@ const seedSections = [
     description_ar: 'تراجم الرجال والطبقات.',
     description_en: 'Biographies and scholarly ranks.',
     order: 10,
-    booksCount: 0
+    booksCount: 57
   },
   {
     id: 'cat-language',
@@ -132,7 +132,7 @@ const seedSections = [
     description_ar: 'اللغة العربية والنحو والبلاغة.',
     description_en: 'Arabic language, grammar, and rhetoric.',
     order: 11,
-    booksCount: 0
+    booksCount: 28
   },
   {
     id: 'cat-magazines',
@@ -141,7 +141,7 @@ const seedSections = [
     description_ar: 'مجلات ودوريات علمية.',
     description_en: 'Scholarly magazines and periodicals.',
     order: 12,
-    booksCount: 0
+    booksCount: 4
   },
   {
     id: 'cat-general',
@@ -150,7 +150,7 @@ const seedSections = [
     description_ar: 'كتب متنوعة.',
     description_en: 'Miscellaneous books.',
     order: 13,
-    booksCount: 0
+    booksCount: 373
   },
 ];
 
