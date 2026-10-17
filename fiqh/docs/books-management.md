@@ -42,7 +42,7 @@ src/data/books.js
   madhab_en: '',
   description_ar: 'نبذة عن الكتاب',
   description_en: 'Book description',
-  coverImage: '/covers/اسم-الغلاف.svg', // ضع الصورة في public/covers/ أو اتركه null
+  coverImage: '/covers/اسم-الغلاف.svg', // ضع الصورة في public/covers/ (أو استخدم رابط خارجي مثل غلاف archive.org) أو اتركه null
   order: 5,                   // ترتيب ظهور الكتاب في المكتبة
   volumes: [
     // المجلد الأول — مدمج مع التطبيق (يعمل دون إنترنت)
@@ -210,8 +210,7 @@ PDF (وغالبًا توجد مجلدات منفصلة لكل جزء)، اجعل
 
 بدلاً من نسخ الإدخالات يدويًا، يجلب السكربت `scripts/import-archive-account.mjs`
 كل كتب حساب على archive.org: يقرأ وصف كل عنصر، يختار ملف الـ PDF المناسب
-(نسخة `_text.pdf` ذات الطبقة النصية القابلة للبحث إن وُجدت)، ينزّل غلاف العنصر
-إلى `public/covers/`، ثم يضيف إدخال كتاب لكل عنصر إلى `src/data/books.js`.
+(نسخة `_text.pdf` ذات الطبقة النصية القابلة للبحث إن وُجدت)، يستخدم غلاف العنصر من archive.org (عن بُعد)، ولا يحفظه محليًا في `public/covers/`، ثم يضيف إدخال كتاب لكل عنصر إلى `src/data/books.js`.
 
 ```bash
 node scripts/import-archive-account.mjs --uploader freework
@@ -257,7 +256,7 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
 - `muhaqqiq`, `translator`, `publisher`, `edition`, `year`, `language`,
   `category`, `madhab` — optional metadata (empty fields are hidden in the UI).
 - `description_ar` / `description_en` — a short description.
-- `coverImage` — put an image in `public/covers/` and reference it, or keep
+- `coverImage` — put an image in `public/covers/` or use a remote URL (e.g. archive.org services/img), or keep
   `null` for a styled placeholder.
 - `order` — the book's position in the library.
 - `volumes` — the volumes of the book:
@@ -281,7 +280,7 @@ Copy an existing entry from `src/data/books.js` and fill in the fields:
 Instead of copying entries by hand, `scripts/import-archive-account.mjs`
 imports every book of an archive.org account: it reads each item's metadata,
 picks its PDFs (preferring the searchable `_text.pdf` derivative), downloads
-the item cover into `public/covers/`, and appends one book entry per item to
+the item's cover as a remote URL (archive.org services/img), and appends one book entry per item to
 `src/data/books.js`.
 
 ```bash

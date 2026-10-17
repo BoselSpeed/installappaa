@@ -28,7 +28,7 @@ npm run dev        # dev server on http://localhost:3000
 
 ```
 src/
-  data/books.js        the entire library — 29 books / 146 volumes, the only
+  data/books.js        the entire library — 870 books / 4396 volumes, the only
                        file you edit to add or change content
   pages/               14 routed screens
   components/
