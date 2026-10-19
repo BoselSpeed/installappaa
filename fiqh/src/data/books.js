@@ -4482,8 +4482,8 @@ const SEED_BOOKS = [
   },
   {
     id: 'akhsaragmi',
-    title_ar: 'akhsaragmi',
-    title_en: 'akhsaragmi',
+    title_ar: 'المزهرات شرح أخصر المختصرات',
+    title_en: 'المزهرات شرح أخصر المختصرات',
     author_ar: '',
     author_en: '',
     muhaqqiq_ar: '',
