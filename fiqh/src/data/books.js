@@ -18662,8 +18662,8 @@ const SEED_BOOKS = [
   },
   {
     id: 'mnhsolook',
-    title_ar: 'mnhsolook',
-    title_en: 'mnhsolook',
+    title_ar: 'منحة السلوك في شرح تحفة الملوك',
+    title_en: 'منحة السلوك في شرح تحفة الملوك',
     author_ar: '',
     author_en: '',
     muhaqqiq_ar: '',
