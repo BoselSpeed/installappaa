@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
-        name: 'fiqh',
-        short_name: 'fiqh',
-        description: 'fiqh — مكتبة كتب إسلامية، تعمل بدون إنترنت',
+        name: 'تطبيق الفقه',
+        short_name: 'تطبيق الفقه',
+        description: 'موسوعة كتب التوحيد والعقيدة — تعمل بدون إنترنت',
         lang: 'ar',
         dir: 'rtl',
         display: 'standalone',
@@ -98,6 +98,13 @@ export default defineConfig({
   build: {
     outDir: 'fiqh-build',
     sourcemap: false,
-    target: 'es2022',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'pdf-reader': ['pdfjs-dist'],
+          'ocr': ['tesseract.js'],
+        },
+      },
+    },
   },
 })
