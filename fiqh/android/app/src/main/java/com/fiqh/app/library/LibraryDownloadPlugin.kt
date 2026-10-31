@@ -448,8 +448,4 @@ class LibraryDownloadPlugin : Plugin() {
                 )
         )
     }
-
-    companion object {
-        import java.nio.charset.Charsets
-    }
 }
