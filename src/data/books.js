@@ -5092,48 +5092,7 @@ const SEED_BOOKS = [
         downloadUrl: 'https://archive.org/download/20201228_20201228_1245/%D8%AF%D9%8A%D9%88%D8%A7%D9%86%20%D8%A3%D8%AD%D9%85%D8%AF%20%D8%A7%D9%84%D8%BA%D8%B1%D8%A7%D8%A8%D9%84%D9%8A.pdf',
         sizeMb: 5
       }
-    ]
-  },
-  {
-    id: 'a1096n',
-    title_ar: 'ديوان ابن حمديس',
-    title_en: 'ديوان ابن حمديس',
-    author_ar: 'ديوان ابن حمديس pdf',
-    author_en: 'ديوان ابن حمديس pdf',
-    muhaqqiq_ar: '',
-    muhaqqiq_en: '',
-    translator_ar: '',
-    translator_en: '',
-    publisher_ar: '',
-    publisher_en: '',
-    edition_ar: '',
-    edition_en: '',
-    year_ar: '',
-    year_en: '',
-    language_ar: 'العربية',
-    language_en: 'Arabic',
-    category_ar: 'أدب',
-    category_en: 'Adab',
-    madhab_ar: '',
-    madhab_en: '',
-    description_ar:
-      'ديوان ابن حمديس pdf',
-    description_en:
-      'ديوان ابن حمديس pdf',
-    coverImage: null,
-    order: 126,
-    volumes: [
-      {
-        id: 'v1',
-        number: 1,
-        title_ar: 'الكتاب كاملًا',
-        title_en: 'Full Book',
-        bundled: false,
-        pdfUrl: null,
-        downloadUrl: 'https://archive.org/download/a1096n/a1096n.pdf',
-        sizeMb: 5
-      }
-    ]
+    ],
   },
   {
     id: 'diwanqabailsos',
