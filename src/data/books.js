@@ -8662,47 +8662,6 @@ const SEED_BOOKS = [
     ]
   },
   {
-    id: '1-20230703-20230703-1321',
-    title_ar: '‎⁨ديوان الاوفاق والطلاسم ج 1⁩',
-    title_en: '‎⁨ديوان الاوفاق والطلاسم ج 1⁩',
-    author_ar: '',
-    author_en: '',
-    muhaqqiq_ar: '',
-    muhaqqiq_en: '',
-    translator_ar: '',
-    translator_en: '',
-    publisher_ar: '',
-    publisher_en: '',
-    edition_ar: '',
-    edition_en: '',
-    year_ar: '',
-    year_en: '',
-    language_ar: 'العربية',
-    language_en: 'Arabic',
-    category_ar: 'أدب',
-    category_en: 'Adab',
-    madhab_ar: '',
-    madhab_en: '',
-    description_ar:
-      'مجموعة بدر الربيعي',
-    description_en:
-      'مجموعة بدر الربيعي',
-    coverImage: null,
-    order: 260,
-    volumes: [
-      {
-        id: 'v1',
-        number: 1,
-        title_ar: 'الكتاب كاملًا',
-        title_en: 'Full Book',
-        bundled: false,
-        pdfUrl: null,
-        downloadUrl: 'https://archive.org/download/1_20230703_20230703_1321/%E2%80%8E%E2%81%A8%D8%AF%D9%8A%D9%88%D8%A7%D9%86%20%D8%A7%D9%84%D8%A7%D9%88%D9%81%D8%A7%D9%82%20%D9%88%D8%A7%D9%84%D8%B7%D9%84%D8%A7%D8%B3%D9%85%20%D8%AC1%E2%81%A9.pdf',
-        sizeMb: 9.0
-      }
-    ]
-  },
-  {
     id: 'diwanabifarasalhmdany-03',
     title_ar: 'شرح ديوان أبي فراس الحمداني لابن خالويه «حسـب المخطوطة التونسية»',
     title_en: 'شرح ديوان أبي فراس الحمداني لابن خالويه «حسـب المخطوطة التونسية»',
