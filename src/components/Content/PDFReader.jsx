@@ -138,6 +138,9 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
   const tapStateRef = useRef(null);
   const lastTapRef = useRef(0);
   const controlsVisibleRef = useRef(true);
+  // Track if we're currently handling a resize/orientation change to prevent
+  // the IntersectionObserver from switching pages mid-resize.
+  const isResizingRef = useRef(false);
 
   useEffect(() => {
     onPageChangeRef.current = onPageChange;
@@ -279,8 +282,11 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
       if (!el || !doc) return Promise.resolve(scaleRef.current);
       const width = el.clientWidth;
       const height = el.clientHeight || window.innerHeight;
+      // Use the current page's viewport for more accurate scaling, especially
+      // in FIT_PAGE mode where pages can have different aspect ratios.
+      const pageNumber = currentPageRef.current;
       return doc
-        .getPage(1)
+        .getPage(pageNumber)
         .then((page) => {
           const viewport = page.getViewport({ scale: 1 });
           let scale;
@@ -1060,17 +1066,32 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
           scroller && anchorEl
             ? anchorEl.getBoundingClientRect().top - scroller.getBoundingClientRect().top
             : null;
-        computeScale(fitModeRef.current).then((scale) => {
-          scaleRef.current = scale;
-          applySizeStyles();
-          if (scroller && anchorEl && prevTop !== null) {
-            const nowTop = anchorEl.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-            const delta = nowTop - prevTop;
-            if (Math.abs(delta) > 0.5) scroller.scrollTop += delta;
-          }
-          cancelAllRenders();
-          renderVisiblePages();
-        });
+        
+        // Mark that we're resizing to prevent IntersectionObserver from changing page
+        isResizingRef.current = true;
+        
+        computeScale(fitModeRef.current)
+          .then((scale) => {
+            scaleRef.current = scale;
+            applySizeStyles();
+            if (scroller && anchorEl && prevTop !== null) {
+              const nowTop = anchorEl.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+              const delta = nowTop - prevTop;
+              if (Math.abs(delta) > 0.5) scroller.scrollTop += delta;
+            }
+            cancelAllRenders();
+            renderVisiblePages();
+            
+            // Allow IntersectionObserver to update page again after a brief delay
+            // to let the layout settle
+            setTimeout(() => {
+              isResizingRef.current = false;
+            }, 100);
+          })
+          .catch(() => {
+            // Ensure the flag is reset even if computeScale fails
+            isResizingRef.current = false;
+          });
       });
     };
 
@@ -1083,6 +1104,7 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
     return () => {
       cancelAnimationFrame(frame);
       ro.disconnect();
+      isResizingRef.current = false;
     };
   }, [doc, applySizeStyles, computeScale, renderVisiblePages, cancelAllRenders]);
 
@@ -1097,6 +1119,23 @@ const PDFReader = ({ pdfUrl, fileName, storageKey, initialPage, onPageChange, on
 
     const observer = new IntersectionObserver(
       (entries) => {
+        // Skip page tracking during resize/orientation change to prevent
+        // the page from jumping when the container size changes.
+        if (isResizingRef.current) {
+          entries.forEach((entry) => {
+            const pageNumber = Number(entry.target.dataset.page);
+            if (!pageNumber) return;
+            if (entry.isIntersecting) {
+              visible.add(pageNumber);
+              renderPage(pageNumber);
+            } else {
+              visible.delete(pageNumber);
+            }
+          });
+          scheduleRelease();
+          return;
+        }
+
         const rootTop = root.getBoundingClientRect().top;
         entries.forEach((entry) => {
           const pageNumber = Number(entry.target.dataset.page);
