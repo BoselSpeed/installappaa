@@ -17,6 +17,7 @@ const SearchPage = () => {
   const query = searchParams.get('q') || '';
   const [lessonResults, setLessonResults] = useState([]);
   const [sectionResults, setSectionResults] = useState([]);
+  const [bookResults, setBookResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ const SearchPage = () => {
     if (!query) {
       setLessonResults([]);
       setSectionResults([]);
+      setBookResults([]);
       setSearched(false);
       return;
     }
@@ -70,6 +72,17 @@ const SearchPage = () => {
             inText(section.title_ar, section.title_en, section.description_ar, section.description_en)
           )
         );
+
+        // Search books by title, author, description, and category
+        const matchedBooks = allBooks.filter((book) =>
+          inText(
+            book.title_ar, book.title_en,
+            book.author_ar, book.author_en,
+            book.description_ar, book.description_en,
+            book.category_ar, book.category_en
+          )
+        );
+        setBookResults(matchedBooks);
       } catch (error) {
         console.error('Error searching:', error);
       } finally {
@@ -93,8 +106,58 @@ const SearchPage = () => {
         <LoadingState label={t('loading')} />
       ) : (
         <div className="space-y-10 lg:space-y-12">
-          {searched && lessonResults.length === 0 && sectionResults.length === 0 && (
+          {searched && lessonResults.length === 0 && sectionResults.length === 0 && bookResults.length === 0 && (
             <EmptyState icon="inbox" title={t('no_results')} description={t('try_another_search')} />
+          )}
+
+          {bookResults.length > 0 && (
+            <section>
+              <SectionTitle className="mb-4">{t('books')}</SectionTitle>
+              <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
+                {bookResults.map((book) => (
+                  <Card
+                    key={book.id}
+                    as={Link}
+                    to={`/books/${book.id}`}
+                    interactive
+                    className="p-5 focus-visible:border-ink sm:p-6"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-line bg-surface overflow-hidden">
+                        {book.coverImage ? (
+                          <img
+                            src={book.coverImage}
+                            alt={pick(book, 'title')}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.parentElement.innerHTML = '<span class=\'flex h-full w-full items-center justify-center\'><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14\'/><path d=\'M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2\'/><path d=\'M9 9v6\'/><path d=\'M12 9v6\'/><path d=\'M15 9v6\'/></svg></span>';
+                            }}
+                          />
+                        ) : (
+                          <Icon name="book" size="md" />
+                        )}
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="text-base font-bold leading-snug text-ink sm:text-lg">
+                          {highlight(pick(book, 'title'), query)}
+                        </h3>
+                        {book.author_ar || book.author_en ? (
+                          <p className="mt-0.5 text-xs text-ink-muted">
+                            {pick(book, 'author')}
+                          </p>
+                        ) : null}
+                        <p className="mt-1 line-clamp-2 text-xs text-ink-muted">
+                          {highlight(pick(book, 'description'), query)}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </section>
           )}
 
           {lessonResults.length > 0 && (

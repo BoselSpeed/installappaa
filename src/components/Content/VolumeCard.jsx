@@ -9,6 +9,7 @@ import { ProgressBar } from '../UI/ProgressBar';
 import { Icon } from '../UI/Icon';
 import { Spinner } from '../UI/Spinner';
 import { cn } from '../../utils/cn';
+import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 
 const VolumeTocModal = lazy(() =>
   import('./VolumeTocModal').then((m) => ({ default: m.VolumeTocModal }))
@@ -36,14 +37,28 @@ const StatusMark = ({ tone, icon, label }) => (
 const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
   const { t } = useTranslation();
   const { pick } = useLocalized();
+  const isOnline = useOnlineStatus();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [tocOpen, setTocOpen] = useState(false);
+  const [coverSrc, setCoverSrc] = useState(null);
   // Last page the reader stopped at for this volume, read once on mount so the
   // card can offer to resume instead of starting over.
   const [savedPage, setSavedPage] = useState(null);
 
   const storageKey = `${book.id}--${volume.id}`;
   const localVolume = state.bundled || state.downloaded;
+
+  // Fetch the cover image when online and a cover URL is available.
+  useEffect(() => {
+    if (!isOnline) {
+      setCoverSrc(null);
+      return;
+    }
+    const coverUrl = book?.coverImage || volume?.coverImage;
+    if (coverUrl) {
+      setCoverSrc(coverUrl);
+    }
+  }, [isOnline, book?.coverImage, volume?.coverImage]);
 
   useEffect(() => {
     if (!localVolume) return;
@@ -213,7 +228,18 @@ const VolumeCard = ({ book, volume, state, onDownload, onDelete }) => {
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
           <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink-muted">
-            <Icon name="book" size="md" />
+            {coverSrc ? (
+              <img
+                src={coverSrc}
+                alt={title}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full rounded-xl object-cover"
+                onError={() => setCoverSrc(null)}
+              />
+            ) : (
+              <Icon name="book" size="md" />
+            )}
           </span>
           <div className="min-w-0">
             <h3 className="text-base font-bold leading-snug text-ink sm:text-lg">{title}</h3>

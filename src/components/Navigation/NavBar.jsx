@@ -3,6 +3,7 @@ import { useAppSettings } from '../../hooks/useAppSettings';
 import { Logo } from '../UI/Logo';
 import { LanguageToggle } from '../UI/LanguageToggle';
 import { Icon } from '../UI/Icon';
+import { SearchBar } from '../UI/SearchBar';
 
 const NavBar = () => {
   const { t } = useAppSettings();
@@ -10,7 +11,7 @@ const NavBar = () => {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/80">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-3">
+        <div className="flex h-16 items-center gap-3">
           <Link
             to="/"
             className="group flex min-h-[44px] items-center gap-2.5 text-ink"
@@ -19,6 +20,10 @@ const NavBar = () => {
             <Logo className="h-7 w-7 transition-colors duration-200 group-hover:text-ink-soft" />
             <span className="text-base font-bold whitespace-nowrap sm:text-lg">{t('app_name')}</span>
           </Link>
+
+          <div className="flex-1 max-w-md mx-auto px-2">
+            <SearchBar placeholder={t('search_placeholder')} />
+          </div>
 
           <div className="flex items-center gap-1">
             <Link
