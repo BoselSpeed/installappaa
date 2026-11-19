@@ -29,7 +29,7 @@ const DEMO_USER = { uid: 'demo-user', email: 'demo@fiqh.app' };
 
 // Bump this whenever the seeded content changes so returning users get the
 // new demo data instead of a stale localStorage copy.
-const SEED_VERSION = 'sections-v8';
+const SEED_VERSION = 'sections-v9';
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -41,13 +41,76 @@ const SEED_VERSION = 'sections-v8';
 // page rather than to a section page.
 const seedSections = [
   {
-    id: 'adab',
-    title_ar: 'أدب',
-    title_en: 'Adab',
-    description_ar: ' كتب الأدب والشعر والبلاغة العربية: دواوين الشعر الجاهلي، المعلقات، كتب البلاغة، وكتب الأدب الكلاسيكية.',
-    description_en: 'Books of Arabic literature, poetry, and rhetoric: pre-Islamic poetry diwans, the Mu\'allaqat, rhetoric works, and classical literary texts.',
+    id: 'adab-diaries',
+    title_ar: 'الدواوين الشعرية',
+    title_en: 'Poetry Diwans',
+    description_ar: 'دواوين الشعراء العرب: ديوان الحماسة، ديوان المتنبي، ديوان الشافعي، ديوان بشار بن برد، وغيرهم من كبار الشعراء.',
+    description_en: 'Diwans of Arab poets: Diwan al-Hamasa, Diwan al-Mutanabbi, Diwan al-Shafi\'i, Diwan Bashshar ibn Burd, and other major poets.',
     order: 1,
-    booksCount: 14
+    booksCount: 30
+  },
+  {
+    id: 'adab-balagha',
+    title_ar: 'البلاغة والنقد',
+    title_en: 'Rhetoric & Criticism',
+    description_ar: 'كتب البلاغة العربية وعلومها: المعاني، البيان، البديع، والنقد الأدبي — الكافي في البلاغة، المختصر، جواهر البلاغة، البلاغة الواضحة، البلاغة تطور وتاريخ.',
+    description_en: 'Arabic rhetoric works: meanings, expression, embellishment, and literary criticism — Al-Kafi, Al-Mukhtasar, Jawahir al-Balagha, Al-Balagha al-Wadiha, Al-Balagha Tatawwur wa Tarikh.',
+    order: 2,
+    booksCount: 10
+  },
+  {
+    id: 'adab-anthologies',
+    title_ar: 'المجموعات والأنثولوجيات الشعرية',
+    title_en: 'Poetry Collections & Anthologies',
+    description_ar: 'المجموعات الشعرية الكبرى: المفضليات، الأصمعيات، المعلقات السبع، جمهرة أشعار العرب، مختارات الشعر الجاهلي، ودواوين الشعراء الستة.',
+    description_en: 'Major poetry anthologies: Al-Mufaddaliyat, Al-Asma\'iyyat, Al-Mu\'allaqat al-Sab\', Jamharat Ash\'ar al-Arab, Mukhtarat al-Shi\'r al-Jahili, and the Six Poets\' Diwans.',
+    order: 3,
+    booksCount: 8
+  },
+  {
+    id: 'adab-tribes',
+    title_ar: 'القبائل والأنساب',
+    title_en: 'Tribes & Genealogy',
+    description_ar: 'موسوعات القبائل العربية وأنسابها وأخبارها وأشعارها — موسوعة القبائل العربية (12 مجلداً).',
+    description_en: 'Encyclopedias of Arab tribes, their lineages, histories, and poetry — Mawsu\'at al-Qaba\'il al-Arabiyya (12 volumes).',
+    order: 4,
+    booksCount: 1
+  },
+  {
+    id: 'adab-commentaries',
+    title_ar: 'الشروح والتعليقات',
+    title_en: 'Commentaries & Explanations',
+    description_ar: 'الشروح على الدواوين والكتب الأدبية: شرح ديوان الحماسة للمرزوقي، شرح ديوان أبي فراس، شرح لامية العرب، شرح ديوان ذي الرمة.',
+    description_en: 'Commentaries on diwans and literary works: Sharh Diwan al-Hamasa by al-Marzuqi, Sharh Diwan Abi Firas, Sharh Lamiyat al-Arab, Sharh Diwan Dhi al-Rumma.',
+    order: 5,
+    booksCount: 8
+  },
+  {
+    id: 'adab-maghribi',
+    title_ar: 'الأدب المغربي والأندلسي',
+    title_en: 'Maghrebi & Andalusian Literature',
+    description_ar: 'آداب المغرب والأندلس: الملحون، ديوان الأمير عبد القادر، ديوان محمد العيد آل خليفة، ديوان إدريس السناني، وأدب الهذليين.',
+    description_en: 'Literature of the Maghreb and Al-Andalus: Al-Malhun, Diwan of Amir Abd al-Qadir, Diwan of Muhammad al-\'Id al-Khalifa, Diwan of Idris al-Sanani, and Hudhali poetry.',
+    order: 6,
+    booksCount: 10
+  },
+  {
+    id: 'adab-mystical',
+    title_ar: 'الأدب الصوفي والعرفاني',
+    title_en: 'Mystical & Gnosis Literature',
+    description_ar: 'الشعر الصوفي والأدب العرفاني: ديوان ابن الفارض، ديوان الحلاج، ديوان يونس أمره، والأدب الروحي.',
+    description_en: 'Sufi poetry and gnostic literature: Diwan Ibn al-Farid, Diwan al-Hallaj, Diwan Yunus Emre, and spiritual literature.',
+    order: 7,
+    booksCount: 5
+  },
+  {
+    id: 'adab-modern',
+    title_ar: 'الأدب الحديث والمعاصر',
+    title_en: 'Modern & Contemporary Literature',
+    description_ar: 'الأدب العربي الحديث: ديوان شوقي، ديوان حافظ الشيرازي (معرب)، ديوان الزنادقة، ومجالس أدبية في ديوان المتنبي.',
+    description_en: 'Modern Arabic literature: Diwan Shawqi, Diwan Hafiz Shirazi (Arabic), Diwan al-Zanadiqa, and literary councils on Diwan al-Mutanabbi.',
+    order: 8,
+    booksCount: 8
   },
   // Category entries. A section whose id is not a book id is treated as a
   // category browser: SectionsPage links it to /books?category=<title_ar>, so
@@ -59,7 +122,7 @@ const seedSections = [
     title_en: 'Tawhid and Aqeedah',
     description_ar: 'كتب العقيدة والتوحيد: العقيدة الواسطية، كتاب التوحيد، متن الأصول الثلاثة، وكشف الشبهات — مباني الدين وأصول الإيمان.',
     description_en: 'Works on Aqeedah and Tawhid: Al-Aqidah al-Wasitiyyah, Kitab al-Tawhid, Thalathat al-Usul, and Kashf al-Shubuhat — the foundations of the religion and of faith.',
-    order: 2,
+    order: 9,
     booksCount: 4
   },
   {
@@ -67,8 +130,8 @@ const seedSections = [
     title_ar: 'الحديث',
     title_en: 'Hadith',
     description_ar: 'دواوين السنة: صحيح البخاري، صحيح مسلم، سنن أبي داود، سنن الترمذي، وسنن النسائي.',
-    description_en: 'The canonical hadith collections: Sahih al-Bukhari, Sahih Muslim, Sunan Abi Dawud, Jami’ al-Tirmidhi, and Sunan al-Nasa’i.',
-    order: 3,
+    description_en: 'The canonical hadith collections: Sahih al-Bukhari, Sahih Muslim, Sunan Abi Dawud, Jami\' al-Tirmidhi, and Sunan al-Nasa\'i.',
+    order: 10,
     booksCount: 5
   },
   {
@@ -77,7 +140,7 @@ const seedSections = [
     title_en: 'Tafsir',
     description_ar: 'كتب تفسير القرآن الكريم: تفسير ابن كثير، والقرطبي، والطبري، والبغوي، والشوكاني.',
     description_en: 'Commentaries on the Quran: Ibn Kathir, al-Qurtubi, al-Tabari, al-Baghawi, and al-Shawkani.',
-    order: 4,
+    order: 11,
     booksCount: 5
   },
   {
@@ -86,7 +149,7 @@ const seedSections = [
     title_en: 'Stories',
     description_ar: 'قصص مختارة من صحيح البخاري بأسلوب مبسط مناسب للناشئة، ترسيخًا لقيم السنة ومعانيها.',
     description_en: 'Selected stories from Sahih al-Bukhari in a simple style suited for young readers, instilling the values and meanings of the Sunnah.',
-    order: 5,
+    order: 12,
     booksCount: 1
   }
 ];
