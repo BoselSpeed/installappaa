@@ -12789,20 +12789,56 @@ const SEED_BOOKS = [
       'A book by Imam Malik ibn Anas, one of the oldest and most authentic hadith books, collecting Prophetic narrations, Companions and Successors reports, and the fiqh of the people of Medina.',
     coverImage: '/covers/al-muwatta.jpg',
     order: 310,
-    source: {
-      type: 'zip',
-      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=7'
-    },
     volumes: [
       {
         id: 'v1',
         number: 1,
-        title_ar: 'الكتاب كاملًا',
-        title_en: 'Full Book',
+        title_ar: 'المجلد ١',
+        title_en: 'Volume 1',
         bundled: false,
         pdfUrl: null,
-        downloadUrl: null,
-        sizeMb: 0
+        downloadUrl: 'https://archive.org/download/AlMuwatae/MuwataeVol.1_text.pdf',
+        sizeMb: 4
+      },
+      {
+        id: 'v2',
+        number: 2,
+        title_ar: 'المجلد ٢',
+        title_en: 'Volume 2',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://archive.org/download/AlMuwatae/MuwataeVol.2_text.pdf',
+        sizeMb: 4
+      },
+      {
+        id: 'v3',
+        number: 3,
+        title_ar: 'المجلد ٣',
+        title_en: 'Volume 3',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://archive.org/download/AlMuwatae/MuwataeVol.3_text.pdf',
+        sizeMb: 4
+      },
+      {
+        id: 'v4',
+        number: 4,
+        title_ar: 'المجلد ٤',
+        title_en: 'Volume 4',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://archive.org/download/AlMuwatae/MuwataeVol.4_text.pdf',
+        sizeMb: 3
+      },
+      {
+        id: 'v5',
+        number: 5,
+        title_ar: 'المجلد ٥',
+        title_en: 'Volume 5',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: 'https://archive.org/download/AlMuwatae/MuwataeVol.5_text.pdf',
+        sizeMb: 3
       }
     ]
   },
@@ -12834,21 +12870,57 @@ const SEED_BOOKS = [
       'One of the largest books of the Sunnah, compiled by Imam Ahmad ibn Hanbal al-Shaybani, arranged by the names of the Companions who narrate the hadiths, containing about forty thousand hadiths.',
     coverImage: '/covers/musnad-imam-ahmad.jpg',
     order: 311,
-    source: {
-      type: 'zip',
-      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=6'
-    },
     volumes: [
-      {
-        id: 'v1',
-        number: 1,
-        title_ar: 'الكتاب كاملًا',
-        title_en: 'Full Book',
-        bundled: false,
-        pdfUrl: null,
-        downloadUrl: null,
-        sizeMb: 0
-      }
+      { id: 'v1', number: 1, title_ar: 'الجزء ١', title_en: 'Part 1', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_01.pdf', sizeMb: 9 },
+      { id: 'v2', number: 2, title_ar: 'الجزء ٢', title_en: 'Part 2', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_02.pdf', sizeMb: 8 },
+      { id: 'v3', number: 3, title_ar: 'الجزء ٣', title_en: 'Part 3', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_03.pdf', sizeMb: 9 },
+      { id: 'v4', number: 4, title_ar: 'الجزء ٤', title_en: 'Part 4', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_04.pdf', sizeMb: 8 },
+      { id: 'v5', number: 5, title_ar: 'الجزء ٥', title_en: 'Part 5', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_05.pdf', sizeMb: 8 },
+      { id: 'v6', number: 6, title_ar: 'الجزء ٦', title_en: 'Part 6', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_06.pdf', sizeMb: 7 },
+      { id: 'v7', number: 7, title_ar: 'الجزء ٧', title_en: 'Part 7', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_07.pdf', sizeMb: 7 },
+      { id: 'v8', number: 8, title_ar: 'الجزء ٨', title_en: 'Part 8', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_08.pdf', sizeMb: 8 },
+      { id: 'v9', number: 9, title_ar: 'الجزء ٩', title_en: 'Part 9', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_09.pdf', sizeMb: 8 },
+      { id: 'v10', number: 10, title_ar: 'الجزء ١٠', title_en: 'Part 10', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_10.pdf', sizeMb: 12 },
+      { id: 'v11', number: 11, title_ar: 'الجزء ١١', title_en: 'Part 11', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_11.pdf', sizeMb: 10 },
+      { id: 'v12', number: 12, title_ar: 'الجزء ١٢', title_en: 'Part 12', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_12.pdf', sizeMb: 9 },
+      { id: 'v13', number: 13, title_ar: 'الجزء ١٣', title_en: 'Part 13', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_13.pdf', sizeMb: 9 },
+      { id: 'v14', number: 14, title_ar: 'الجزء ١٤', title_en: 'Part 14', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_14.pdf', sizeMb: 9 },
+      { id: 'v15', number: 15, title_ar: 'الجزء ١٥', title_en: 'Part 15', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_15.pdf', sizeMb: 10 },
+      { id: 'v16', number: 16, title_ar: 'الجزء ١٦', title_en: 'Part 16', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_16.pdf', sizeMb: 8 },
+      { id: 'v17', number: 17, title_ar: 'الجزء ١٧', title_en: 'Part 17', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_17.pdf', sizeMb: 7 },
+      { id: 'v18', number: 18, title_ar: 'الجزء ١٨', title_en: 'Part 18', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_18.pdf', sizeMb: 8 },
+      { id: 'v19', number: 19, title_ar: 'الجزء ١٩', title_en: 'Part 19', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_19.pdf', sizeMb: 8 },
+      { id: 'v20', number: 20, title_ar: 'الجزء ٢٠', title_en: 'Part 20', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_20.pdf', sizeMb: 8 },
+      { id: 'v21', number: 21, title_ar: 'الجزء ٢١', title_en: 'Part 21', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_21.pdf', sizeMb: 8 },
+      { id: 'v22', number: 22, title_ar: 'الجزء ٢٢', title_en: 'Part 22', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_22.pdf', sizeMb: 7 },
+      { id: 'v23', number: 23, title_ar: 'الجزء ٢٣', title_en: 'Part 23', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_23.pdf', sizeMb: 8 },
+      { id: 'v24', number: 24, title_ar: 'الجزء ٢٤', title_en: 'Part 24', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_24.pdf', sizeMb: 9 },
+      { id: 'v25', number: 25, title_ar: 'الجزء ٢٥', title_en: 'Part 25', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_25.pdf', sizeMb: 7 },
+      { id: 'v26', number: 26, title_ar: 'الجزء ٢٦', title_en: 'Part 26', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_26.pdf', sizeMb: 6 },
+      { id: 'v27', number: 27, title_ar: 'الجزء ٢٧', title_en: 'Part 27', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_27.pdf', sizeMb: 11 },
+      { id: 'v28', number: 28, title_ar: 'الجزء ٢٨', title_en: 'Part 28', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_28.pdf', sizeMb: 10 },
+      { id: 'v29', number: 29, title_ar: 'الجزء ٢٩', title_en: 'Part 29', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_29.pdf', sizeMb: 11 },
+      { id: 'v30', number: 30, title_ar: 'الجزء ٣٠', title_en: 'Part 30', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_30.pdf', sizeMb: 9 },
+      { id: 'v31', number: 31, title_ar: 'الجزء ٣١', title_en: 'Part 31', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_31.pdf', sizeMb: 10 },
+      { id: 'v32', number: 32, title_ar: 'الجزء ٣٢', title_en: 'Part 32', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_32.pdf', sizeMb: 8 },
+      { id: 'v33', number: 33, title_ar: 'الجزء ٣٣', title_en: 'Part 33', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_33.pdf', sizeMb: 9 },
+      { id: 'v34', number: 34, title_ar: 'الجزء ٣٤', title_en: 'Part 34', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_34.pdf', sizeMb: 9 },
+      { id: 'v35', number: 35, title_ar: 'الجزء ٣٥', title_en: 'Part 35', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_35.pdf', sizeMb: 12 },
+      { id: 'v36', number: 36, title_ar: 'الجزء ٣٦', title_en: 'Part 36', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_36.pdf', sizeMb: 9 },
+      { id: 'v37', number: 37, title_ar: 'الجزء ٣٧', title_en: 'Part 37', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_37.pdf', sizeMb: 10 },
+      { id: 'v38', number: 38, title_ar: 'الجزء ٣٨', title_en: 'Part 38', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_38.pdf', sizeMb: 9 },
+      { id: 'v39', number: 39, title_ar: 'الجزء ٣٩', title_en: 'Part 39', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_39.pdf', sizeMb: 9 },
+      { id: 'v40', number: 40, title_ar: 'الجزء ٤٠', title_en: 'Part 40', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_40.pdf', sizeMb: 9 },
+      { id: 'v41', number: 41, title_ar: 'الجزء ٤١', title_en: 'Part 41', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_41.pdf', sizeMb: 8 },
+      { id: 'v42', number: 42, title_ar: 'الجزء ٤٢', title_en: 'Part 42', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_42.pdf', sizeMb: 7 },
+      { id: 'v43', number: 43, title_ar: 'الجزء ٤٣', title_en: 'Part 43', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_43.pdf', sizeMb: 11 },
+      { id: 'v44', number: 44, title_ar: 'الجزء ٤٤', title_en: 'Part 44', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_44.pdf', sizeMb: 8 },
+      { id: 'v45', number: 45, title_ar: 'الجزء ٤٥', title_en: 'Part 45', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_45.pdf', sizeMb: 8 },
+      { id: 'v46', number: 46, title_ar: 'الجزء ٤٦', title_en: 'Part 46', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_46.pdf', sizeMb: 9 },
+      { id: 'v47', number: 47, title_ar: 'الجزء ٤٧', title_en: 'Part 47', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_47.pdf', sizeMb: 9 },
+      { id: 'v48', number: 48, title_ar: 'الجزء ٤٨', title_en: 'Part 48', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_48.pdf', sizeMb: 8 },
+      { id: 'v49', number: 49, title_ar: 'الجزء ٤٩', title_en: 'Part 49', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_49.pdf', sizeMb: 12 },
+      { id: 'v50', number: 50, title_ar: 'الجزء ٥٠', title_en: 'Part 50', bundled: false, pdfUrl: null, downloadUrl: 'https://archive.org/download/musnadahmed/ahmd_50.pdf', sizeMb: 10 }
     ]
   },
   {
@@ -12879,10 +12951,6 @@ const SEED_BOOKS = [
       'A book on creed and tawhid attributed to Imam Abu Hanifa al-Nu\'man, founder of the Hanafi school, containing discussions on names and attributes, faith, and creed.',
     coverImage: '/covers/fiqh-al-akbar.jpg',
     order: 312,
-    source: {
-      type: 'zip',
-      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=103'
-    },
     volumes: [
       {
         id: 'v1',
@@ -12891,8 +12959,8 @@ const SEED_BOOKS = [
         title_en: 'Full Book',
         bundled: false,
         pdfUrl: null,
-        downloadUrl: null,
-        sizeMb: 0
+        downloadUrl: 'https://archive.org/download/Fiqh-ul-Akbar/Al%20Fiqh%20ul%20Akbar_Arabic.pdf',
+        sizeMb: 2
       }
     ]
   },
