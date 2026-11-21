@@ -12761,6 +12761,231 @@ const SEED_BOOKS = [
       }
     ]
   },
+  {
+    id: 'al-muwatta',
+    title_ar: 'الموطأ',
+    title_en: 'Al-Muwatta',
+    author_ar: 'مالك بن أنس',
+    author_en: 'Malik ibn Anas',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'حديث',
+    category_en: 'Hadith',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'كتاب من تأليف الإمام مالك بن أنس، وهو من أقدم وأصح كتب الحديث، جمع فيه الأحاديث النبوية وآثار الصحابة والتابعين وفقه أهل المدينة.',
+    description_en:
+      'A book by Imam Malik ibn Anas, one of the oldest and most authentic hadith books, collecting Prophetic narrations, Companions and Successors reports, and the fiqh of the people of Medina.',
+    coverImage: '/covers/al-muwatta.jpg',
+    order: 310,
+    source: {
+      type: 'zip',
+      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=7'
+    },
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: null,
+        sizeMb: 0
+      }
+    ]
+  },
+  {
+    id: 'musnad-imam-ahmad',
+    title_ar: 'مسند الإمام أحمد بن حنبل',
+    title_en: 'Musnad Imam Ahmad ibn Hanbal',
+    author_ar: 'أحمد بن حنبل',
+    author_en: 'Ahmad ibn Hanbal',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'حديث',
+    category_en: 'Hadith',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'أوسع كتب السنة النبوية، صنّفه الإمام أحمد بن حنبل الشيباني، مرتب على أسماء الصحابة الذين يروون الأحاديث، يبلغ عدد أحاديثه أربعين ألفًا تقريبًا.',
+    description_en:
+      'One of the largest books of the Sunnah, compiled by Imam Ahmad ibn Hanbal al-Shaybani, arranged by the names of the Companions who narrate the hadiths, containing about forty thousand hadiths.',
+    coverImage: '/covers/musnad-imam-ahmad.jpg',
+    order: 311,
+    source: {
+      type: 'zip',
+      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=6'
+    },
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: null,
+        sizeMb: 0
+      }
+    ]
+  },
+  {
+    id: 'fiqh-al-akbar',
+    title_ar: 'الفقه الأكبر',
+    title_en: 'Al-Fiqh al-Akbar',
+    author_ar: 'الإمام أبو حنيفة النعمان',
+    author_en: 'Imam Abu Hanifa al-Nu\'man',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'حديث',
+    category_en: 'Hadith',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'كتاب في العقيدة والتوحيد منسوب للإمام أبي حنيفة النعمان، مؤسس المذهب الحنفي، يحتوي على مباحث في الأسماء والصفات والإيمان والإسرة.',
+    description_en:
+      'A book on creed and tawhid attributed to Imam Abu Hanifa al-Nu\'man, founder of the Hanafi school, containing discussions on names and attributes, faith, and creed.',
+    coverImage: '/covers/fiqh-al-akbar.jpg',
+    order: 312,
+    source: {
+      type: 'zip',
+      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=103'
+    },
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: null,
+        sizeMb: 0
+      }
+    ]
+  },
+  {
+    id: 'al-mabsut-sarakhsi',
+    title_ar: 'المبسوط',
+    title_en: 'Al-Mabsut',
+    author_ar: 'محمد بن أحمد السرخسي',
+    author_en: 'Muhammad ibn Ahmad al-Sarakhsi',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'فقه',
+    category_en: 'Fiqh',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'كتاب في الفقه الحنفي، من تأليف الإمام السرخسي، يعتبر من أكبر وأشهر كتب المذهب الحنفي، يتناول أبوابات الفقه المختلفة بأدلتها وأقوال العلماء.',
+    description_en:
+      'A Hanafi fiqh book by Imam al-Sarakhsi, considered one of the largest and most famous books of the Hanafi school, addressing various fiqh chapters with their evidences and scholars\' opinions.',
+    coverImage: '/covers/al-mabsut.jpg',
+    order: 313,
+    source: {
+      type: 'zip',
+      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=103'
+    },
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: null,
+        sizeMb: 0
+      }
+    ]
+  },
+  {
+    id: 'al-hidayah',
+    title_ar: 'الهداية',
+    title_en: 'Al-Hidayah',
+    author_ar: 'برهان الدين المرغيناني',
+    author_en: 'Burhan al-Din al-Marghinani',
+    muhaqqiq_ar: '',
+    muhaqqiq_en: '',
+    translator_ar: '',
+    translator_en: '',
+    publisher_ar: '',
+    publisher_en: '',
+    edition_ar: '',
+    edition_en: '',
+    year_ar: '',
+    year_en: '',
+    language_ar: 'العربية',
+    language_en: 'Arabic',
+    category_ar: 'فقه',
+    category_en: 'Fiqh',
+    madhab_ar: '',
+    madhab_en: '',
+    description_ar:
+      'كتاب في الفقه الحنفي، من تأليف الإمام برهان الدين المرغيناني، من أشهر وأعمق كتب المذهب الحنفي، يعتمد عليه في الفتوى والتدريس.',
+    description_en:
+      'A Hanafi fiqh book by Imam Burhan al-Din al-Marghinani, one of the most famous and profound books of the Hanafi school, relied upon for fatwa and teaching.',
+    coverImage: '/covers/al-hidayah.jpg',
+    order: 314,
+    source: {
+      type: 'zip',
+      pageUrl: 'https://www.islamweb.net/ar/library/index.php?ID=103'
+    },
+    volumes: [
+      {
+        id: 'v1',
+        number: 1,
+        title_ar: 'الكتاب كاملًا',
+        title_en: 'Full Book',
+        bundled: false,
+        pdfUrl: null,
+        downloadUrl: null,
+        sizeMb: 0
+      }
+    ]
+  },
 
 ];
 
